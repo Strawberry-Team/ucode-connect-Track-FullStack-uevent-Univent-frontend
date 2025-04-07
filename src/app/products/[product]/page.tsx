@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import LogoImage from "@/assets/logo_white.png";
 import TicketActions from "@/components/card/TicketActions";
+import NotificationsBlock from "@/components/notification/NotificationsBlock";
 
 export default async function PageCard({params}: { params: Promise<{ product: string }> }) {
     const resolvedParams = await params;
@@ -29,6 +30,23 @@ export default async function PageCard({params}: { params: Promise<{ product: st
         company: "Eventify Inc.",
         price: `${id * 10}.00 - ${id * 20}.00 $`,
         image: LogoImage.src,
+        notifications: [
+            {
+                title: "Event Schedule Updated",
+                description: "We’ve updated the schedule for Event ${id}. Check out the new timings for workshops and performances.",
+                date: "March 10th, 2025",
+            },
+            {
+                title: "Special Guest Announced",
+                description: "We’re excited to announce a special guest for Event ${id}! Join us to meet a famous artist.",
+                date: "March 5th, 2025",
+            },
+            {
+                title: "Early Bird Tickets Sold Out",
+                description: "Early bird tickets for Event ${id} are sold out. Regular tickets are still available!",
+                date: "March 1st, 2025",
+            },
+        ],
     };
 
     if (isNaN(id) || id < 1) {
@@ -46,10 +64,10 @@ export default async function PageCard({params}: { params: Promise<{ product: st
                         alt={ticketData.title}
                         width={384}
                         height={384}
-                        className="h-96 w-full object-contain rounded-t-lg md:rounded-l-lg md:rounded-t-none"
+                        className="h-96 w-full object-contain"
                     />
                 </div>
-                <div className="p-6 flex-1 flex flex-col gap-4">
+                <div className="px-6 flex-1 flex flex-col gap-4">
                     {/* Заголовок */}
                     <h1 className="text-3xl font-bold text-gray-800">{ticketData.title}</h1>
 
@@ -97,23 +115,25 @@ export default async function PageCard({params}: { params: Promise<{ product: st
                         </div>
                     </div>
 
-                    {/* Описание */}
-                    <p className="text-gray-600 text-lg leading-relaxed mt-2">
-                        {ticketData.description}
-                    </p>
-
                     {/* Цена */}
-                    <div className="mt-4">
+                    <div className="mt-2">
                         <span className="text-2xl font-semibold text-gray-900">
                             {ticketData.price}
                         </span>
                     </div>
 
                     {/* Кнопка Buy */}
-                    <div className="mt-6">
+                    <div className="">
                         <TicketActions title={ticketData.title} price={ticketData.price}/>
                     </div>
                 </div>
+            </div>
+            <NotificationsBlock notifications={ticketData.notifications} />
+            {/* Описание */}
+            <div className="mt-8 border-t">
+                <p className="mb-2 my-6 text-gray-600 text-lg leading-relaxed">
+                    {ticketData.description}
+                </p>
             </div>
         </div>
     );

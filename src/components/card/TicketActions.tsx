@@ -14,7 +14,7 @@ export default function TicketActions({ title, price }: TicketActionsProps) {
 
     return (
         <Button
-            className="mt-4 w-full md:w-auto"
+            className="text-[16px] py-5 px-7 rounded-full font-medium mt-1 w-[250px]"
             onClick={handleBuy}
         >
             Buy

@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import LogoImage from "@/assets/logo_white.png";
 import { Card, CardContent } from "@/components/ui/card";
-import {CalendarDays, Guitar, MapPinned, Palette} from "lucide-react";
+import {CalendarDays, Guitar, MapPinned, Palette, Tag} from "lucide-react";
 
 interface ProductCardProps {
     index: number;
@@ -37,6 +37,11 @@ const ProductCard = ({ index }: ProductCardProps) => {
                         Ticket {index + 1}
                     </h3>
                     <div className="flex flex-col gap-1 text-gray-700">
+
+                        <p className="text-sm font-medium flex items-center gap-1">
+                            <Tag strokeWidth={2.5} className="w-4 h-4"/>
+                            Concert • Nauka, Isskusstvo
+                        </p>
                         <p className="text-sm font-medium flex items-center gap-1">
                             <Guitar strokeWidth={2.5} className="w-4 h-4" /> Concert
                             <Palette strokeWidth={2.5} className="w-4 h-4" /> Nauka, Isskusstvo
