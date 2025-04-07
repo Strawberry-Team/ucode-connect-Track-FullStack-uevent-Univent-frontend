@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import CustomToolbarFullCalendar from "@/components/header/CustomToolbarFullCalendar";
 import React from "react";
+import ScrollToTopButton from "@/components/ui/scroll-to-top-button";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,6 +30,7 @@ export default function RootLayout({
         <body>
             <CustomToolbarFullCalendar />
             <main>{children}</main>
+            <ScrollToTopButton />
         </body>
     </html>
   );

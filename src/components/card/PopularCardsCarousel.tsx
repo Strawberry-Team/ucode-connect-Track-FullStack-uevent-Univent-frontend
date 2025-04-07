@@ -1,5 +1,7 @@
 "use client"; // Указываем, что это клиентский компонент
 
+import Image from "next/image";
+import {CalendarDays, Guitar, MapPinned, Palette} from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,7 +18,7 @@ const PopularCardsCarousel = () => {
     const totalSlides: number = popularCards.length;
     const isProcessingRef = useRef<boolean>(false);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
-    const router = useRouter(); // Используем useRouter вместо useNavigate
+    const router = useRouter();
 
     // Автоматическое переключение каждые 5 секунд
     useEffect(() => {
@@ -66,10 +68,10 @@ const PopularCardsCarousel = () => {
         setIsPaused(false);
     };
 
-    // Обработчик клика на карточку
+
     const handleCardClick = (index: number) => {
         router.push(
-            `/ticket/${index + 1}?title=Ticket ${index + 1}&date=March 16th, 2025 10:00&description=Hello everyone, I invite you to my cool concert, I'm waiting for everyone ${index + 1}&price=${(index + 1) * 10}.00 - ${(index + 1) * 20}.00 $&image=${encodeURIComponent(LogoImage.src)}`
+            `/products/${index + 1}`
         );
     };
 
@@ -119,20 +121,33 @@ const PopularCardsCarousel = () => {
                             className="w-full h-[400px] relative border-none cursor-pointer"
                             onClick={() => handleCardClick(3)} // Индекс 3 для Ticket 4
                         >
-                            <div
-                                className="absolute inset-0 bg-cover bg-center bg-no-repeat brightness-50 group-hover:brightness-65 transition-all duration-300"
-                                style={{
-                                    backgroundImage: `url(${Solo.src})`,
-                                }}
+                            <Image
+                                src={Solo}
+                                alt={`Ticket 4`}
+                                layout="fill"
+                                objectFit="cover"
+                                className="absolute inset-0 brightness-50 group-hover:brightness-65 transition-all duration-300"
                             />
                             <CardContent className="relative h-full flex items-center justify-between p-8">
-                                <div className="flex flex-col gap-2 text-white max-w-[50%]">
-                                    <h3 className="text-2xl font-bold">Ticket 4</h3>
-                                    <p className="text-[16px]">March 16th, 2025 10:00</p>
-                                    <p className="text-lg">
-                                        Hello everyone, I invite you to my cool concert, I'm waiting for everyone 4
+                                <div className="flex flex-col gap-3 text-white max-w-[50%]">
+                                    <h3 className="text-2xl font-bold">
+                                        Ticket 4
+                                    </h3>
+                                    <div className="flex flex-col gap-2">
+                                        <p className="text-base flex items-center gap-1.5">
+                                            <Guitar strokeWidth={2} className="w-4 h-4 text-white" /> Concert
+                                            <Palette strokeWidth={2} className="w-4 h-4 text-white" /> Nauka, Isskusstvo
+                                        </p>
+                                        <p className="text-base flex items-center gap-1.5">
+                                            <CalendarDays strokeWidth={2} className="w-4 h-4 text-white" /> March 16th, 2025, 10:00
+                                        </p>
+                                        <p className="text-base flex items-center gap-1.5">
+                                            <MapPinned strokeWidth={2} className="w-4 h-4 text-white" /> Lviv
+                                        </p>
+                                    </div>
+                                    <p className="text-xl font-semibold">
+                                        40.00 - 80.00$
                                     </p>
-                                    <p className="text-xl font-semibold">40.00 - 80.00$</p>
                                 </div>
                             </CardContent>
                         </Card>
@@ -144,22 +159,31 @@ const PopularCardsCarousel = () => {
                                 className="w-full h-[400px] relative border-none cursor-pointer group"
                                 onClick={() => handleCardClick(index)}
                             >
-                                <div
-                                    className="absolute inset-0 bg-cover bg-center bg-no-repeat brightness-50 group-hover:brightness-65 transition-all duration-300"
-                                    style={{
-                                        backgroundImage: `url(${Solo.src})`,
-                                    }}
+                                <Image
+                                    src={Solo}
+                                    alt={`Ticket ${index + 1}`}
+                                    layout="fill"
+                                    objectFit="cover"
+                                    className="absolute inset-0 brightness-50 group-hover:brightness-65 transition-all duration-300"
                                 />
                                 <CardContent className="relative h-full flex items-center justify-between p-8">
-                                    <div className="flex flex-col gap-2 text-white max-w-[50%]">
+                                    <div className="flex flex-col gap-3 text-white max-w-[50%]">
                                         <h3 className="text-2xl font-bold">
                                             Ticket {index + 1}
                                         </h3>
-                                        <p className="text-[19px]">March 16th, 2025 10:00</p>
-                                        <p className="text-lg text-gray-300">
-                                            Hello everyone, I invite you to my cool concert, I'm waiting for everyone {index + 1}
-                                        </p>
-                                        <p className="text-xl font-semibold text-gray-300">
+                                        <div className="flex flex-col gap-2">
+                                            <p className="text-base flex items-center gap-1.5">
+                                                <Guitar strokeWidth={2} className="w-4 h-4 text-white" /> Concert
+                                                <Palette strokeWidth={2} className="w-4 h-4 text-white" /> Nauka, Isskusstvo
+                                            </p>
+                                            <p className="text-base flex items-center gap-1.5">
+                                                <CalendarDays strokeWidth={2} className="w-4 h-4 text-white" /> March 16th, 2025, 10:00
+                                            </p>
+                                            <p className="text-base flex items-center gap-1.5">
+                                                <MapPinned strokeWidth={2} className="w-4 h-4 text-white" /> Lviv
+                                            </p>
+                                        </div>
+                                        <p className="text-xl font-semibold">
                                             {(index + 1) * 10}.00 - {(index + 1) * 20}.00 $
                                         </p>
                                     </div>
@@ -173,38 +197,51 @@ const PopularCardsCarousel = () => {
                             className="w-full h-[400px] relative border-none cursor-pointer"
                             onClick={() => handleCardClick(0)} // Индекс 0 для Ticket 1
                         >
-                            <div
-                                className="absolute inset-0 bg-cover bg-center bg-no-repeat brightness-50 group-hover:brightness-65 transition-all duration-300"
-                                style={{
-                                    backgroundImage: `url(${Solo.src})`,
-                                }}
+                            <Image
+                                src={Solo}
+                                alt={`Ticket 1`}
+                                layout="fill"
+                                objectFit="cover"
+                                className="absolute inset-0 brightness-50 group-hover:brightness-65 transition-all duration-300"
                             />
                             <CardContent className="relative h-full flex items-center justify-between p-8">
-                                <div className="flex flex-col gap-2 text-white max-w-[50%]">
-                                    <h3 className="text-2xl font-bold">Ticket 1</h3>
-                                    <p className="text-[19px]">March 16th, 2025 10:00</p>
-                                    <p className="text-lg">
-                                        Hello everyone, I invite you to my cool concert, I'm waiting for everyone 1
+                                <div className="flex flex-col gap-3 text-white max-w-[50%]">
+                                    <h3 className="text-2xl font-bold">
+                                        Ticket 1
+                                    </h3>
+                                    <div className="flex flex-col gap-2">
+                                        <p className="text-base flex items-center gap-1.5">
+                                            <Guitar strokeWidth={2} className="w-4 h-4 text-white" /> Concert
+                                            <Palette strokeWidth={2} className="w-4 h-4 text-white" /> Nauka, Isskusstvo
+                                        </p>
+                                        <p className="text-base flex items-center gap-1.5">
+                                            <CalendarDays strokeWidth={2} className="w-4 h-4 text-white" /> March 16th, 2025, 10:00
+                                        </p>
+                                        <p className="text-base flex items-center gap-1.5">
+                                            <MapPinned strokeWidth={2} className="w-4 h-4 text-white" /> Lviv
+                                        </p>
+                                    </div>
+                                    <p className="text-xl font-semibold">
+                                        10.00 - 20.00 $
                                     </p>
-                                    <p className="text-xl font-semibold">10.00 - 20.00 $</p>
                                 </div>
                             </CardContent>
                         </Card>
                     </div>
                 </div>
                 {/* Кнопки вне прокручиваемого контейнера */}
-                <div className="absolute right-13 bottom-15 flex flex-row gap-2 z-20">
+                <div className="cursor-pointer absolute right-13 bottom-15 flex flex-row gap-2 z-20">
                     <Button
                         onClick={handlePrev}
                         variant="outline"
-                        className="border-none bg-background/10 hover:bg-background/15"
+                        className="cursor-pointer border-none bg-background/10 hover:bg-background/15"
                     >
                         <ChevronLeft strokeWidth={3} className="w-6 h-6 text-white" />
                     </Button>
                     <Button
                         onClick={handleNext}
                         variant="outline"
-                        className="border-none bg-background/10 hover:bg-background/15"
+                        className="cursor-pointer border-none bg-background/10 hover:bg-background/15"
                     >
                         <ChevronRight strokeWidth={3} className="w-6 h-6 text-white" />
                     </Button>

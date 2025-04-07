@@ -1,3 +1,6 @@
+"use client";
+
+import { usePathname } from "next/navigation";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 // import { NavUser } from "@/components/calendar/NavUser";
@@ -5,10 +8,17 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 
 export default function CustomToolbarFullCalendar() {
-    const user = null; // Замени на реальный источник данных, если есть
+    const user = null;
+    const pathname = usePathname();
 
+
+    const showBorder = pathname !== "/";
     return (
-        <header className="z-30 px-custom sticky top-0 flex h-17 shrink-0 items-center gap-2 border-b bg-background/95 backdrop-blur-md">
+        <header
+            className={`z-30 px-custom sticky top-0 flex h-17 shrink-0 items-center gap-2 bg-background/95 backdrop-blur-md ${
+                showBorder ? "border-b" : ""
+            }`}
+        >
             <div className="flex items-center justify-between gap-4 w-full relative">
                 {/* Логотип и название слева */}
                 <Link href="/" className="flex items-center gap-2 cursor-pointer">

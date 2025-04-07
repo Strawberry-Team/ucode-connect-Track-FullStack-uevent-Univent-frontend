@@ -1,8 +1,9 @@
-"use client"; // Указываем, что это клиентский компонент
-
-import { useRouter } from "next/navigation"; // Заменяем useNavigate
+"use client";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import LogoImage from "@/assets/logo_white.png";
 import { Card, CardContent } from "@/components/ui/card";
+import {CalendarDays, Guitar, MapPinned, Palette} from "lucide-react";
 
 interface ProductCardProps {
     index: number;
@@ -22,25 +23,34 @@ const ProductCard = ({ index }: ProductCardProps) => {
             className="cursor-pointer w-full bg-white flex flex-col overflow-hidden transition duration-300 hover:-translate-y-1 hover:-translate-x-1 hover:shadow-2xl"
             onClick={handleClick}
         >
-            {/* Место для изображения */}
-            <div
-                className="h-60 flex items-center justify-center bg-contain bg-center bg-no-repeat"
-                style={{
-                    backgroundImage: `url(${LogoImage.src})`, // Используем .src для импортированного изображения
-                }}
+            <Image
+                src={LogoImage}
+                alt="Ticket"
+                width={300}
+                height={192}
+                className="h-48 w-full object-contain"
             />
             {/* Контент карточки */}
             <CardContent className="p-4 flex-1 flex flex-col justify-between">
                 <div>
-                    <h3 className="text-[20px] font-semibold text-gray-800">
+                    <h3 className="text-xl font-bold text-gray-900 ">
                         Ticket {index + 1}
                     </h3>
-                    <p className="text-[16px] text-gray-600">
-                        March 16th, 2025 10:00
-                    </p>
-                    <p className="text-sm text-gray-600">
-                        Hello everyone, I invite you to my cool concert, I'm waiting for everyone {index + 1}
-                    </p>
+                    <div className="flex flex-col gap-1 text-gray-700">
+                        <p className="text-sm font-medium flex items-center gap-1">
+                            <Guitar strokeWidth={2.5} className="w-4 h-4" /> Concert
+                            <Palette strokeWidth={2.5} className="w-4 h-4" /> Nauka, Isskusstvo
+                        </p>
+                        <p className="text-sm font-medium flex items-center gap-1">
+                            <Palette strokeWidth={2.5} className="w-4 h-4" /> Nauka, Isskusstvo
+                        </p>
+                        <p className="text-sm font-medium flex items-center gap-1">
+                            <CalendarDays strokeWidth={2.5} className="w-4 h-4" /> March 16th, 2025, 10:00
+                        </p>
+                        <p className="text-sm font-medium flex items-center gap-1">
+                            <MapPinned strokeWidth={2.5} className="w-4 h-4" /> Lviv
+                        </p>
+                    </div>
                 </div>
                 <div className="mt-2">
                     <span className="text-xl font-bold text-gray-900">
