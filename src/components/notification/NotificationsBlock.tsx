@@ -18,22 +18,29 @@ export default function NotificationsBlock({ notifications }: NotificationsBlock
     const [isExpanded, setIsExpanded] = useState(false);
     const [isCollapsing, setIsCollapsing] = useState(false);
     const [contentHeight, setContentHeight] = useState(0);
-    const [collapsedHeight, setCollapsedHeight] = useState(0); // Высота в свёрнутом состоянии
+    const [collapsedHeight, setCollapsedHeight] = useState(0);
+    const [descriptionHeight, setDescriptionHeight] = useState(0);
     const contentRef = useRef<HTMLDivElement>(null);
-    const collapsedRef = useRef<HTMLDivElement>(null); // Для свёрнутого состояния
+    const collapsedRef = useRef<HTMLDivElement>(null);
+    const descriptionRef = useRef<HTMLDivElement>(null);
 
-    // Измеряем высоту содержимого
     useEffect(() => {
         const updateHeights = () => {
             if (contentRef.current) {
                 const height = contentRef.current.scrollHeight;
-                const extraHeight = 35; // Дополнительная высота для отступов
+                const extraHeight = 43;
                 setContentHeight(height + extraHeight);
             }
             if (collapsedRef.current) {
-                const height = collapsedRef.current.scrollHeight;
+                let height = collapsedRef.current.scrollHeight;
                 const extraHeight = 2;
+                if (!isExpanded && !isCollapsing && descriptionHeight > 0) {
+                    height -= descriptionHeight;
+                }
                 setCollapsedHeight(height + extraHeight);
+            }
+            if (descriptionRef.current) {
+                setDescriptionHeight(descriptionRef.current.scrollHeight);
             }
         };
 
@@ -43,13 +50,21 @@ export default function NotificationsBlock({ notifications }: NotificationsBlock
         return () => window.removeEventListener("resize", updateHeights);
     }, [isExpanded, notifications]);
 
-    // Обработчик сворачивания с анимацией
     const handleCollapse = () => {
         setIsCollapsing(true);
         setTimeout(() => {
             setIsExpanded(false);
             setIsCollapsing(false);
-        }); // Должно совпадать с duration-500
+            if (collapsedRef.current && descriptionHeight > 0) {
+                const height = collapsedRef.current.scrollHeight - descriptionHeight;
+                const extraHeight = 2;
+                setCollapsedHeight(height + extraHeight);
+            }
+        });
+    };
+
+    const handleExpand = () => {
+        setIsExpanded(true);
     };
 
     if (!notifications || notifications.length === 0) {
@@ -63,18 +78,25 @@ export default function NotificationsBlock({ notifications }: NotificationsBlock
             <div
                 className="overflow-hidden transition-all duration-500 ease-in-out"
                 style={{
-                    height: isExpanded || isCollapsing ? `${contentHeight}px` : `${collapsedHeight}px`, // Анимируем между свёрнутым и полным
+                    height: isExpanded || isCollapsing ? `${contentHeight}px` : `${collapsedHeight}px`,
                 }}
             >
-                <div ref={contentRef}>
-                    {/* Последняя новость всегда видна */}
-                    <div className="border-l-2 border-gray-200 pl-3 py-1">
+                <div
+                    ref={contentRef}
+                    className={isExpanded || isCollapsing ? "overflow-y-auto custom-scroll" : ""}
+                    style={{
+                        maxHeight: isExpanded || isCollapsing ? "350px" : "none",
+                    }}
+                >
+                    {/* Все новости внутри одного блока */}
+                    <div className="border-l-2 border-gray-200 pl-3 mb-3">
                         <div ref={collapsedRef}>
                             <h4 className="text-base font-medium text-gray-800">{latestNotification.title}</h4>
                             <div
+                                ref={descriptionRef}
                                 className="transition-all duration-500 ease-in-out overflow-hidden"
                                 style={{
-                                    maxHeight: isExpanded || isCollapsing ? "100px" : "0px", // Оставляем для описания
+                                    maxHeight: isExpanded || isCollapsing ? "240px" : "0px",
                                     opacity: isExpanded || isCollapsing ? 1 : 0,
                                 }}
                             >
@@ -87,11 +109,10 @@ export default function NotificationsBlock({ notifications }: NotificationsBlock
                         </div>
                     </div>
 
-                    {/* Остальные новости */}
                     {notifications.slice(1).map((notification, index) => (
                         <div
                             key={index}
-                            className="border-l-2 border-gray-200 pl-3 py-1 transition-all duration-500 ease-in-out"
+                            className="border-l-2 border-gray-200 pl-3 mb-3 transition-all duration-500 ease-in-out"
                             style={{
                                 opacity: isExpanded || isCollapsing ? 1 : 0,
                             }}
@@ -104,35 +125,30 @@ export default function NotificationsBlock({ notifications }: NotificationsBlock
                             </div>
                         </div>
                     ))}
-
-                    {/* Кнопка "Collapse" */}
-                    <div
-                        className="flex justify-end mt-2 transition-all duration-500 ease-in-out"
-                        style={{
-                            opacity: isExpanded || isCollapsing ? 1 : 0,
-                        }}
-                    >
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            className="flex items-center gap-1 text-gray-600 hover:text-gray-800"
-                            onClick={handleCollapse}
-                        >
-                            <ChevronUp className="w-3 h-3" />
-                            Collapse
-                        </Button>
-                    </div>
                 </div>
             </div>
 
-            {/* Кнопка "Show More" */}
+            {/* Кнопки вне прокрутки */}
+            {isExpanded && !isCollapsing && (
+                <div className="flex justify-end mt-2">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="cursor-pointer flex items-center gap-1 text-gray-600 hover:text-gray-800"
+                        onClick={handleCollapse}
+                    >
+                        <ChevronUp className="w-3 h-3" />
+                        Collapse
+                    </Button>
+                </div>
+            )}
             {!isExpanded && !isCollapsing && (
                 <div className="flex justify-end mt-1">
                     <Button
                         variant="ghost"
                         size="sm"
-                        className="flex items-center gap-1 text-gray-600 hover:text-gray-800"
-                        onClick={() => setIsExpanded(true)}
+                        className="cursor-pointer flex items-center gap-1 text-gray-600 hover:text-gray-800"
+                        onClick={handleExpand}
                     >
                         <ChevronDown className="w-3 h-3" />
                         Show More

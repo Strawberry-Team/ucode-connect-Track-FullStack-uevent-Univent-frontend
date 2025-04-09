@@ -12,6 +12,7 @@ import {
 import LogoImage from "@/assets/logo_white.png";
 import TicketActions from "@/components/card/TicketActions";
 import NotificationsBlock from "@/components/notification/NotificationsBlock";
+import Link from "next/link";
 
 export default async function PageCard({params}: { params: Promise<{ product: string }> }) {
     const resolvedParams = await params;
@@ -28,17 +29,18 @@ export default async function PageCard({params}: { params: Promise<{ product: st
         format: "Concert",
         themes: ["Music", "Art"],
         company: "Eventify Inc.",
+        companyId: "eventify-inc",
         price: `${id * 10}.00 - ${id * 20}.00 $`,
         image: LogoImage.src,
         notifications: [
             {
                 title: "Event Schedule Updated",
-                description: "We’ve updated the schedule for Event ${id}. Check out the new timings for workshops and performances.",
+                description: "We’ve updated the schedule for Event ${id}.",
                 date: "March 10th, 2025",
             },
             {
                 title: "Special Guest Announced",
-                description: "We’re excited to announce a special guest for Event ${id}! Join us to meet a famous artist.",
+                description: "We’re excitedWe’re excited to We’re excited to We’re excited to We’re excited to  to announce a special guest for Event ${id}! Join us to meet a famous artist.",
                 date: "March 5th, 2025",
             },
             {
@@ -102,16 +104,20 @@ export default async function PageCard({params}: { params: Promise<{ product: st
                                 href={ticketData.locationLink}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-lg font-medium text-blue-600 hover:underline"
+                                className="text-lg font-medium  underline"
                             >
                                 View on Google Maps
                             </a>
                         </div>
 
-                        {/* Компания */}
+                        {/* Ссылка на страницу компании */}
                         <div className="flex items-center gap-2">
-                            <Building strokeWidth={2.5} className="w-5 h-5 text-gray-500"/>
-                            <span className="text-lg font-medium">{ticketData.company}</span>
+                            <Building strokeWidth={2.5} className="w-5 h-5 text-gray-500" />
+                            <Link href={`/company/${ticketData.companyId}`}>
+                                <span className="text-lg font-medium  underline">
+                                    {ticketData.company}
+                                </span>
+                            </Link>
                         </div>
                     </div>
 
@@ -128,6 +134,7 @@ export default async function PageCard({params}: { params: Promise<{ product: st
                     </div>
                 </div>
             </div>
+
             <NotificationsBlock notifications={ticketData.notifications} />
             {/* Описание */}
             <div className="mt-8 border-t">

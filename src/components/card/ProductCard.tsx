@@ -37,17 +37,9 @@ const ProductCard = ({ index }: ProductCardProps) => {
                         Ticket {index + 1}
                     </h3>
                     <div className="flex flex-col gap-1 text-gray-700">
-
                         <p className="text-sm font-medium flex items-center gap-1">
                             <Tag strokeWidth={2.5} className="w-4 h-4"/>
                             Concert • Nauka, Isskusstvo
-                        </p>
-                        <p className="text-sm font-medium flex items-center gap-1">
-                            <Guitar strokeWidth={2.5} className="w-4 h-4" /> Concert
-                            <Palette strokeWidth={2.5} className="w-4 h-4" /> Nauka, Isskusstvo
-                        </p>
-                        <p className="text-sm font-medium flex items-center gap-1">
-                            <Palette strokeWidth={2.5} className="w-4 h-4" /> Nauka, Isskusstvo
                         </p>
                         <p className="text-sm font-medium flex items-center gap-1">
                             <CalendarDays strokeWidth={2.5} className="w-4 h-4" /> March 16th, 2025, 10:00
