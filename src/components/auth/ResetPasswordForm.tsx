@@ -21,23 +21,17 @@ export default function ResetPasswordForm({
     return (
         <form
             onSubmit={handleResetPassword}
-            className="p-6 w-full flex flex-col gap-4">
+            className="pb-35 p-6 w-full flex flex-col gap-4">
             <div className="flex flex-col gap-4">
-                <div className="flex flex-col items-center text-center">
-                    <DialogTitle className="text-2xl font-bold">Сброс пароля</DialogTitle>
-                    <p className="text-balance text-muted-foreground">
-                        Введите email для сброса пароля
-                    </p>
-                </div>
                 <div className="relative flex items-center gap-2">
-                    <div className="absolute left-2">
+                    <div className="absolute left-3">
                         <Mail className="h-5 w-5 text-muted-foreground" />
                     </div>
                     <Input
                         id="reset-email"
-                        type="email"
+                        type="text"
                         placeholder="Email"
-                        className="pl-10 w-full"
+                        className="text-[16px] py-5 px-7 rounded-2xl pl-10 w-full"
                         required
                         value={resetEmail}
                         onChange={(e) => setResetEmail(e.target.value)}
@@ -45,10 +39,10 @@ export default function ResetPasswordForm({
                 </div>
                 <Button
                     type="submit"
-                    className="w-full"
+                    className="text-[16px] py-5 px-7 rounded-full cursor-pointer w-full"
                     disabled={!resetEmail}
                 >
-                    Отправить ссылку для сброса
+                    Send Reset Link
                 </Button>
                 <div className="flex items-center justify-center gap-2 w-full">
                     <button
@@ -56,7 +50,7 @@ export default function ResetPasswordForm({
                         onClick={() => setIsForgotPassword(false)}
                         className="text-sm text-muted-foreground underline-offset-2 hover:underline text-center cursor-pointer"
                     >
-                        Назад
+                        Back to login
                     </button>
                 </div>
             </div>

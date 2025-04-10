@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { login } from "@/lib/auth";
-import {Dialog, DialogContent, DialogTitle} from "@/components/ui/dialog";
+import {Dialog, DialogClose, DialogContent, DialogTitle} from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useAuth } from "@/context/AuthContext";
 import { showErrorToasts, showSuccessToast } from "@/lib/toast";
@@ -21,13 +21,35 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [name, setName] = useState("");
+    const [surname, setSurname] = useState("");
     const [resetEmail, setResetEmail] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [showRegisterPassword, setShowRegisterPassword] = useState(false);
     const [isForgotPassword, setIsForgotPassword] = useState(false);
     const [activeTab, setActiveTab] = useState("login");
     const { checkAuth } = useAuth();
 
     const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+    const togglePasswordRegisterVisibility = () => setShowRegisterPassword((prev) => !prev);
+
+    // Сбрасываем состояния при открытии/закрытии модального окна
+    useEffect(() => {
+        if (isOpen) {
+            // При открытии модального окна сбрасываем вкладку на "login"
+            setActiveTab("login");
+            setIsForgotPassword(false);
+        } else {
+            // При закрытии модального окна сбрасываем все поля
+            setEmail("");
+            setPassword("");
+            setName("");
+            setSurname("");
+            setResetEmail("");
+            setShowPassword(false);
+            setShowRegisterPassword(false);
+            setIsForgotPassword(false);
+        }
+    }, [isOpen]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -55,6 +77,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         e.preventDefault();
         showSuccessToast("Registration successful (placeholder)");
         setName("");
+        setSurname("");
         setEmail("");
         setPassword("");
         setActiveTab("login");
@@ -65,6 +88,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         setEmail("");
         setPassword("");
         setName("");
+        setSurname("");
         setIsForgotPassword(false);
     };
 
@@ -88,23 +112,21 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                             style={{ maxWidth: '100%', maxHeight: '100%' }}
                         />
                     </div>
-                    <div className="relative w-full h-full flex flex-col">
-                        <div className="flex flex-col items-center text-center pt-6">
-                            <DialogTitle className="text-2xl font-bold">Welcome</DialogTitle>
-                            <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full px-6 mt-4">
+                    <div className="w-full h-full flex flex-col">
+                        {/* Заголовок и вкладки сверху */}
+                        <div className="flex flex-col items-center text-center pt-15 px-6">
+                            <DialogTitle className="text-2xl font-bold">Welcome Calendula</DialogTitle>
+                            <Tabs value={activeTab} onValueChange={handleTabChange} className="px-6 w-full mt-4">
                                 <TabsList className="grid w-full grid-cols-2">
-                                    <TabsTrigger value="login">
-                                        Вход
-                                    </TabsTrigger>
-                                    <TabsTrigger value="register">
-                                        Регистрация
-                                    </TabsTrigger>
+                                    <TabsTrigger className="cursor-pointer" value="login">Sign in</TabsTrigger>
+                                    <TabsTrigger className="cursor-pointer" value="register">Sign up</TabsTrigger>
                                 </TabsList>
                             </Tabs>
                         </div>
-                        <div className="flex-1 overflow-y-auto px-6 pb-6">
-                            <Tabs value={activeTab} className="h-full">
-                                <TabsContent value="login" className="h-full">
+                        {/* Центрирование контента */}
+                        <div className="flex-1 flex items-center justify-center px-6 pb-14">
+                            <Tabs value={activeTab} className="w-full">
+                                <TabsContent value="login" className="mt-0">
                                     {!isForgotPassword ? (
                                         <LoginForm
                                             setIsForgotPassword={setIsForgotPassword}
@@ -125,14 +147,18 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                         />
                                     )}
                                 </TabsContent>
-                                <TabsContent value="register" className="h-full">
+                                <TabsContent value="register" className="mt-0">
                                     <RegisterForm
                                         name={name}
+                                        surname={surname}
                                         email={email}
                                         password={password}
                                         setName={setName}
+                                        setSurname={setSurname}
                                         setEmail={setEmail}
                                         setPassword={setPassword}
+                                        showPassword={showRegisterPassword}
+                                        togglePasswordVisibility={togglePasswordRegisterVisibility}
                                         handleRegister={handleRegister}
                                     />
                                 </TabsContent>
