@@ -1,27 +1,31 @@
-// /src/lib/auth.ts
-export async function login(email: string, password: string): Promise<void> {
-    const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-    });
+import api from "@/lib/api";
+import Cookies from "js-cookie";
+import {AxiosError} from "axios";
 
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Ошибка логина");
+export async function login(email: string, password: string): Promise<{ success: boolean; errors: string | string[] }> {
+    try {
+        const response = await api.post("/login", {email, password});
+        const data = response.data;
+
+        if (!data.accessToken) {
+            return {success: false, errors: "Access token not provided by server"};
+        }
+        Cookies.set("accessToken", data.accessToken, {sameSite: "strict"});
+        Cookies.set("refreshToken", data.refreshToken, {sameSite: "strict"});
+
+        return {success: true, errors: ""};
+    } catch (error) {
+        const axiosError = error as AxiosError<{ message?: string | string[] }>;
+        const errorData = axiosError.response?.data;
+
+        if (errorData?.message) {
+            return {
+                success: false,
+                errors: Array.isArray(errorData.message) ? errorData.message : [errorData.message],
+            };
+        }
+
+        return {success: false, errors: "Login failed"};
     }
 }
 
-export async function logout(): Promise<void> {
-    const response = await fetch("/api/auth/logout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Ошибка выхода");
-    }
-}
-
-// Другие функции (register, refreshToken) остаются без изменений

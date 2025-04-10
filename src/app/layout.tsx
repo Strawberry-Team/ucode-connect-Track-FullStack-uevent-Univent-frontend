@@ -1,11 +1,12 @@
 import type {Metadata} from "next";
 import {Geist, Geist_Mono} from "next/font/google";
 import "./globals.css";
-import CustomToolbarFullCalendar from "@/components/header/CustomToolbarFullCalendar";
+import Header from "@/components/header/Header";
 import React from "react";
 import ScrollToTopButton from "@/components/ui/scroll-to-top-button";
 import {AuthProvider} from "@/context/AuthContext";
 import {cookies} from "next/headers";
+import {Toaster} from "@/components/ui/sonner";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -22,38 +23,24 @@ export const metadata: Metadata = {
     description: "Event management platform",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-    const cookieStore = cookies() as any; // TODO НЕ льзя писать мне any, но пусть пока что так будет
+export default async function RootLayout({children}: { children: React.ReactNode }) {
+    const cookieStore = await cookies();
     const accessToken = cookieStore.get("accessToken")?.value || null;
+    // const csrfToken = cookieStore.get("X-CSRF-TOKEN")?.value || null;
     const isAuthenticated = !!accessToken;
+
+    // console.log("[RootLayout] Initial CSRF token from cookies (X-CSRF-TOKEN):", csrfToken);
 
     return (
         <html lang="en">
             <body>
                 <AuthProvider initialAuthState={isAuthenticated}>
-                    <CustomToolbarFullCalendar />
+                    <Header/>
                     {children}
                     <ScrollToTopButton/>
+                    <Toaster/>
                 </AuthProvider>
             </body>
         </html>
     );
 }
-
-// export default function RootLayout({
-//                                        children,
-//                                    }: Readonly<{
-//     children: React.ReactNode;
-// }>) {
-//     return (
-//         <html lang="en">
-//             <body>
-//                 <AuthProvider>
-//                     <CustomToolbarFullCalendar/>
-//                     <main>{children}</main>
-//                     <ScrollToTopButton/>
-//                 </AuthProvider>
-//             </body>
-//         </html>
-//     );
-// }

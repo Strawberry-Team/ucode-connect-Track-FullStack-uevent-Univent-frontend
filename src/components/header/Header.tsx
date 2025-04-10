@@ -1,4 +1,3 @@
-// /src/components/header/CustomToolbarFullCalendar.tsx
 "use client";
 
 import { useState } from "react";
@@ -7,25 +6,25 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import LoginModal from "@/components/auth/LoginModal";
+import AuthModal from "@/components/auth/AuthModal";
 import { useAuth } from "@/context/AuthContext";
-import { logout } from "@/lib/auth";
 
-export default function CustomToolbarFullCalendar() {
+
+export default function Header() {
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const { isAuthenticated, setAuthenticated } = useAuth();
-    const pathname = usePathname();
+
 
     const handleLogout = async () => {
         try {
-            await logout();
+
             setAuthenticated(false);
         } catch (err) {
-            console.error("Ошибка выхода:", err);
+
         }
     };
 
-    const showBorder = pathname !== "/";
+    const showBorder = usePathname() !== "/";
 
     return (
         <header
@@ -77,9 +76,9 @@ export default function CustomToolbarFullCalendar() {
                 </div>
             </div>
 
-            <LoginModal
+            <AuthModal
                 isOpen={isLoginModalOpen}
-                onClose={() => setIsLoginModalOpen(false)} // Убираем setAuthenticated(true)
+                onClose={() => setIsLoginModalOpen(false)}
             />
         </header>
     );

@@ -13,17 +13,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({
                                  children,
-                                 initialAuthState, // Добавляем пропс для начального состояния с сервера
+                                 initialAuthState,
                              }: {
     children: React.ReactNode;
-    initialAuthState?: boolean; // Может быть undefined, если сервер не предоставил данные
+    initialAuthState?: boolean;
 }) {
     const [isAuthenticated, setAuthenticated] = useState(() => {
-        // Если есть начальное состояние с сервера, используем его
-        if (typeof initialAuthState !== "undefined") {
-            return initialAuthState;
-        }
-        // Иначе проверяем куки на клиенте (для случаев, когда нет SSR)
+        if (typeof initialAuthState !== "undefined") return initialAuthState;
         const accessToken = Cookies.get("accessToken");
         return !!accessToken;
     });
