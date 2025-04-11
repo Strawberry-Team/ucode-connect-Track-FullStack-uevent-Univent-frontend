@@ -2,7 +2,7 @@ import axios, { AxiosInstance} from "axios";
 import Cookies from "js-cookie";
 import { fetchCsrfToken } from "./csrf";
 
-const backendUrl = "http://localhost:8080/api/auth";
+const backendUrl = "http://localhost:8080/api";
 
 const api: AxiosInstance = axios.create({
     baseURL: backendUrl,

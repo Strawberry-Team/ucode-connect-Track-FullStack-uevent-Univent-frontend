@@ -3,7 +3,7 @@ import { AxiosRequestConfig } from "axios";
 
 export async function fetchCsrfToken(): Promise<string> {
     try {
-        const response = await api.get("/csrf-token", { withCredentials: true });
+        const response = await api.get("/auth/csrf-token", { withCredentials: true });
         let csrfToken = response.data.csrfToken || response.headers["x-csrf-token"];
 
         const setCookieHeader = response.headers["set-cookie"];

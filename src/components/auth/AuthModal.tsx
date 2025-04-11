@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { login } from "@/lib/auth";
-import {Dialog, DialogClose, DialogContent, DialogTitle} from "@/components/ui/dialog";
+import {login, register, resetPassword} from "@/lib/auth";
+import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useAuth } from "@/context/AuthContext";
 import { showErrorToasts, showSuccessToast } from "@/lib/toast";
@@ -11,6 +11,28 @@ import Image from "next/image";
 import LoginForm from "./LoginForm";
 import ResetPasswordForm from "./ResetPasswordForm";
 import RegisterForm from "./RegisterForm";
+import { z } from "zod";
+
+const authSchema = z.object({
+    name: z.string().min(3, { message: "Name must be longer than or equal to 3 characters" }),
+    surname: z
+        .string()
+        .optional()
+        .refine(
+            (value) => !value || value.length >= 3,
+            { message: "Surname must be longer than or equal to 3 characters if provided" }
+        ),
+    email: z.string().email({ message: "Please enter a valid email address" }),
+    password: z
+        .string()
+        .min(8, { message: "Password must be at least 8 characters long" })
+        .regex(/[a-zA-Z]/, { message: "Password must contain at least one letter" })
+        .regex(/[0-9]/, { message: "Password must contain at least one number" }),
+});
+
+const loginSchema = authSchema.pick({ email: true, password: true });
+const registerSchema = authSchema.pick({ name: true, surname: true, email: true, password: true });
+const resetPasswordSchema = authSchema.pick({ email: true });
 
 interface AuthModalProps {
     isOpen: boolean;
@@ -20,6 +42,7 @@ interface AuthModalProps {
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const { setAuthenticated, setUserEmail } = useAuth();
     const [name, setName] = useState("");
     const [surname, setSurname] = useState("");
     const [resetEmail, setResetEmail] = useState("");
@@ -27,19 +50,22 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const [showRegisterPassword, setShowRegisterPassword] = useState(false);
     const [isForgotPassword, setIsForgotPassword] = useState(false);
     const [activeTab, setActiveTab] = useState("login");
+    const [loginErrors, setLoginErrors] = useState<{ email?: string; password?: string }>({});
+    const [registerErrors, setRegisterErrors] = useState<{ name?: string; surname?: string; email?: string; password?: string }>({});
+    const [resetErrors, setResetErrors] = useState<{ email?: string }>({});
     const { checkAuth } = useAuth();
 
     const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
     const togglePasswordRegisterVisibility = () => setShowRegisterPassword((prev) => !prev);
 
-    // Сбрасываем состояния при открытии/закрытии модального окна
     useEffect(() => {
         if (isOpen) {
-            // При открытии модального окна сбрасываем вкладку на "login"
             setActiveTab("login");
             setIsForgotPassword(false);
+            setLoginErrors({});
+            setRegisterErrors({});
+            setResetErrors({});
         } else {
-            // При закрытии модального окна сбрасываем все поля
             setEmail("");
             setPassword("");
             setName("");
@@ -48,14 +74,37 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             setShowPassword(false);
             setShowRegisterPassword(false);
             setIsForgotPassword(false);
+            setLoginErrors({});
+            setRegisterErrors({});
+            setResetErrors({});
         }
     }, [isOpen]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const result = await login(email, password);
+
+        const loginData = { email, password };
+        const loginValidation = loginSchema.safeParse(loginData);
+
+        if (!loginValidation.success) {
+            const errors = loginValidation.error.flatten().fieldErrors;
+            setLoginErrors({
+                email: errors.email?.[0],
+                password: errors.password?.[0],
+            });
+
+            const errorMessages = Object.values(errors)
+                .filter((error): error is string[] => error !== undefined)
+                .flatMap((error) => error);
+            showErrorToasts(errorMessages);
+            return;
+        }
+        setLoginErrors({});
+
+        const result = await login(email, password, setUserEmail);
 
         if (result.success) {
+            setAuthenticated(true);
             showSuccessToast("Login successful");
             setEmail("");
             setPassword("");
@@ -68,19 +117,72 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
     const handleResetPassword = async (e: React.FormEvent) => {
         e.preventDefault();
-        showSuccessToast("Password reset link sent (placeholder)");
-        setResetEmail("");
-        setIsForgotPassword(false);
+
+        const resetData = { email: resetEmail };
+        const resetValidation = resetPasswordSchema.safeParse(resetData);
+
+        if (!resetValidation.success) {
+            const errors = resetValidation.error.flatten().fieldErrors;
+            setResetErrors({
+                email: errors.email?.[0],
+            });
+
+            const errorMessages = Object.values(errors)
+                .filter((error): error is string[] => error !== undefined)
+                .flatMap((error) => error);
+            showErrorToasts(errorMessages);
+            return;
+        }
+        setResetErrors({});
+
+        const result = await resetPassword(resetEmail);
+
+        if (result.success) {
+            showSuccessToast("Password reset link sent to your email");
+            setResetEmail("");
+            setIsForgotPassword(false);
+        } else {
+            showErrorToasts(result.errors);
+        }
     };
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
-        showSuccessToast("Registration successful (placeholder)");
-        setName("");
-        setSurname("");
-        setEmail("");
-        setPassword("");
-        setActiveTab("login");
+
+        const registerData = { name, surname, email, password };
+        const registerValidation = registerSchema.safeParse(registerData);
+
+        if (!registerValidation.success) {
+            const errors = registerValidation.error.flatten().fieldErrors;
+            setRegisterErrors({
+                name: errors.name?.[0],
+                surname: errors.surname?.[0],
+                email: errors.email?.[0],
+                password: errors.password?.[0],
+            });
+
+            const errorMessages = Object.values(errors)
+                .filter((error): error is string[] => error !== undefined)
+                .flatMap((error) => error);
+            showErrorToasts(errorMessages);
+            return;
+        }
+
+        setRegisterErrors({});
+
+        const result = await register(name, (surname || null) as string, email, password);
+
+        if (result.success) {
+            showSuccessToast("Registration successful. Please verify your email!");
+            setName("");
+            setSurname("");
+            setEmail("");
+            setPassword("");
+            setActiveTab("login");
+            onClose();
+        } else {
+            showErrorToasts(result.errors);
+        }
     };
 
     const handleTabChange = (value: string) => {
@@ -90,6 +192,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         setName("");
         setSurname("");
         setIsForgotPassword(false);
+        setLoginErrors({});
+        setRegisterErrors({});
     };
 
     return (
@@ -97,10 +201,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             <DialogContent
                 className="p-0 border-none rounded-4xl overflow-hidden"
                 style={{
-                    width: 'clamp(300px, 100%, 1000px)',
-                    height: 'clamp(400px, 100vh - 250px, 600px)',
-                    maxWidth: '95%',
-                    maxHeight: '75%',
+                    width: "clamp(300px, 100%, 1000px)",
+                    height: "clamp(400px, 100vh - 250px, 600px)",
+                    maxWidth: "95%",
+                    maxHeight: "75%",
                 }}
             >
                 <div className="grid md:grid-cols-2 h-full">
@@ -109,7 +213,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                             src={LogoImage}
                             alt="Logo"
                             className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-                            style={{ maxWidth: '100%', maxHeight: '100%' }}
+                            style={{ maxWidth: "100%", maxHeight: "100%" }}
                         />
                     </div>
                     <div className="w-full h-full flex flex-col">
@@ -118,8 +222,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                             <DialogTitle className="text-2xl font-bold">Welcome Calendula</DialogTitle>
                             <Tabs value={activeTab} onValueChange={handleTabChange} className="px-6 w-full mt-4">
                                 <TabsList className="grid w-full grid-cols-2">
-                                    <TabsTrigger className="cursor-pointer" value="login">Sign in</TabsTrigger>
-                                    <TabsTrigger className="cursor-pointer" value="register">Sign up</TabsTrigger>
+                                    <TabsTrigger className="cursor-pointer" value="login">
+                                        Sign in
+                                    </TabsTrigger>
+                                    <TabsTrigger className="cursor-pointer" value="register">
+                                        Sign up
+                                    </TabsTrigger>
                                 </TabsList>
                             </Tabs>
                         </div>

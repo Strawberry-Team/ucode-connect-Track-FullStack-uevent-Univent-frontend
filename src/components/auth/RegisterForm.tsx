@@ -61,7 +61,6 @@ export default function RegisterForm({
                         type="text"
                         placeholder="Surname"
                         className="text-[16px] py-5 px-7 rounded-2xl pl-10 w-full"
-                        required
                         value={surname}
                         onChange={(e) => setSurname(e.target.value)}
                     />

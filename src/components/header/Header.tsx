@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -8,23 +8,35 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import AuthModal from "@/components/auth/AuthModal";
 import { useAuth } from "@/context/AuthContext";
-
+import { showErrorToasts } from "@/lib/toast";
+import {getUser, User} from "@/lib/user";
+import {NavUser} from "@/components/user/NavUser";
 
 export default function Header() {
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const { isAuthenticated, setAuthenticated } = useAuth();
+    const [user, setUser] = useState<User | null>(null);
+    const pathname = usePathname();
 
+    useEffect(() => {
+        const fetchUser = async () => {
+            if (isAuthenticated) {
+                const result = await getUser();
+                if (result.success && result.data) {
+                    setUser(result.data);
+                } else {
+                    showErrorToasts(result.errors);
+                    setAuthenticated(false);
+                }
+            } else {
+                setUser(null);
+            }
+        };
 
-    const handleLogout = async () => {
-        try {
+        fetchUser();
+    }, [isAuthenticated, setAuthenticated]);
 
-            setAuthenticated(false);
-        } catch (err) {
-
-        }
-    };
-
-    const showBorder = usePathname() !== "/";
+    const showBorder = pathname !== "/";
 
     return (
         <header
@@ -56,14 +68,8 @@ export default function Header() {
                 </Button>
 
                 <div>
-                    {isAuthenticated ? (
-                        <Button
-                            variant="outline"
-                            className="text-[16px] py-5 px-7 rounded-full font-medium"
-                            onClick={handleLogout}
-                        >
-                            Выйти
-                        </Button>
+                    {isAuthenticated && user ? (
+                        <NavUser user={user} />
                     ) : (
                         <Button
                             variant="outline"

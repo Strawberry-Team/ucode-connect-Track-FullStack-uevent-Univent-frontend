@@ -51,7 +51,7 @@ export default function LoginForm({
                         id="password"
                         type={showPassword ? "text" : "password"}
                         placeholder="Password"
-                        className="text-[16px] py-5 px-7 rounded-2xl font-medium pl-10 w-full"
+                        className="text-[16px] py-5 px-7 rounded-2xl pl-10 w-full"
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
