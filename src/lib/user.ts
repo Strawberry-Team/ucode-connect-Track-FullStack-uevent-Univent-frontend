@@ -1,21 +1,25 @@
 import api from "@/lib/api";
 import Cookies from "js-cookie";
-import {AxiosError} from "axios";
+import { AxiosError } from "axios";
 
 export interface User {
+    id: number;
     firstName: string;
+    lastName: string;
     email: string;
     profilePictureName: string;
+    role: string;
+    createdAt: string;
 }
 
-export async function getUser(): Promise<{ success: boolean; data?: User; errors: string | string[] }> {
+export async function getUserMe(): Promise<{ success: boolean; data?: User; errors: string | string[] }> {
     try {
         const accessToken = Cookies.get("accessToken");
         if (!accessToken) {
             return { success: false, errors: "Access token not found", data: undefined };
         }
 
-        const response = await api.get("user", {
+        const response = await api.get("/users/me", {
             headers: {
                 Authorization: `Bearer ${accessToken}`,
             },

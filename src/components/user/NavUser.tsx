@@ -27,11 +27,12 @@ interface NavUserProps {
 }
 
 export function NavUser({ user }: NavUserProps) {
-    const { setAuthenticated, setUserEmail } = useAuth();
+    const { setAuthenticated, setUser } = useAuth();
 
     const handleLogout = async () => {
-        const result = await logout(setUserEmail);
+        const result = await logout();
         setAuthenticated(false);
+        setUser(null);
         if (result.success) {
             showSuccessToast("Logged out successfully");
         } else {

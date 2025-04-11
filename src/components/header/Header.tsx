@@ -9,32 +9,12 @@ import Link from "next/link";
 import AuthModal from "@/components/auth/AuthModal";
 import { useAuth } from "@/context/AuthContext";
 import { showErrorToasts } from "@/lib/toast";
-import {getUser, User} from "@/lib/user";
 import {NavUser} from "@/components/user/NavUser";
 
 export default function Header() {
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-    const { isAuthenticated, setAuthenticated } = useAuth();
-    const [user, setUser] = useState<User | null>(null);
+    const { isAuthenticated, user } = useAuth();
     const pathname = usePathname();
-
-    useEffect(() => {
-        const fetchUser = async () => {
-            if (isAuthenticated) {
-                const result = await getUser();
-                if (result.success && result.data) {
-                    setUser(result.data);
-                } else {
-                    showErrorToasts(result.errors);
-                    setAuthenticated(false);
-                }
-            } else {
-                setUser(null);
-            }
-        };
-
-        fetchUser();
-    }, [isAuthenticated, setAuthenticated]);
 
     const showBorder = pathname !== "/";
 
