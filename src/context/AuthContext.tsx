@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import Cookies from "js-cookie";
-import {getUserMe, User} from "@/lib/user";
+import { getUserMe, User } from "@/lib/user";
 
 interface AuthContextType {
     isAuthenticated: boolean;
@@ -16,18 +16,15 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({
                                  children,
-                                 initialAuthState,
+                                 initialAuthState = false,
+                                 initialUser = null,
                              }: {
     children: ReactNode;
     initialAuthState?: boolean;
+    initialUser?: User | null;
 }) {
-    const [isAuthenticated, setAuthenticated] = useState(() => {
-        if (typeof initialAuthState !== "undefined") return initialAuthState;
-        const accessToken = Cookies.get("accessToken");
-        return !!accessToken;
-    });
-
-    const [user, setUser] = useState<User | null>(null);
+    const [isAuthenticated, setAuthenticated] = useState(initialAuthState);
+    const [user, setUser] = useState<User | null>(initialUser);
 
     const checkAuth = async () => {
         const accessToken = Cookies.get("accessToken");
@@ -35,12 +32,10 @@ export function AuthProvider({
         setAuthenticated(isAuth);
 
         if (isAuth) {
-            // Если пользователь авторизован, запрашиваем его данные
-            const result = await getUserMe();
+            const result = await getUserMe(accessToken);
             if (result.success && result.data) {
                 setUser(result.data);
             } else {
-                // Если не удалось получить данные, сбрасываем авторизацию
                 setAuthenticated(false);
                 setUser(null);
             }
@@ -50,7 +45,11 @@ export function AuthProvider({
     };
 
     useEffect(() => {
-        checkAuth();
+        const accessToken = Cookies.get("accessToken");
+        const isAuth = !!accessToken;
+        if (isAuth !== isAuthenticated || (isAuth && !user)) {
+            checkAuth();
+        }
     }, []);
 
     return (

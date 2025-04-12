@@ -1,6 +1,7 @@
-import axios, { AxiosInstance} from "axios";
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 import Cookies from "js-cookie";
 import { fetchCsrfToken } from "./csrf";
+import { refreshAccessToken } from "./auth";
 
 const backendUrl = "http://localhost:8080/api";
 
@@ -25,6 +26,13 @@ api.interceptors.request.use(
             config.headers = config.headers || {};
             config.headers["X-CSRF-Token"] = csrfToken;
         }
+
+        const accessToken = Cookies.get("accessToken");
+        if (accessToken) {
+            config.headers = config.headers || {};
+            config.headers["Authorization"] = `Bearer ${accessToken}`;
+        }
+
         return config;
     },
     (error) => Promise.reject(error)
@@ -32,12 +40,42 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
     (response) => response,
-    async (error) => {
-        if (error.response?.status === 403 && error.response?.data?.message === "Invalid CSRF token") {
+    async (error: AxiosError<{ message?: string | string[] }>) => {
+        const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+
+        // Обработка ошибки "Invalid CSRF token" (403)
+        if (error.response?.data?.message === "Invalid CSRF token" && error.response?.status === 403) {
             const newCsrfToken = await fetchCsrfToken();
-            error.config.headers["X-CSRF-Token"] = newCsrfToken;
-            return api.request(error.config);
+            originalRequest.headers = originalRequest.headers || {};
+            originalRequest.headers["X-CSRF-Token"] = newCsrfToken;
+            return api.request(originalRequest);
         }
+
+        // Обработка ошибки 401 (истекший accessToken)
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+
+            try {
+                const refreshResult = await refreshAccessToken();
+                if (refreshResult.success) {
+                    const newAccessToken = Cookies.get("accessToken");
+                    if (newAccessToken) {
+                        originalRequest.headers = originalRequest.headers || {};
+                        originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+                    }
+                    return api.request(originalRequest);
+                } else {
+                    Cookies.remove("accessToken");
+                    Cookies.remove("refreshToken");
+                    return Promise.reject(new Error("Failed to refresh access token"));
+                }
+            } catch (refreshError) {
+                Cookies.remove("accessToken");
+                Cookies.remove("refreshToken");
+                return Promise.reject(refreshError);
+            }
+        }
+
         return Promise.reject(error);
     }
 );

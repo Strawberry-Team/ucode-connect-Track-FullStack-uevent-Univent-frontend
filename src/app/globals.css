@@ -162,3 +162,4 @@
   padding-left: clamp(1rem, calc(1rem + 0.23 * (100vw - 950px)), 25rem);
   padding-right: clamp(1rem, calc(1rem + 0.23 * (100vw - 950px)), 25rem);
 }
+

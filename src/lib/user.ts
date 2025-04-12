@@ -1,5 +1,5 @@
+// lib/user.ts
 import api from "@/lib/api";
-import Cookies from "js-cookie";
 import { AxiosError } from "axios";
 
 export interface User {
@@ -12,9 +12,8 @@ export interface User {
     createdAt: string;
 }
 
-export async function getUserMe(): Promise<{ success: boolean; data?: User; errors: string | string[] }> {
+export async function getUserMe(accessToken?: string): Promise<{ success: boolean; data?: User; errors: string | string[] }> {
     try {
-        const accessToken = Cookies.get("accessToken");
         if (!accessToken) {
             return { success: false, errors: "Access token not found", data: undefined };
         }

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { MapPin, User } from "lucide-react";
+import {Mail, MapPin, User} from "lucide-react";
 import LogoImage from "@/assets/logo_white.png";
 import NotificationsBlock from "@/components/notification/NotificationsBlock";
 
@@ -12,7 +12,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ compan
         id: companyId,
         name: "Eventify Inc.",
         description: "Eventify Inc. is a leading company in organizing unforgettable events, concerts, and cultural experiences across the globe.",
-        location: "123 Creative Street, Lviv, Ukraine",
+        email: "company@gmail.com",
         owner: "John Doe",
         image: LogoImage.src,
         notifications: [
@@ -54,8 +54,8 @@ export default async function CompanyPage({ params }: { params: Promise<{ compan
                     <div className="flex flex-col gap-3 text-gray-700">
                         {/* Местоположение */}
                         <div className="flex items-center gap-2">
-                            <MapPin strokeWidth={2.5} className="w-5 h-5 text-gray-500" />
-                            <span className="text-lg font-medium">{companyData.location}</span>
+                            <Mail strokeWidth={2.5} className="w-5 h-5 text-gray-500" />
+                            <span className="text-lg font-medium">{companyData.email}</span>
                         </div>
                         {/* Владелец */}
                         <div className="flex items-center gap-2">

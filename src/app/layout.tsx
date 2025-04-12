@@ -1,12 +1,14 @@
-import type {Metadata} from "next";
-import {Geist, Geist_Mono} from "next/font/google";
+// app/layout.tsx
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/header/Header";
 import React from "react";
 import ScrollToTopButton from "@/components/ui/scroll-to-top-button";
-import {AuthProvider} from "@/context/AuthContext";
-import {cookies} from "next/headers";
-import {Toaster} from "@/components/ui/sonner";
+import { AuthProvider } from "@/context/AuthContext";
+import { cookies } from "next/headers";
+import { Toaster } from "@/components/ui/sonner";
+import { getUserMe, User } from "@/lib/user";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -23,22 +25,27 @@ export const metadata: Metadata = {
     description: "Event management platform",
 };
 
-export default async function RootLayout({children}: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("accessToken")?.value || null;
-    // const csrfToken = cookieStore.get("X-CSRF-TOKEN")?.value || null;
     const isAuthenticated = !!accessToken;
 
-    // console.log("[RootLayout] Initial CSRF token from cookies (X-CSRF-TOKEN):", csrfToken);
+    let initialUser: User | null = null;
+    if (accessToken) {
+        const userResult = await getUserMe(accessToken);
+        if (userResult.success && userResult.data) {
+            initialUser = userResult.data;
+        }
+    }
 
     return (
         <html lang="en">
             <body>
-                <AuthProvider initialAuthState={isAuthenticated}>
-                    <Header/>
+                <AuthProvider initialAuthState={isAuthenticated} initialUser={initialUser}>
+                    <Header />
                     {children}
-                    <ScrollToTopButton/>
-                    <Toaster/>
+                    <ScrollToTopButton />
+                    <Toaster />
                 </AuthProvider>
             </body>
         </html>

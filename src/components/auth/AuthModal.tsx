@@ -42,7 +42,7 @@ interface AuthModalProps {
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const { setAuthenticated, setUserEmail } = useAuth();
+    const { setAuthenticated } = useAuth();
     const [name, setName] = useState("");
     const [surname, setSurname] = useState("");
     const [resetEmail, setResetEmail] = useState("");
@@ -101,7 +101,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         }
         setLoginErrors({});
 
-        const result = await login(email, password, setUserEmail);
+        const result = await login(email, password);
 
         if (result.success) {
             setAuthenticated(true);

@@ -126,3 +126,38 @@ export async function logout(): Promise<{ success: boolean; errors: string | str
         return { success: false, errors: "Logout failed" };
     }
 }
+
+export async function refreshAccessToken(): Promise<{ success: boolean; errors: string | string[] }> {
+    try {
+        const refreshToken = Cookies.get("refreshToken");
+        if (!refreshToken) {
+            return { success: false, errors: "No refresh token available" };
+        }
+
+        const response = await api.post("/auth/access-token/refresh", { refreshToken });
+        const data = response.data;
+
+        if (!data.accessToken) {
+            return { success: false, errors: "Access token not provided by server" };
+        }
+
+        Cookies.set("accessToken", data.accessToken, { sameSite: "strict" });
+        if (data.refreshToken) {
+            Cookies.set("refreshToken", data.refreshToken, { sameSite: "strict" });
+        }
+
+        return { success: true, errors: "" };
+    } catch (error) {
+        const axiosError = error as AxiosError<{ message?: string | string[] }>;
+        const errorData = axiosError.response?.data;
+
+        if (errorData?.message) {
+            return {
+                success: false,
+                errors: Array.isArray(errorData.message) ? errorData.message : [errorData.message],
+            };
+        }
+
+        return { success: false, errors: "Failed to refresh access token" };
+    }
+}

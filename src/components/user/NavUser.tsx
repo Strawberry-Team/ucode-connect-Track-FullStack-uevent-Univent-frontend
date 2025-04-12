@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut } from "lucide-react";
+import {LogOut, UserPen} from "lucide-react";
 import {
     Avatar,
     AvatarFallback,
@@ -17,13 +17,11 @@ import {
 import { logout } from "@/lib/auth";
 import { showSuccessToast, showErrorToasts } from "@/lib/toast";
 import { useAuth } from "@/context/AuthContext";
+import {User} from "@/lib/user";
+import Link from "next/link";
 
 interface NavUserProps {
-    user: {
-        firstName: string;
-        email: string;
-        profilePictureName: string;
-    };
+    user: User;
 }
 
 export function NavUser({ user }: NavUserProps) {
@@ -34,7 +32,7 @@ export function NavUser({ user }: NavUserProps) {
         setAuthenticated(false);
         setUser(null);
         if (result.success) {
-            showSuccessToast("Logged out successfully");
+            showSuccessToast("Logout successfully");
         } else {
             showErrorToasts(result.errors);
         }
@@ -54,7 +52,7 @@ export function NavUser({ user }: NavUserProps) {
                         </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-[16px] leading-tight">
-                        <span className="truncate font-medium">{user.firstName}</span>
+                        <span className="font-medium">{user.firstName + " " +user.lastName}</span>
                     </div>
                 </div>
             </DropdownMenuTrigger>
@@ -76,15 +74,21 @@ export function NavUser({ user }: NavUserProps) {
                                 </AvatarFallback>
                             </Avatar>
                             <div className="flex-1 leading-tight">
-                                <span className="truncate font-medium block">{user.firstName}</span>
+                                <span className="truncate font-medium block">{user.firstName + " " +user.lastName}</span>
                                 <span className="truncate text-xs py-1 block">{user.email}</span>
                             </div>
                         </div>
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <Link href="/profile">
+                    <DropdownMenuItem className="cursor-pointer">
+                        <UserPen strokeWidth={2.5} className="mr-2 h-4 w-4" />
+                        Profile
+                    </DropdownMenuItem>
+                </Link>
                 <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-                    <LogOut className="mr-2 h-4 w-4" />
+                    <LogOut strokeWidth={2.5} className="mr-2 h-4 w-4" />
                     Log out
                 </DropdownMenuItem>
             </DropdownMenuContent>
