@@ -44,7 +44,7 @@ export function NavUser({ user }: NavUserProps) {
                 <div className="flex items-center gap-2 cursor-pointer">
                     <Avatar className="h-10 w-10 rounded-lg">
                         <AvatarImage
-                            src={`http://localhost:8080/profile-pictures/${user.profilePictureName}`}
+                            src={`http://localhost:8080/uploads/avatars/${user.profilePictureName}`}
                             alt={user.firstName}
                         />
                         <AvatarFallback className="rounded-lg">
@@ -52,7 +52,7 @@ export function NavUser({ user }: NavUserProps) {
                         </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-[16px] leading-tight">
-                        <span className="font-medium">{user.firstName + " " +user.lastName}</span>
+                        <span className="font-medium">{user.firstName} {user.lastName}</span>
                     </div>
                 </div>
             </DropdownMenuTrigger>
