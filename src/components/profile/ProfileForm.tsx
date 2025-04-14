@@ -11,21 +11,15 @@ type Ticket = {
     status: string;
 };
 
-type Company = {
-    name: string;
-    status: string;
-} | null;
-
 type ProfileFormProps = {
-    initialCompany: Company;
     initialTickets: Ticket[];
 };
 
-export default function ProfileForm({ initialCompany, initialTickets }: ProfileFormProps) {
+export default function ProfileForm({ initialTickets }: ProfileFormProps) {
     const [editMode, setEditMode] = useState(false);
 
     return (
-        <div className="flex justify-center items-start bg-background overflow-hidden">
+        <div className="flex justify-center items-center mt-7 bg-background">
             <div className="flex flex-col md:flex-row gap-6 max-w-4xl w-full">
                 {/* Карточка профиля */}
                 <ProfileCard editMode={editMode} setEditMode={setEditMode} />
@@ -33,7 +27,7 @@ export default function ProfileForm({ initialCompany, initialTickets }: ProfileF
                 {/* Правая колонка с карточками */}
                 <div className="flex flex-col gap-6 w-full md:w-1/2">
                     {/* Карточка компании */}
-                    <CompanyCard initialCompany={initialCompany} />
+                    <CompanyCard  />
 
                     {/* Карточка тикетов */}
                     <TicketsCard initialTickets={initialTickets} />

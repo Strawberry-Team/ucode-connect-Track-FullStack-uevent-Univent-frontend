@@ -1,24 +1,43 @@
-"use client"; // Указываем, что это клиентский компонент
+"use client";
 
 import Image from "next/image";
-import {CalendarDays, Guitar, MapPinned, Palette} from "lucide-react";
+import { CalendarDays, Guitar, MapPinned, Palette } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import LogoImage from "@/assets/logo_white.png";
-import Solo from "@/assets/solo.png";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useRouter } from "next/navigation"; // Заменяем useNavigate
+import { useRouter } from "next/navigation";
+import { useEventsStore } from "@/store/eventsStore";
+import { Event } from "@/lib/event"; // Импортируем тип Event
 
 const PopularCardsCarousel = () => {
+    const { events, fetchEvents } = useEventsStore(); // Получаем события из стора
     const [currentIndex, setCurrentIndex] = useState<number>(1);
     const [isPaused, setIsPaused] = useState<boolean>(false);
     const [isTransitioning, setIsTransitioning] = useState<boolean>(true);
-    const popularCards: undefined[] = Array.from({ length: 4 });
-    const totalSlides: number = popularCards.length;
     const isProcessingRef = useRef<boolean>(false);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const router = useRouter();
+
+    const popularEvents: Event[] = [...events]
+        .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+        .slice(0, 4);
+
+    const totalSlides: number = popularEvents.length || 1;
+
+
+    useEffect(() => {
+        const shouldFetch =
+            events.length === 0 ||
+            !useEventsStore.getState().lastFetched ||
+            (useEventsStore.getState().lastFetched &&
+                Date.now() - useEventsStore.getState().lastFetched > 5 * 60 * 1000);
+
+        if (shouldFetch) {
+            fetchEvents();
+            console.log("Загрузка карусель");
+        }
+    }, [fetchEvents]);
 
     // Автоматическое переключение каждые 5 секунд
     useEffect(() => {
@@ -68,11 +87,9 @@ const PopularCardsCarousel = () => {
         setIsPaused(false);
     };
 
-
-    const handleCardClick = (index: number) => {
-        router.push(
-            `/products/${index + 1}`
-        );
+    // Обработчик клика по карточке
+    const handleCardClick = (eventId: number) => {
+        router.push(`/products/${eventId}`);
     };
 
     // Сброс позиции для бесконечного цикла
@@ -103,6 +120,11 @@ const PopularCardsCarousel = () => {
         return currentIndex - 1;
     };
 
+    // Если событий нет, показываем заглушку
+    if (popularEvents.length === 0) {
+        return <div className="px-custom p-4">No popular events available.</div>;
+    }
+
     return (
         <div
             className="px-custom w-full relative z-10"
@@ -115,119 +137,153 @@ const PopularCardsCarousel = () => {
                     className={`flex ${isTransitioning ? "transition-transform duration-500 ease-in-out" : ""}`}
                     style={{ transform: getTranslateX() }}
                 >
-                    {/* Дубликат последней карточки (4-й) для обратного перехода */}
-                    <div key="duplicate-last" className="w-full flex-shrink-0">
-                        <Card
-                            className="w-full h-[400px] relative border-none cursor-pointer"
-                            onClick={() => handleCardClick(3)} // Индекс 3 для Ticket 4
-                        >
-                            <Image
-                                src={Solo}
-                                alt={`Ticket 4`}
-                                layout="fill"
-                                objectFit="cover"
-                                className="absolute inset-0 brightness-50 group-hover:brightness-65 transition-all duration-300"
-                            />
-                            <CardContent className="relative h-full flex items-center justify-between p-8">
-                                <div className="flex flex-col gap-3 text-white max-w-[50%]">
-                                    <h3 className="text-2xl font-bold">
-                                        Ticket 4
-                                    </h3>
-                                    <div className="flex flex-col gap-2">
-                                        <p className="text-base flex items-center gap-1.5">
-                                            <Guitar strokeWidth={2} className="w-4 h-4 text-white" /> Concert
-                                            <Palette strokeWidth={2} className="w-4 h-4 text-white" /> Nauka, Isskusstvo
-                                        </p>
-                                        <p className="text-base flex items-center gap-1.5">
-                                            <CalendarDays strokeWidth={2} className="w-4 h-4 text-white" /> March 16th, 2025, 10:00
-                                        </p>
-                                        <p className="text-base flex items-center gap-1.5">
-                                            <MapPinned strokeWidth={2} className="w-4 h-4 text-white" /> Lviv
-                                        </p>
-                                    </div>
-                                    <p className="text-xl font-semibold">
-                                        40.00 - 80.00$
-                                    </p>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
-                    {/* Оригинальные карточки */}
-                    {popularCards.map((_, index) => (
-                        <div key={`original-${index}`} className="w-full flex-shrink-0">
+                    {/* Дубликат последней карточки для обратного перехода */}
+                    {popularEvents.length > 0 && (
+                        <div key={`duplicate-last-${popularEvents[popularEvents.length - 1].id}`} className="w-full flex-shrink-0">
                             <Card
-                                className="w-full h-[400px] relative border-none cursor-pointer group"
-                                onClick={() => handleCardClick(index)}
+                                className="w-full h-[400px] relative border-none cursor-pointer"
+                                onClick={() => handleCardClick(popularEvents[popularEvents.length - 1].id)}
                             >
-                                <Image
-                                    src={Solo}
-                                    alt={`Ticket ${index + 1}`}
-                                    layout="fill"
-                                    objectFit="cover"
-                                    className="absolute inset-0 brightness-50 group-hover:brightness-65 transition-all duration-300"
+                                <img
+                                    src={
+                                        popularEvents[popularEvents.length - 1].posterName
+                                            ? `http://localhost:8080/uploads/event-posters/${popularEvents[popularEvents.length - 1].posterName}`
+                                            : "https://via.placeholder.com/300x192"
+                                    }
+                                    alt={popularEvents[popularEvents.length - 1].title}
+                                    className="absolute inset-0 w-full h-full object-cover brightness-50 group-hover:brightness-65 transition-all duration-300"
                                 />
                                 <CardContent className="relative h-full flex items-center justify-between p-8">
                                     <div className="flex flex-col gap-3 text-white max-w-[50%]">
                                         <h3 className="text-2xl font-bold">
-                                            Ticket {index + 1}
+                                            {popularEvents[popularEvents.length - 1].title}
                                         </h3>
                                         <div className="flex flex-col gap-2">
                                             <p className="text-base flex items-center gap-1.5">
-                                                <Guitar strokeWidth={2} className="w-4 h-4 text-white" /> Concert
-                                                <Palette strokeWidth={2} className="w-4 h-4 text-white" /> Nauka, Isskusstvo
+                                                <Guitar strokeWidth={2} className="w-4 h-4 text-white" /> Event
+                                                <Palette strokeWidth={2} className="w-4 h-4 text-white" />{" "}
+                                                {popularEvents[popularEvents.length - 1].formatId === 1 ? "Conference" : "Other"}
                                             </p>
                                             <p className="text-base flex items-center gap-1.5">
-                                                <CalendarDays strokeWidth={2} className="w-4 h-4 text-white" /> March 16th, 2025, 10:00
+                                                <CalendarDays strokeWidth={2} className="w-4 h-4 text-white" />{" "}
+                                                {new Date(popularEvents[popularEvents.length - 1].startedAt).toLocaleString("en-US", {
+                                                    month: "long",
+                                                    day: "numeric",
+                                                    year: "numeric",
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                })}
                                             </p>
                                             <p className="text-base flex items-center gap-1.5">
-                                                <MapPinned strokeWidth={2} className="w-4 h-4 text-white" /> Lviv
+                                                <MapPinned strokeWidth={2} className="w-4 h-4 text-white" />{" "}
+                                                <span className="truncate">{popularEvents[popularEvents.length - 1].venue}</span>
                                             </p>
                                         </div>
                                         <p className="text-xl font-semibold">
-                                            {(index + 1) * 10}.00 - {(index + 1) * 20}.00 $
+                                            {(popularEvents[popularEvents.length - 1].id * 10).toFixed(2)} -{" "}
+                                            {(popularEvents[popularEvents.length - 1].id * 20).toFixed(2)} $
+                                        </p>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    )}
+                    {/* Оригинальные карточки */}
+                    {popularEvents.map((event) => (
+                        <div key={`original-${event.id}`} className="w-full flex-shrink-0">
+                            <Card
+                                className="w-full h-[400px] relative border-none cursor-pointer group"
+                                onClick={() => handleCardClick(event.id)}
+                            >
+                                <img
+                                    src={
+                                        event.posterName
+                                            ? `http://localhost:8080/uploads/event-posters/${event.posterName}`
+                                            : "https://via.placeholder.com/300x192"
+                                    }
+                                    alt={event.title}
+                                    className="absolute inset-0 w-full h-full object-cover brightness-50 group-hover:brightness-65 transition-all duration-300"
+                                />
+                                <CardContent className="relative h-full flex items-center justify-between p-8">
+                                    <div className="flex flex-col gap-3 text-white max-w-[50%]">
+                                        <h3 className="text-2xl font-bold">{event.title}</h3>
+                                        <div className="flex flex-col gap-2">
+                                            <p className="text-base flex items-center gap-1.5">
+                                                <Guitar strokeWidth={2} className="w-4 h-4 text-white" /> Event
+                                                <Palette strokeWidth={2} className="w-4 h-4 text-white" />{" "}
+                                                {event.formatId === 1 ? "Conference" : "Other"}
+                                            </p>
+                                            <p className="text-base flex items-center gap-1.5">
+                                                <CalendarDays strokeWidth={2} className="w-4 h-4 text-white" />{" "}
+                                                {new Date(event.startedAt).toLocaleString("en-US", {
+                                                    month: "long",
+                                                    day: "numeric",
+                                                    year: "numeric",
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                })}
+                                            </p>
+                                            <p className="text-base flex items-center gap-1.5">
+                                                <MapPinned strokeWidth={2} className="w-4 h-4 text-white" />{" "}
+                                                <span className="truncate">{event.venue}</span>
+                                            </p>
+                                        </div>
+                                        <p className="text-xl font-semibold">
+                                            {(event.id * 10).toFixed(2)} - {(event.id * 20).toFixed(2)} $
                                         </p>
                                     </div>
                                 </CardContent>
                             </Card>
                         </div>
                     ))}
-                    {/* Дубликат первой карточки для перехода вперед */}
-                    <div key="duplicate-0" className="w-full flex-shrink-0">
-                        <Card
-                            className="w-full h-[400px] relative border-none cursor-pointer"
-                            onClick={() => handleCardClick(0)} // Индекс 0 для Ticket 1
-                        >
-                            <Image
-                                src={Solo}
-                                alt={`Ticket 1`}
-                                layout="fill"
-                                objectFit="cover"
-                                className="absolute inset-0 brightness-50 group-hover:brightness-65 transition-all duration-300"
-                            />
-                            <CardContent className="relative h-full flex items-center justify-between p-8">
-                                <div className="flex flex-col gap-3 text-white max-w-[50%]">
-                                    <h3 className="text-2xl font-bold">
-                                        Ticket 1
-                                    </h3>
-                                    <div className="flex flex-col gap-2">
-                                        <p className="text-base flex items-center gap-1.5">
-                                            <Guitar strokeWidth={2} className="w-4 h-4 text-white" /> Concert
-                                            <Palette strokeWidth={2} className="w-4 h-4 text-white" /> Nauka, Isskusstvo
-                                        </p>
-                                        <p className="text-base flex items-center gap-1.5">
-                                            <CalendarDays strokeWidth={2} className="w-4 h-4 text-white" /> March 16th, 2025, 10:00
-                                        </p>
-                                        <p className="text-base flex items-center gap-1.5">
-                                            <MapPinned strokeWidth={2} className="w-4 h-4 text-white" /> Lviv
+                    {/* Дубликат первой карточки для перехода вперёд */}
+                    {popularEvents.length > 0 && (
+                        <div key={`duplicate-first-${popularEvents[0].id}`} className="w-full flex-shrink-0">
+                            <Card
+                                className="w-full h-[400px] relative border-none cursor-pointer"
+                                onClick={() => handleCardClick(popularEvents[0].id)}
+                            >
+                                <img
+                                    src={
+                                        popularEvents[0].posterName
+                                            ? `http://localhost:8080/uploads/event-posters/${popularEvents[0].posterName}`
+                                            : "https://via.placeholder.com/300x192"
+                                    }
+                                    alt={popularEvents[0].title}
+                                    className="absolute inset-0 w-full h-full object-cover brightness-50 group-hover:brightness-65 transition-all duration-300"
+                                />
+                                <CardContent className="relative h-full flex items-center justify-between p-8">
+                                    <div className="flex flex-col gap-3 text-white max-w-[50%]">
+                                        <h3 className="text-2xl font-bold">{popularEvents[0].title}</h3>
+                                        <div className="flex flex-col gap-2">
+                                            <p className="text-base flex items-center gap-1.5">
+                                                <Guitar strokeWidth={2} className="w-4 h-4 text-white" /> Event
+                                                <Palette strokeWidth={2} className="w-4 h-4 text-white" />{" "}
+                                                {popularEvents[0].formatId === 1 ? "Conference" : "Other"}
+                                            </p>
+                                            <p className="text-base flex items-center gap-1.5">
+                                                <CalendarDays strokeWidth={2} className="w-4 h-4 text-white" />{" "}
+                                                {new Date(popularEvents[0].startedAt).toLocaleString("en-US", {
+                                                    month: "long",
+                                                    day: "numeric",
+                                                    year: "numeric",
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                })}
+                                            </p>
+                                            <p className="text-base flex items-center gap-1.5">
+                                                <MapPinned strokeWidth={2} className="w-4 h-4 text-white" />{" "}
+                                                <span className="truncate">{popularEvents[0].venue}</span>
+                                            </p>
+                                        </div>
+                                        <p className="text-xl font-semibold">
+                                            {(popularEvents[0].id * 10).toFixed(2)} - {(popularEvents[0].id * 20).toFixed(2)} $
                                         </p>
                                     </div>
-                                    <p className="text-xl font-semibold">
-                                        10.00 - 20.00 $
-                                    </p>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    )}
                 </div>
                 {/* Кнопки вне прокручиваемого контейнера */}
                 <div className="cursor-pointer absolute right-13 bottom-15 flex flex-row gap-2 z-20">
@@ -250,7 +306,7 @@ const PopularCardsCarousel = () => {
 
             {/* Индикаторы (полоски) */}
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
-                {popularCards.map((_, index) => (
+                {popularEvents.map((_, index) => (
                     <div
                         key={index}
                         className={`w-6 h-1 rounded ${

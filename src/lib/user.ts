@@ -1,4 +1,3 @@
-// lib/user.ts
 import api from "@/lib/api";
 import { AxiosError } from "axios";
 
@@ -10,6 +9,16 @@ export interface User {
     profilePictureName: string;
     role: string;
     createdAt: string;
+}
+
+export interface Company {
+    id: number;
+    ownerId: number;
+    email: string;
+    title: string;
+    description: string;
+    createdAt: string;
+    logoName: string;
 }
 
 export async function getUserMe(accessToken?: string): Promise<{ success: boolean; data?: User; errors: string | string[] }> {
@@ -46,9 +55,7 @@ export async function updateUser(
     data: { firstName?: string; lastName?: string | null },
 ): Promise<{ success: boolean; data?: User; errors: string | string[] }> {
     try {
-        const response = await api.patch(`/users/${userId}`, data, {
-
-        });
+        const response = await api.patch(`/users/${userId}`, data);
 
         return { success: true, data: response.data, errors: "" };
     } catch (error) {
@@ -95,5 +102,26 @@ export async function uploadAvatar(
         }
 
         return { success: false, data: undefined, errors: "Failed to upload avatar" };
+    }
+}
+
+export async function getUserCompany(userId: number): Promise<{ success: boolean; data?: Company[] | null; errors: string | string[] }> {
+    try {
+        const response = await api.get(`/users/${userId}/companies`);
+
+        return { success: true, data: response.data, errors: "" };
+    } catch (error) {
+        const axiosError = error as AxiosError<{ message?: string | string[] }>;
+        const errorData = axiosError.response?.data;
+
+        if (errorData?.message) {
+            return {
+                success: false,
+                data: undefined,
+                errors: Array.isArray(errorData.message) ? errorData.message : [errorData.message],
+            };
+        }
+
+        return { success: false, data: undefined, errors: "Failed to fetch company data" };
     }
 }

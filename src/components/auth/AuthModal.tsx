@@ -11,28 +11,7 @@ import Image from "next/image";
 import LoginForm from "./LoginForm";
 import ResetPasswordForm from "./ResetPasswordForm";
 import RegisterForm from "./RegisterForm";
-import { z } from "zod";
-
-const authSchema = z.object({
-    name: z.string().min(3, { message: "Name must be longer than or equal to 3 characters" }),
-    surname: z
-        .string()
-        .optional()
-        .refine(
-            (value) => !value || value.length >= 3,
-            { message: "Surname must be longer than or equal to 3 characters if provided" }
-        ),
-    email: z.string().email({ message: "Please enter a valid email address" }),
-    password: z
-        .string()
-        .min(8, { message: "Password must be at least 8 characters long" })
-        .regex(/[a-zA-Z]/, { message: "Password must contain at least one letter" })
-        .regex(/[0-9]/, { message: "Password must contain at least one number" }),
-});
-
-const loginSchema = authSchema.pick({ email: true, password: true });
-const registerSchema = authSchema.pick({ name: true, surname: true, email: true, password: true });
-const resetPasswordSchema = authSchema.pick({ email: true });
+import {loginZodSchema, registerZodSchema, resetPasswordZodSchema} from "@/zod/shemas";
 
 interface AuthModalProps {
     isOpen: boolean;
@@ -51,7 +30,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const [isForgotPassword, setIsForgotPassword] = useState(false);
     const [activeTab, setActiveTab] = useState("login");
     const [loginErrors, setLoginErrors] = useState<{ email?: string; password?: string }>({});
-    const [registerErrors, setRegisterErrors] = useState<{ name?: string; surname?: string; email?: string; password?: string }>({});
+    const [registerErrors, setRegisterErrors] = useState<{
+        firstName?: string;
+        lastName?: string;
+        email?: string;
+        password?: string;
+    }>({});
     const [resetErrors, setResetErrors] = useState<{ email?: string }>({});
     const { checkAuth } = useAuth();
 
@@ -84,7 +68,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         e.preventDefault();
 
         const loginData = { email, password };
-        const loginValidation = loginSchema.safeParse(loginData);
+        const loginValidation = loginZodSchema.safeParse(loginData);
 
         if (!loginValidation.success) {
             const errors = loginValidation.error.flatten().fieldErrors;
@@ -119,7 +103,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         e.preventDefault();
 
         const resetData = { email: resetEmail };
-        const resetValidation = resetPasswordSchema.safeParse(resetData);
+        const resetValidation = resetPasswordZodSchema.safeParse(resetData);
 
         if (!resetValidation.success) {
             const errors = resetValidation.error.flatten().fieldErrors;
@@ -150,13 +134,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         e.preventDefault();
 
         const registerData = { name, surname, email, password };
-        const registerValidation = registerSchema.safeParse(registerData);
+        const registerValidation = registerZodSchema.safeParse(registerData);
 
         if (!registerValidation.success) {
             const errors = registerValidation.error.flatten().fieldErrors;
             setRegisterErrors({
-                name: errors.name?.[0],
-                surname: errors.surname?.[0],
+                firstName: errors.firstName?.[0],
+                lastName: errors.lastName?.[0],
                 email: errors.email?.[0],
                 password: errors.password?.[0],
             });

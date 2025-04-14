@@ -44,7 +44,7 @@ export function NavUser({ user }: NavUserProps) {
                 <div className="flex items-center gap-2 cursor-pointer">
                     <Avatar className="h-10 w-10 rounded-lg">
                         <AvatarImage
-                            src={`http://localhost:8080/uploads/avatars/${user.profilePictureName}`}
+                            src={`http://localhost:8080/uploads/user-avatars/${user.profilePictureName}`}
                             alt={user.firstName}
                         />
                         <AvatarFallback className="rounded-lg">

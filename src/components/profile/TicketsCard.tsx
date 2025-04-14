@@ -14,7 +14,7 @@ type TicketsCardProps = {
 
 export default function TicketsCard({ initialTickets }: TicketsCardProps) {
     return (
-        <Card className="shadow-lg transition-all duration-300 hover:shadow-xl h-[350px] flex flex-col">
+        <Card className="shadow-lg transition-all duration-300 hover:shadow-xl h-[396px] flex flex-col">
             <CardContent className="flex-1">
                 <div className="border-b">
                     <CardHeader className="text-xl font-medium text-foreground">Tickets</CardHeader>
