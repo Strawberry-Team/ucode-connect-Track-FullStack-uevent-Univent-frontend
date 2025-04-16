@@ -83,7 +83,7 @@ export default function CompanyCard() {
                                             <p
                                                 className="text-gray-600 text-[14.5px]"
                                                 style={{
-                                                    maxWidth: "180px",
+                                                    maxWidth: "200px",
                                                     wordBreak: "break-word",
                                                     display: "-webkit-box",
                                                     WebkitBoxOrient: "vertical",

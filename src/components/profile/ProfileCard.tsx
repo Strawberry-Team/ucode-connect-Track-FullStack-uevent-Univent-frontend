@@ -197,7 +197,7 @@ export default function ProfileCard({ setEditMode, editMode }: ProfileCardProps)
                                 </p>
                                 <p className="text-base text-foreground/80">{user.email}</p>
                             </div>
-                            <div className="text-[17px] space-y-1 pt-2">
+                            <div className="text-center text-[17px] space-y-1 pt-2">
                                 <div>
                                     <span className="font-medium">Role:</span> {user.role}
                                 </div>

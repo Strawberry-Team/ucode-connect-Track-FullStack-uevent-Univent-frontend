@@ -1,25 +1,26 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import ProductCard from "./ProductCard";
-import { useEventsStore } from "@/store/eventsStore";
-import { useEffect } from "react";
+import { getEvents, Event } from "@/lib/event";
 
 const ProductCardList = () => {
-    const { events, isLoading, fetchEvents } = useEventsStore();
+    const [events, setEvents] = useState<Event[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        // Загружаем события, если их нет или если прошло больше 5 минут
-        const shouldFetch =
-            events.length === 0 ||
-            !useEventsStore.getState().lastFetched ||
-            (useEventsStore.getState().lastFetched &&
-                Date.now() - useEventsStore.getState().lastFetched > 5 * 60 * 1000);
-
-        if (shouldFetch) {
-            fetchEvents();
-            console.log("Загрузка");
-        }
-    }, [fetchEvents]);
+        const fetchEvents = async () => {
+            setIsLoading(true);
+            const response = await getEvents();
+            if (response.success && response.data) {
+                setEvents(response.data);
+            } else {
+                setEvents([]);
+            }
+            setIsLoading(false);
+        };
+        fetchEvents();
+    }, []);
 
     if (isLoading) {
         return <div className="px-custom p-4">Loading events...</div>;

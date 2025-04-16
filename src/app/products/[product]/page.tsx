@@ -1,146 +1,171 @@
-import Image from "next/image";
-import {Card, CardContent} from "@/components/ui/card";
-import {Button} from "@/components/ui/button";
-import {
-    CalendarDays,
-    MapPinned,
-    MapPin,
-    Tag,
-    Palette,
-    Building,
-} from "lucide-react";
-import LogoImage from "@/assets/logo_white.png";
+import { format } from "date-fns";
+import Link from "next/link";
+import { getEventById, getEventByIdNews } from "@/lib/event";
+import { generateMapEmbedUrl } from "@/utils/generateMapEmbedUrl"; // Импортируем новую утилиту
+import { CalendarDays, MapPinned, MapPin, Tag, Building } from "lucide-react";
 import TicketActions from "@/components/card/TicketActions";
 import NotificationsBlock from "@/components/notification/NotificationsBlock";
-import Link from "next/link";
 
-export default async function PageCard({params}: { params: Promise<{ product: string }> }) {
+interface NewsNotification {
+    type: "news";
+    title: string;
+    description: string;
+    createdAt: string;
+}
+
+interface UserNotification {
+    type: "user";
+    firstName: string;
+    lastName: string;
+    createdAt: string;
+    avatarUrl: string;
+}
+
+export default async function PageCard({ params }: { params: Promise<{ product: string }> }) {
     const resolvedParams = await params;
     const id = parseInt(resolvedParams.product, 10);
-
-    // Пример данных (в реальном проекте это может быть запрос к API)
-    const ticketData = {
-        title: `Event ${id}`,
-        description: `Join us for an amazing event! This is a detailed description of the event with ID ${id}. We’ll have a great time together, with lots of activities and fun.`,
-        location: "Lviv Opera House",
-        locationLink: "https://maps.google.com/?q=Lviv+Opera+House", // Ссылка на Google Maps
-        dateStart: "March 16th, 2025, 10:00",
-        dateEnd: "March 16th, 2025, 14:00",
-        format: "Concert",
-        themes: ["Music", "Art"],
-        company: "Eventify Inc.",
-        companyId: "eventify-inc",
-        price: `${id * 10}.00 - ${id * 20}.00 $`,
-        image: LogoImage.src,
-        notifications: [
-            {
-                title: "Event Schedule Updated",
-                description: "We’ve updated the schedule for Event ${id}.",
-                date: "March 10th, 2025",
-            },
-            {
-                title: "Special Guest Announced",
-                description: "We’re excitedWe’re excited to We’re excited to We’re excited to We’re excited to  to announce a special guest for Event ${id}! Join us to meet a famous artist.",
-                date: "March 5th, 2025",
-            },
-            {
-                title: "Early Bird Tickets Sold Out",
-                description: "Early bird tickets for Event ${id} are sold out. Regular tickets are still available!",
-                date: "March 1st, 2025",
-            },
-        ],
-    };
 
     if (isNaN(id) || id < 1) {
         return <div className="px-custom py-4">Ticket not found</div>;
     }
 
+    const eventResponse = await getEventById(id);
+    if (!eventResponse.success || !eventResponse.data) {
+        return <div className="px-custom py-4">Event not found: {eventResponse.errors}</div>;
+    }
+
+    const notificationsResponse = await getEventByIdNews(id);
+    const rawNewsNotifications = notificationsResponse.success && notificationsResponse.data ? notificationsResponse.data : [];
+
+    const newsNotifications: NewsNotification[] = rawNewsNotifications.map((notification) => ({
+        type: "news" as const,
+        title: notification.title,
+        description: notification.description,
+        createdAt: notification.createdAt,
+    }));
+
+    const rawUserNotifications = [
+        {
+            id: 1,
+            firstName: "John",
+            lastName: "Doe",
+            createdAt: "2025-04-15T10:07:28.000Z",
+            avatarUrl: `http://localhost:8080/uploads/event-posters/default-poster.png`,
+        },
+        {
+            id: 2,
+            firstName: "Jane",
+            lastName: "Smith",
+            createdAt: "2025-04-15T10:08:00.000Z",
+            avatarUrl: `http://localhost:8080/uploads/event-posters/default-poster.png`,
+        },
+        {
+            id: 1,
+            firstName: "John",
+            lastName: "Doe",
+            createdAt: "2025-04-15T10:07:28.000Z",
+            avatarUrl: `http://localhost:8080/uploads/event-posters/default-poster.png`,
+        },
+    ];
+
+    const userNotifications: UserNotification[] = rawUserNotifications.map((user) => ({
+        type: "user" as const,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        createdAt: user.createdAt,
+        avatarUrl: user.avatarUrl,
+    }));
+
+    const event = eventResponse.data;
+    const dateStart = format(new Date(event.startedAt), "MMMM d, yyyy HH:mm");
+    const dateEnd = format(new Date(event.endedAt), "MMMM d, yyyy HH:mm");
+    const price = `${(event.id * 10).toFixed(2)} - ${(event.id * 20).toFixed(2)} $`;
+    const imageUrl = event.posterName
+        ? `http://localhost:8080/uploads/event-posters/${event.posterName}`
+        : "https://via.placeholder.com/384x384";
+    
+    const mapEmbedUrl = generateMapEmbedUrl(event.locationCoordinates);
 
     return (
         <div className="px-custom py-4 w-full">
             <div className="flex flex-col md:flex-row gap-6 items-start">
-                {/* Изображение */}
-                <div className="shrink-0 w-full md:w-96">
-                    <Image
-                        src={LogoImage}
-                        alt={ticketData.title}
+                <div className="shrink-0 w-full md:w-90">
+                    <img
+                        src={imageUrl}
+                        alt={event.title}
                         width={384}
                         height={384}
-                        className="h-96 w-full object-contain"
+                        className="md:h-130 w-full object-contain"
                     />
                 </div>
-                <div className="px-6 flex-1 flex flex-col gap-4">
-                    {/* Заголовок */}
-                    <h1 className="text-3xl font-bold text-gray-800">{ticketData.title}</h1>
 
-                    {/* Основная информация */}
+                <div className="px-3 flex-1 flex flex-col gap-4">
+                    <h1 className="text-3xl font-bold text-gray-800">{event.title}</h1>
+
                     <div className="flex flex-col gap-3 text-gray-700">
-                        {/* Формат и темы */}
                         <div className="flex items-center gap-2">
-                            <Tag strokeWidth={2.5} className="w-5 h-5 text-gray-500"/>
+                            <Tag strokeWidth={2.5} className="w-5 h-5 text-gray-500" />
                             <span className="text-lg font-medium">
-                                {ticketData.format} • {ticketData.themes.join(", ")}
+                                {event.format.title} • {event.themes.map((theme) => theme.title).join(", ")}
                             </span>
                         </div>
 
-                        {/* Даты */}
                         <div className="flex items-center gap-2">
-                            <CalendarDays strokeWidth={2.5} className="w-5 h-5 text-gray-500"/>
+                            <CalendarDays strokeWidth={2.5} className="w-5 h-5 text-gray-500" />
                             <span className="text-lg font-medium">
-                                {ticketData.dateStart} - {ticketData.dateEnd}
+                                {dateStart} - {dateEnd}
                             </span>
                         </div>
 
-                        {/* Место проведения */}
                         <div className="flex items-center gap-2">
-                            <MapPin strokeWidth={2.5} className="w-5 h-5 text-gray-500"/>
-                            <span className="text-lg font-medium">{ticketData.location}</span>
+                            <MapPin strokeWidth={2.5} className="w-5 h-5 text-gray-500" />
+                            <span className="text-lg font-medium">{event.venue}</span>
                         </div>
 
-                        {/* Локация (ссылка на Google Maps) */}
-                        <div className="flex items-center gap-2">
-                            <MapPinned strokeWidth={2.5} className="w-5 h-5 text-gray-500"/>
-                            <a
-                                href={ticketData.locationLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-lg font-medium  underline"
-                            >
-                                View on Google Maps
-                            </a>
-                        </div>
-
-                        {/* Ссылка на страницу компании */}
                         <div className="flex items-center gap-2">
                             <Building strokeWidth={2.5} className="w-5 h-5 text-gray-500" />
-                            <Link href={`/company/${ticketData.companyId}`}>
-                                <span className="text-lg font-medium  underline">
-                                    {ticketData.company}
+                            <Link href={`/company/${event.company.id}`}>
+                                <span className="text-lg font-medium underline">
+                                    {event.company.title}
                                 </span>
                             </Link>
                         </div>
                     </div>
 
-                    {/* Цена */}
                     <div className="mt-2">
-                        <span className="text-2xl font-semibold text-gray-900">
-                            {ticketData.price}
-                        </span>
+                        <span className="text-2xl font-semibold text-gray-900">{price}</span>
                     </div>
 
-                    {/* Кнопка Buy */}
-                    <div className="">
-                        <TicketActions title={ticketData.title} price={ticketData.price}/>
+                    <div>
+                        <TicketActions title={event.title} price={price} />
                     </div>
                 </div>
             </div>
 
-            <NotificationsBlock notifications={ticketData.notifications} />
-            {/* Описание */}
+            <div className="flex flex-col md:flex-row gap-6 mt-8">
+                <div className="flex-1 md:flex-[2]">
+                    <NotificationsBlock notifications={userNotifications} />
+                </div>
+                <div className="flex-1 md:flex-[4]">
+                    <NotificationsBlock notifications={newsNotifications} />
+                </div>
+            </div>
+
             <div className="mt-8 border-t">
-                <p className="mb-2 my-6 text-gray-600 text-lg leading-relaxed">
-                    {ticketData.description}
-                </p>
+                <div className="my-6">
+                    <div className="block">
+                        <iframe
+                            src={mapEmbedUrl}
+                            width="100%"
+                            height="300"
+                            allowFullScreen
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                            className="md:w-[500px] rounded-lg md:float-right md:ml-6"
+                        ></iframe>
+                        <p className="mt-5 text-gray-600 text-lg leading-relaxed">{event.description}</p>
+                    </div>
+                </div>
             </div>
         </div>
     );

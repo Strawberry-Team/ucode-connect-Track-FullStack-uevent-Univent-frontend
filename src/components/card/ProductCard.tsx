@@ -1,29 +1,21 @@
 "use client";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
-import { CalendarDays, MapPinned, Tag } from "lucide-react";
-import { Event } from "@/lib/event";
+import {useRouter} from "next/navigation";
+import {Card, CardContent} from "@/components/ui/card";
+import {CalendarDays, MapPinned, Tag} from "lucide-react";
+import {Event} from "@/lib/event";
+import {format} from "date-fns";
 
 interface ProductCardProps {
     event: Event;
 }
 
-const ProductCard = ({ event }: ProductCardProps) => {
+const ProductCard = ({event}: ProductCardProps) => {
     const router = useRouter();
 
     const handleClick = () => {
         router.push(`/products/${event.id}`);
     };
-
-    // Форматируем дату начала события
-    const startDate = new Date(event.startedAt).toLocaleString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    });
 
     return (
         <Card
@@ -45,16 +37,18 @@ const ProductCard = ({ event }: ProductCardProps) => {
                 <div>
                     <h3 className="text-xl font-bold text-gray-900">{event.title}</h3>
                     <div className="flex flex-col gap-1 text-gray-700">
-                        <p className="text-sm font-medium flex items-center gap-1">
-                            <Tag strokeWidth={2.5} className="w-4 h-4" />
-                            Event • {event.formatId === 1 ? "Conference" : "Other"}
+                        <p className="text-sm font-medium flex items-center gap-1 truncate max-w-full">
+                            <Tag strokeWidth={2.5} className="w-4 h-4 flex-shrink-0"/>
+                            <span className="truncate">
+                                {event.format.title} • {event.themes.map((theme) => theme.title).join(", ")}
+                            </span>
                         </p>
                         <p className="text-sm font-medium flex items-center gap-1">
-                            <CalendarDays strokeWidth={2.5} className="w-4 h-4" />
-                            {startDate}
+                            <CalendarDays strokeWidth={2.5} className="w-4 h-4"/>
+                            {format(new Date(event.startedAt), "MMMM d, yyyy HH:mm")}
                         </p>
                         <p className="text-sm font-medium flex items-center gap-1 truncate max-w-full">
-                            <MapPinned strokeWidth={2.5} className="w-4 h-4 flex-shrink-0" />
+                            <MapPinned strokeWidth={2.5} className="w-4 h-4 flex-shrink-0"/>
                             <span className="truncate">{event.venue}</span>
                         </p>
                     </div>

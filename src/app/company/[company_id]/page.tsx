@@ -1,38 +1,80 @@
 import Image from "next/image";
-import {Mail, MapPin, User} from "lucide-react";
-import LogoImage from "@/assets/logo_white.png";
+import { Mail } from "lucide-react";
+import { getCompanyById, getCompanyNewsById } from "@/lib/company";
 import NotificationsBlock from "@/components/notification/NotificationsBlock";
+import {Button} from "@/components/ui/button";
 
-export default async function CompanyPage({ params }: { params: Promise<{ companyId: string }> }) {
+interface CompanyNewsNotification {
+    type: "companyNews";
+    title: string;
+    description: string;
+    createdAt: string;
+}
+
+interface EventNotification {
+    type: "event";
+    title: string;
+    createdAt: string;
+    avatarUrl: string;
+}
+
+export default async function CompanyPage({ params }: { params: Promise<{ company_id: string }> }) {
     const resolvedParams = await params;
-    const companyId = resolvedParams.companyId;
+    const companyId = parseInt(resolvedParams.company_id, 10);
 
-    // Пример данных компании (в реальном проекте это может быть запрос к API)
-    const companyData = {
-        id: companyId,
-        name: "Eventify Inc.",
-        description: "Eventify Inc. is a leading company in organizing unforgettable events, concerts, and cultural experiences across the globe.",
-        email: "company@gmail.com",
-        owner: "John Doe",
-        image: LogoImage.src,
-        notifications: [
-            {
-                title: "Company Schedule Updated",
-                description: "We’ve updated the schedule for Event ${id}.",
-                date: "March 10th, 2025",
-            },
-            {
-                title: "Special Guest Announced",
-                description: "We’re excited to announce a special guest for Event ${id}! Join us to meet a famous artist.",
-                date: "March 5th, 2025",
-            },
-            {
-                title: "Early Bird Tickets Sold Out",
-                description: "Early bird tickets for Event ${id} are sold out. Regular tickets are still available!",
-                date: "March 1st, 2025",
-            },
-        ],
-    };
+    if (isNaN(companyId) || companyId < 1) {
+        return <div className="px-custom py-4">Company not found</div>;
+    }
+
+    const companyResponse = await getCompanyById(companyId);
+    if (!companyResponse.success || !companyResponse.data) {
+        return <div className="px-custom py-4">Company not found: {companyResponse.errors}</div>;
+    }
+
+    const newsResponse = await getCompanyNewsById(companyId);
+    const rawCompanyNews = newsResponse.success && newsResponse.data ? newsResponse.data : [];
+
+    const companyNewsNotifications: CompanyNewsNotification[] = rawCompanyNews.map((news) => ({
+        type: "companyNews" as const,
+        title: news.title,
+        description: news.description,
+        createdAt: news.createdAt,
+    }));
+
+    const rawEventNotifications = [
+        {
+            id: 1,
+            title: "John",
+            createdAt: "2025-04-15T10:07:28.000Z",
+            avatarUrl: `http://localhost:8080/uploads/event-posters/default-poster.png`,
+        },
+        {
+            id: 2,
+            title: "Jane",
+            createdAt: "2025-04-15T10:08:00.000Z",
+            avatarUrl: `http://localhost:8080/uploads/event-posters/default-poster.png`,
+        },
+        {
+            id: 1,
+            title: "John",
+            createdAt: "2025-04-15T10:07:28.000Z",
+            avatarUrl: `http://localhost:8080/uploads/event-posters/default-poster.png`,
+        },
+    ];
+
+    const eventNotifications: EventNotification[] = rawEventNotifications.map((event) => ({
+        type: "event" as const,
+        title: event.title,
+        createdAt: event.createdAt,
+        avatarUrl: event.avatarUrl,
+    }));
+
+    const company = companyResponse.data;
+
+    // Формируем URL изображения компании
+    const imageUrl = company.logoName
+        ? `http://localhost:8080/uploads/company-logos/${company.logoName}` // Предполагаемый путь к логотипу
+        : "https://via.placeholder.com/384x384"; // Запасное изображение
 
     return (
         <div className="px-custom py-4 w-full">
@@ -40,8 +82,8 @@ export default async function CompanyPage({ params }: { params: Promise<{ compan
                 {/* Изображение */}
                 <div className="shrink-0 w-full md:w-96">
                     <Image
-                        src={LogoImage}
-                        alt={companyData.name}
+                        src={imageUrl}
+                        alt={company.title}
                         width={384}
                         height={384}
                         className="h-96 w-full object-contain"
@@ -50,26 +92,35 @@ export default async function CompanyPage({ params }: { params: Promise<{ compan
 
                 {/* Информация о компании */}
                 <div className="px-6 flex-1 flex flex-col gap-4">
-                    <h1 className="text-3xl font-bold text-gray-800">{companyData.name}</h1>
+                    <h1 className="text-3xl font-bold text-gray-800">{company.title}</h1>
                     <div className="flex flex-col gap-3 text-gray-700">
-                        {/* Местоположение */}
+                        {/* Email */}
                         <div className="flex items-center gap-2">
                             <Mail strokeWidth={2.5} className="w-5 h-5 text-gray-500" />
-                            <span className="text-lg font-medium">{companyData.email}</span>
+                            <span className="text-lg font-medium">{company.email}</span>
                         </div>
-                        {/* Владелец */}
-                        <div className="flex items-center gap-2">
-                            <User strokeWidth={2.5} className="w-5 h-5 text-gray-500" />
-                            <span className="text-lg font-medium">Owner: {companyData.owner}</span>
+                        <Button
+                            variant="outline"
+                            className="text-[16px] py-5 px-7 rounded-full font-medium mt-1 w-[300px]"
+                        >
+                            Subscribe to event notifications
+                        </Button>
+                        <div className="-mt-3 flex flex-wrap gap-2">
+                            <div className="flex-1 min-w-[300px] md:flex-[2]">
+                                <NotificationsBlock notifications={eventNotifications} />
+                            </div>
+                            <div className="flex-1 min-w-[300px] md:flex-[4]">
+                                <NotificationsBlock notifications={companyNewsNotifications} />
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <NotificationsBlock notifications={companyData.notifications} />
+
             {/* Описание компании */}
             <div className="mt-8 border-t">
                 <p className="mb-2 my-6 text-gray-600 text-lg leading-relaxed">
-                    {companyData.description}
+                    {company.description}
                 </p>
             </div>
         </div>

@@ -1,17 +1,17 @@
 "use client";
 
 import Image from "next/image";
-import { CalendarDays, Guitar, MapPinned, Palette } from "lucide-react";
+import {CalendarDays, Guitar, MapPinned, Palette, Tag} from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEventsStore } from "@/store/eventsStore";
-import { Event } from "@/lib/event"; // Импортируем тип Event
+import { Event, getEvents } from "@/lib/event";
+import {format} from "date-fns";
 
 const PopularCardsCarousel = () => {
-    const { events, fetchEvents } = useEventsStore(); // Получаем события из стора
+    const [events, setEvents] = useState<Event[]>([]);
     const [currentIndex, setCurrentIndex] = useState<number>(1);
     const [isPaused, setIsPaused] = useState<boolean>(false);
     const [isTransitioning, setIsTransitioning] = useState<boolean>(true);
@@ -19,25 +19,25 @@ const PopularCardsCarousel = () => {
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const router = useRouter();
 
+    useEffect(() => {
+        const fetchEvents = async () => {
+            const response = await getEvents();
+
+            if (response.success && response.data) {
+                setEvents(response.data);
+            } else {
+                setEvents([]);
+            }
+        };
+
+        fetchEvents();
+    }, []);
+
     const popularEvents: Event[] = [...events]
         .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
         .slice(0, 4);
 
     const totalSlides: number = popularEvents.length || 1;
-
-
-    useEffect(() => {
-        const shouldFetch =
-            events.length === 0 ||
-            !useEventsStore.getState().lastFetched ||
-            (useEventsStore.getState().lastFetched &&
-                Date.now() - useEventsStore.getState().lastFetched > 5 * 60 * 1000);
-
-        if (shouldFetch) {
-            fetchEvents();
-            console.log("Загрузка карусель");
-        }
-    }, [fetchEvents]);
 
     // Автоматическое переключение каждые 5 секунд
     useEffect(() => {
@@ -160,19 +160,15 @@ const PopularCardsCarousel = () => {
                                         </h3>
                                         <div className="flex flex-col gap-2">
                                             <p className="text-base flex items-center gap-1.5">
-                                                <Guitar strokeWidth={2} className="w-4 h-4 text-white" /> Event
-                                                <Palette strokeWidth={2} className="w-4 h-4 text-white" />{" "}
-                                                {popularEvents[popularEvents.length - 1].formatId === 1 ? "Conference" : "Other"}
+                                                <Tag strokeWidth={2.5} className="w-4 h-4 flex-shrink-0"/>
+                                                <span className="truncate">
+                                                    {popularEvents[popularEvents.length - 1].format.title} • {popularEvents[popularEvents.length - 1].themes.map((theme) => theme.title).join(", ")}
+                                                </span>
                                             </p>
+
                                             <p className="text-base flex items-center gap-1.5">
                                                 <CalendarDays strokeWidth={2} className="w-4 h-4 text-white" />{" "}
-                                                {new Date(popularEvents[popularEvents.length - 1].startedAt).toLocaleString("en-US", {
-                                                    month: "long",
-                                                    day: "numeric",
-                                                    year: "numeric",
-                                                    hour: "2-digit",
-                                                    minute: "2-digit",
-                                                })}
+                                                {format(new Date(popularEvents[popularEvents.length - 1].startedAt), "MMMM d, yyyy HH:mm")}
                                             </p>
                                             <p className="text-base flex items-center gap-1.5">
                                                 <MapPinned strokeWidth={2} className="w-4 h-4 text-white" />{" "}
@@ -209,19 +205,14 @@ const PopularCardsCarousel = () => {
                                         <h3 className="text-2xl font-bold">{event.title}</h3>
                                         <div className="flex flex-col gap-2">
                                             <p className="text-base flex items-center gap-1.5">
-                                                <Guitar strokeWidth={2} className="w-4 h-4 text-white" /> Event
-                                                <Palette strokeWidth={2} className="w-4 h-4 text-white" />{" "}
-                                                {event.formatId === 1 ? "Conference" : "Other"}
+                                                <Tag strokeWidth={2.5} className="w-4 h-4 flex-shrink-0"/>
+                                                <span className="truncate">
+                                                    {event.format.title} • {event.themes.map((theme) => theme.title).join(", ")}
+                                                </span>
                                             </p>
                                             <p className="text-base flex items-center gap-1.5">
                                                 <CalendarDays strokeWidth={2} className="w-4 h-4 text-white" />{" "}
-                                                {new Date(event.startedAt).toLocaleString("en-US", {
-                                                    month: "long",
-                                                    day: "numeric",
-                                                    year: "numeric",
-                                                    hour: "2-digit",
-                                                    minute: "2-digit",
-                                                })}
+                                                {format(new Date(event.startedAt), "MMMM d, yyyy HH:mm")}
                                             </p>
                                             <p className="text-base flex items-center gap-1.5">
                                                 <MapPinned strokeWidth={2} className="w-4 h-4 text-white" />{" "}
@@ -257,19 +248,14 @@ const PopularCardsCarousel = () => {
                                         <h3 className="text-2xl font-bold">{popularEvents[0].title}</h3>
                                         <div className="flex flex-col gap-2">
                                             <p className="text-base flex items-center gap-1.5">
-                                                <Guitar strokeWidth={2} className="w-4 h-4 text-white" /> Event
-                                                <Palette strokeWidth={2} className="w-4 h-4 text-white" />{" "}
-                                                {popularEvents[0].formatId === 1 ? "Conference" : "Other"}
+                                                <Tag strokeWidth={2.5} className="w-4 h-4 flex-shrink-0"/>
+                                                <span className="truncate">
+                                                    {popularEvents[0].format.title} • {popularEvents[0].themes.map((theme) => theme.title).join(", ")}
+                                                </span>
                                             </p>
                                             <p className="text-base flex items-center gap-1.5">
                                                 <CalendarDays strokeWidth={2} className="w-4 h-4 text-white" />{" "}
-                                                {new Date(popularEvents[0].startedAt).toLocaleString("en-US", {
-                                                    month: "long",
-                                                    day: "numeric",
-                                                    year: "numeric",
-                                                    hour: "2-digit",
-                                                    minute: "2-digit",
-                                                })}
+                                                {format(new Date(popularEvents[0].startedAt), "MMMM d, yyyy HH:mm")}
                                             </p>
                                             <p className="text-base flex items-center gap-1.5">
                                                 <MapPinned strokeWidth={2} className="w-4 h-4 text-white" />{" "}

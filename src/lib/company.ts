@@ -11,6 +11,16 @@ export interface Company {
     logoName: string;
 }
 
+interface CompanyNews {
+    id: number;
+    authorId: number;
+    companyId: number;
+    eventId: number | null;
+    title: string;
+    description: string;
+    createdAt: string;
+}
+
 export async function createCompany(
     data: { email: string; title: string; description: string; ownerId: number }
 ): Promise<{ success: boolean; data?: Company; errors: string | string[] }> {
@@ -62,5 +72,54 @@ export async function uploadCompanyLogo(
         }
 
         return { success: false, data: undefined, errors: "Failed to upload company logo" };
+    }
+}
+
+export async function getCompanyById(id: number): Promise<{
+    success: boolean;
+    data?: Company;
+    errors: string | string[];
+}> {
+    try {
+        const response = await api.get(`/companies/${id}`);
+
+        return { success: true, data: response.data, errors: "" };
+    } catch (error) {
+        const axiosError = error as AxiosError<{ message?: string | string[] }>;
+        const errorData = axiosError.response?.data;
+
+        if (errorData?.message) {
+            return {
+                success: false,
+                data: undefined,
+                errors: Array.isArray(errorData.message) ? errorData.message : [errorData.message],
+            };
+        }
+
+        return { success: false, data: undefined, errors: `Failed to fetch company with ID ${id}` };
+    }
+}
+
+export async function getCompanyNewsById(id: number): Promise<{
+    success: boolean;
+    data?: CompanyNews[];
+    errors: string | string[];
+}> {
+    try {
+        const response = await api.get(`/companies/${id}/news`);
+        return { success: true, data: response.data, errors: "" };
+    } catch (error) {
+        const axiosError = error as AxiosError<{ message?: string | string[] }>;
+        const errorData = axiosError.response?.data;
+
+        if (errorData?.message) {
+            return {
+                success: false,
+                data: undefined,
+                errors: Array.isArray(errorData.message) ? errorData.message : [errorData.message],
+            };
+        }
+
+        return { success: false, data: undefined, errors: `Failed to fetch news for company with ID ${id}` };
     }
 }
