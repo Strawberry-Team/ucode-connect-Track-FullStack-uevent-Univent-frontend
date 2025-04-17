@@ -44,6 +44,50 @@ export async function createCompany(
     }
 }
 
+export async function updateCompany(
+    companyId: number,
+    data: { title: string; description: string }
+): Promise<{ success: boolean; data?: Company; errors: string | string[] }> {
+    try {
+        const response = await api.patch(`/companies/${companyId}`, data);
+        return { success: true, data: response.data, errors: "" };
+    } catch (error) {
+        const axiosError = error as AxiosError<{ message?: string | string[] }>;
+        const errorData = axiosError.response?.data;
+
+        if (errorData?.message) {
+            return {
+                success: false,
+                data: undefined,
+                errors: Array.isArray(errorData.message) ? errorData.message : [errorData.message],
+            };
+        }
+
+        return { success: false, data: undefined, errors: `Failed to update company with ID ${companyId}` };
+    }
+}
+
+export async function deleteCompany(
+    companyId: number
+): Promise<{ success: boolean; errors: string | string[] }> {
+    try {
+        await api.delete(`/companies/${companyId}`);
+        return { success: true, errors: "" };
+    } catch (error) {
+        const axiosError = error as AxiosError<{ message?: string | string[] }>;
+        const errorData = axiosError.response?.data;
+
+        if (errorData?.message) {
+            return {
+                success: false,
+                errors: Array.isArray(errorData.message) ? errorData.message : [errorData.message],
+            };
+        }
+
+        return { success: false, errors: `Failed to delete company with ID ${companyId}` };
+    }
+}
+
 export async function uploadCompanyLogo(
     companyId: number,
     file: File

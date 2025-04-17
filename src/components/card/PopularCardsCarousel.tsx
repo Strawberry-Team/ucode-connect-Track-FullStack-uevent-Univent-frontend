@@ -1,14 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import {CalendarDays, Guitar, MapPinned, Palette, Tag} from "lucide-react";
+import { CalendarDays, Guitar, MapPinned, Palette, Tag } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Event, getEvents } from "@/lib/event";
-import {format} from "date-fns";
+import { format } from "date-fns";
+import { Skeleton } from "@/components/ui/skeleton"; // Импортируем наш кастомный Skeleton
 
 const PopularCardsCarousel = () => {
     const [events, setEvents] = useState<Event[]>([]);
@@ -18,18 +19,24 @@ const PopularCardsCarousel = () => {
     const isProcessingRef = useRef<boolean>(false);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const router = useRouter();
+    const [isLoading, setIsLoading] = useState(true); // Состояние загрузки
 
     useEffect(() => {
         const fetchEvents = async () => {
+            const start = Date.now();
             const response = await getEvents();
-
+            const elapsed = Date.now() - start;
+            const remaining = 300 - elapsed; // Минимальная задержка 300 мс
+            if (remaining > 0) {
+                await new Promise((resolve) => setTimeout(resolve, remaining));
+            }
             if (response.success && response.data) {
                 setEvents(response.data);
             } else {
                 setEvents([]);
             }
+            setIsLoading(false);
         };
-
         fetchEvents();
     }, []);
 
@@ -45,7 +52,7 @@ const PopularCardsCarousel = () => {
             clearInterval(intervalRef.current);
         }
 
-        if (!isPaused) {
+        if (!isPaused && !isLoading) {
             intervalRef.current = setInterval(() => {
                 setCurrentIndex((prevIndex) => prevIndex + 1);
             }, 5000);
@@ -56,7 +63,7 @@ const PopularCardsCarousel = () => {
                 clearInterval(intervalRef.current);
             }
         };
-    }, [isPaused]);
+    }, [isPaused, isLoading]);
 
     // Плавный переход для бесконечной карусели
     const getTranslateX = (): string => {
@@ -65,14 +72,14 @@ const PopularCardsCarousel = () => {
 
     // Обработчики для кнопок с защитой от множественных кликов
     const handlePrev = (): void => {
-        if (isProcessingRef.current) return;
+        if (isProcessingRef.current || isLoading) return;
         isProcessingRef.current = true;
         setCurrentIndex((prevIndex) => prevIndex - 1);
         setTimeout(() => (isProcessingRef.current = false), 500);
     };
 
     const handleNext = (): void => {
-        if (isProcessingRef.current) return;
+        if (isProcessingRef.current || isLoading) return;
         isProcessingRef.current = true;
         setCurrentIndex((prevIndex) => prevIndex + 1);
         setTimeout(() => (isProcessingRef.current = false), 500);
@@ -89,7 +96,9 @@ const PopularCardsCarousel = () => {
 
     // Обработчик клика по карточке
     const handleCardClick = (eventId: number) => {
-        router.push(`/products/${eventId}`);
+        if (!isLoading) {
+            router.push(`/products/${eventId}`);
+        }
     };
 
     // Сброс позиции для бесконечного цикла
@@ -120,9 +129,28 @@ const PopularCardsCarousel = () => {
         return currentIndex - 1;
     };
 
-    // Если событий нет, показываем заглушку
-    if (popularEvents.length === 0) {
-        return <div className="px-custom p-4">No popular events available.</div>;
+
+    if (isLoading) {
+        return (
+            <div className="px-custom w-full relative z-10">
+                <div className="mt-4 overflow-hidden rounded-lg relative">
+                    <div
+                        className={`flex ${isTransitioning ? "transition-transform duration-500 ease-in-out" : ""}`}
+                        style={{ transform: getTranslateX() }}
+                    >
+                        {Array.from({ length: 4 }).map((_, index) => (
+                            <div key={`skeleton-${index}`} className="w-full flex-shrink-0">
+                                <Card className="w-full h-[400px] relative border-none">
+                                    <Skeleton className="absolute inset-0 w-full h-full" />
+
+                                </Card>
+                            </div>
+                        ))}
+                    </div>
+
+                </div>
+            </div>
+        );
     }
 
     return (
@@ -131,13 +159,11 @@ const PopularCardsCarousel = () => {
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
-            {/* Контейнер для карточки */}
             <div className="mt-4 overflow-hidden rounded-lg relative">
                 <div
                     className={`flex ${isTransitioning ? "transition-transform duration-500 ease-in-out" : ""}`}
                     style={{ transform: getTranslateX() }}
                 >
-                    {/* Дубликат последней карточки для обратного перехода */}
                     {popularEvents.length > 0 && (
                         <div key={`duplicate-last-${popularEvents[popularEvents.length - 1].id}`} className="w-full flex-shrink-0">
                             <Card
@@ -165,7 +191,6 @@ const PopularCardsCarousel = () => {
                                                     {popularEvents[popularEvents.length - 1].format.title} • {popularEvents[popularEvents.length - 1].themes.map((theme) => theme.title).join(", ")}
                                                 </span>
                                             </p>
-
                                             <p className="text-base flex items-center gap-1.5">
                                                 <CalendarDays strokeWidth={2} className="w-4 h-4 text-white" />{" "}
                                                 {format(new Date(popularEvents[popularEvents.length - 1].startedAt), "MMMM d, yyyy HH:mm")}
@@ -184,7 +209,6 @@ const PopularCardsCarousel = () => {
                             </Card>
                         </div>
                     )}
-                    {/* Оригинальные карточки */}
                     {popularEvents.map((event) => (
                         <div key={`original-${event.id}`} className="w-full flex-shrink-0">
                             <Card
@@ -227,7 +251,6 @@ const PopularCardsCarousel = () => {
                             </Card>
                         </div>
                     ))}
-                    {/* Дубликат первой карточки для перехода вперёд */}
                     {popularEvents.length > 0 && (
                         <div key={`duplicate-first-${popularEvents[0].id}`} className="w-full flex-shrink-0">
                             <Card
@@ -271,7 +294,6 @@ const PopularCardsCarousel = () => {
                         </div>
                     )}
                 </div>
-                {/* Кнопки вне прокручиваемого контейнера */}
                 <div className="cursor-pointer absolute right-13 bottom-15 flex flex-row gap-2 z-20">
                     <Button
                         onClick={handlePrev}
@@ -290,7 +312,6 @@ const PopularCardsCarousel = () => {
                 </div>
             </div>
 
-            {/* Индикаторы (полоски) */}
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
                 {popularEvents.map((_, index) => (
                     <div

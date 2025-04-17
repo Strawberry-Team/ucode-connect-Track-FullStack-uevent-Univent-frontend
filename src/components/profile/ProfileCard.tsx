@@ -1,26 +1,28 @@
 "use client";
 
-import { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
-import { updateUser, uploadAvatar } from "@/lib/user";
-import { showSuccessToast, showErrorToasts } from "@/lib/toast";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Save, Camera } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { userZodSchema } from "@/zod/shemas";
+import {useState} from "react";
+import {useAuth} from "@/context/AuthContext";
+import {updateUser, uploadAvatar} from "@/lib/user";
+import {showSuccessToast, showErrorToasts} from "@/lib/toast";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {Card, CardContent, CardFooter} from "@/components/ui/card";
+import {Save, Camera} from "lucide-react";
+import {cn} from "@/lib/utils";
+import {userZodSchema} from "@/zod/shemas";
+import {format} from "date-fns";
 
 type ProfileCardProps = {
     setEditMode: (editMode: boolean) => void;
     editMode: boolean;
 };
 
-export default function ProfileCard({ setEditMode, editMode }: ProfileCardProps) {
-    const { user, setUser } = useAuth();
+export default function ProfileCard({setEditMode, editMode}: ProfileCardProps) {
+    const {user, setUser} = useAuth();
+    if (!user) return null
     const [formData, setFormData] = useState({
-        firstName: user?.firstName || "",
-        lastName: user?.lastName || "",
+        firstName: user.firstName,
+        lastName: user.lastName || "",
         profilePicture: null as File | null,
     });
     const [userErrors, setUserErrors] = useState<{
@@ -29,13 +31,14 @@ export default function ProfileCard({ setEditMode, editMode }: ProfileCardProps)
     }>({});
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-    if (!user) {
-        return null;
-    }
+    const imageUrl = previewUrl ||
+        (user.profilePictureName
+            ? `http://localhost:8080/uploads/user-avatars/${user.profilePictureName}`
+            : "https://via.placeholder.com/200x200");
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        const {name, value} = e.target;
+        setFormData((prev) => ({...prev, [name]: value}));
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,7 +52,7 @@ export default function ProfileCard({ setEditMode, editMode }: ProfileCardProps)
                 showErrorToasts("File size should be less than 5MB");
                 return;
             }
-            setFormData((prev) => ({ ...prev, profilePicture: file }));
+            setFormData((prev) => ({...prev, profilePicture: file}));
             setPreviewUrl(URL.createObjectURL(file));
         }
     };
@@ -76,7 +79,7 @@ export default function ProfileCard({ setEditMode, editMode }: ProfileCardProps)
         }
         setUserErrors({});
 
-        let updatedUser = { ...user };
+        let updatedUser = {...user};
 
         if (formData.firstName !== user.firstName || formData.lastName !== (user.lastName || "")) {
             const updateData: { firstName: string; lastName?: string | null } = {
@@ -107,7 +110,7 @@ export default function ProfileCard({ setEditMode, editMode }: ProfileCardProps)
         setUser(updatedUser);
         setEditMode(false);
         showSuccessToast("Profile updated successfully");
-        setFormData({ firstName: updatedUser.firstName, lastName: updatedUser.lastName || "", profilePicture: null });
+        setFormData({firstName: updatedUser.firstName, lastName: updatedUser.lastName || "", profilePicture: null});
         if (previewUrl) {
             URL.revokeObjectURL(previewUrl);
             setPreviewUrl(null);
@@ -131,18 +134,13 @@ export default function ProfileCard({ setEditMode, editMode }: ProfileCardProps)
     return (
         <Card className="shadow-lg transition-all duration-300 hover:shadow-xl h-[640px] flex flex-col w-full md:w-1/2">
             <CardContent className="space-y-6 flex-1 overflow-y-auto">
-                {/* Аватар */}
                 <div className="flex flex-col items-center gap-4">
                     <div className="relative group">
                         <img
-                            src={
-                                previewUrl ||
-                                `http://localhost:8080/uploads/user-avatars/${user.profilePictureName}` ||
-                                "https://via.placeholder.com/200x200"
-                            }
+                            src={imageUrl}
                             alt={user.firstName}
                             className={cn(
-                                "relative h-95 w-100 object-cover rounded-md",
+                                "relative h-95 w-95 object-cover rounded-md",
                                 editMode && "cursor-pointer group-hover:brightness-60 transition-all duration-200"
                             )}
                             onClick={() => editMode && document.getElementById("profilePicture")?.click()}
@@ -156,15 +154,15 @@ export default function ProfileCard({ setEditMode, editMode }: ProfileCardProps)
                                     onChange={handleFileChange}
                                     className="hidden"
                                 />
-                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                                    <Camera strokeWidth={2.5} className="text-white w-10 h-10" />
+                                <div
+                                    className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                                    <Camera strokeWidth={2.5} className="text-white w-10 h-10"/>
                                 </div>
                             </>
                         )}
                     </div>
                 </div>
 
-                {/* Данные профиля */}
                 <div className="space-y-4">
                     {editMode ? (
                         <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-300">
@@ -190,7 +188,7 @@ export default function ProfileCard({ setEditMode, editMode }: ProfileCardProps)
                             </div>
                         </div>
                     ) : (
-                        <div className="space-y-2 animate-in fade-in-0 duration-300">
+                        <div className="space-y-2">
                             <div className="text-center">
                                 <p className="-mt-5 text-[27px] font-medium">
                                     {user.firstName} {user.lastName}
@@ -203,7 +201,7 @@ export default function ProfileCard({ setEditMode, editMode }: ProfileCardProps)
                                 </div>
                                 <div>
                                     <span className="font-medium">Joined:</span>{" "}
-                                    {new Date(user.createdAt).toLocaleDateString()}
+                                    {format(new Date(user.createdAt), "MMMM d, yyyy")}
                                 </div>
                             </div>
                         </div>
@@ -221,7 +219,7 @@ export default function ProfileCard({ setEditMode, editMode }: ProfileCardProps)
                             disabled={!formData.firstName}
                             className="flex-1 w-full"
                         >
-                            <Save className="h-4 w-4" />
+                            <Save className="h-4 w-4"/>
                             Save Changes
                         </Button>
                     </div>

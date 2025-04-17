@@ -22,8 +22,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const { setAuthenticated } = useAuth();
-    const [name, setName] = useState("");
-    const [surname, setSurname] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [resetEmail, setResetEmail] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showRegisterPassword, setShowRegisterPassword] = useState(false);
@@ -52,8 +52,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         } else {
             setEmail("");
             setPassword("");
-            setName("");
-            setSurname("");
+            setFirstName("");
+            setLastName("");
             setResetEmail("");
             setShowPassword(false);
             setShowRegisterPassword(false);
@@ -133,7 +133,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const registerData = { name, surname, email, password };
+        const registerData = { firstName, lastName, email, password };
         const registerValidation = registerZodSchema.safeParse(registerData);
 
         if (!registerValidation.success) {
@@ -154,12 +154,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
         setRegisterErrors({});
 
-        const result = await register(name, (surname || null) as string, email, password);
+
+        const result = await register(firstName, (lastName || null) as string, email, password);
 
         if (result.success) {
             showSuccessToast("Registration successful. Please verify your email!");
-            setName("");
-            setSurname("");
+            setFirstName("");
+            setLastName("");
             setEmail("");
             setPassword("");
             setActiveTab("login");
@@ -173,8 +174,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         setActiveTab(value);
         setEmail("");
         setPassword("");
-        setName("");
-        setSurname("");
+        setFirstName("");
+        setLastName("");
         setIsForgotPassword(false);
         setLoginErrors({});
         setRegisterErrors({});
@@ -241,12 +242,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                 </TabsContent>
                                 <TabsContent value="register" className="mt-0">
                                     <RegisterForm
-                                        name={name}
-                                        surname={surname}
+                                        firstName={firstName}
+                                        lastName={lastName}
                                         email={email}
                                         password={password}
-                                        setName={setName}
-                                        setSurname={setSurname}
+                                        setFirstName={setFirstName}
+                                        setLastName={setLastName}
                                         setEmail={setEmail}
                                         setPassword={setPassword}
                                         showPassword={showRegisterPassword}

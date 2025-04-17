@@ -40,13 +40,6 @@ export default function Header() {
                     />
                 </div>
 
-                {/*<Button*/}
-                {/*    variant="outline"*/}
-                {/*    className="text-[16px] py-5 px-7 rounded-full font-medium"*/}
-                {/*>*/}
-                {/*    Create company*/}
-                {/*</Button>*/}
-
                 <div>
                     {isAuthenticated && user ? (
                         <NavUser user={user} />

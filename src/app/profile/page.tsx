@@ -3,10 +3,10 @@ import ProfileForm from "@/components/profile/ProfileForm";
 export default async function ProfilePage() {
 
     const tickets = [
-        { id: 1, name: "Phone bill", status: "paid" },
-        { id: 2, name: "Internet bill", status: "pending" },
-        { id: 3, name: "House rent", status: "paid" },
-        { id: 4, name: "Income tax", status: "pending" },
+        { id: 1, name: "Phone bill", status: "April 15, 2025" },
+        { id: 2, name: "Internet bill", status: "April 15, 2025" },
+        { id: 3, name: "House rent", status: "April 15, 2025" },
+        { id: 4, name: "Income tax", status: "April 15, 2025" },
     ];
 
     return (

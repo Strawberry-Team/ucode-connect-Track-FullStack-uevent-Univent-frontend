@@ -17,7 +17,7 @@ export default function TicketsCard({ initialTickets }: TicketsCardProps) {
         <Card className="shadow-lg transition-all duration-300 hover:shadow-xl h-[396px] flex flex-col">
             <CardContent className="flex-1">
                 <div className="border-b">
-                    <CardHeader className="text-xl font-medium text-foreground">Tickets</CardHeader>
+                    <CardHeader className="text-xl font-medium text-foreground">Orders</CardHeader>
                 </div>
                 <div className="mt-4 space-y-3">
                     {initialTickets.length > 0 ? (

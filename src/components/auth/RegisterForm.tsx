@@ -6,12 +6,12 @@ import {DialogTitle} from "@/components/ui/dialog";
 import {LockKeyhole, Mail, User, Eye, EyeOff} from "lucide-react";
 
 interface RegisterFormProps {
-    name: string;
-    surname: string;
+    firstName: string;
+    lastName: string;
     email: string;
     password: string;
-    setName: (value: string) => void;
-    setSurname: (value: string) => void;
+    setFirstName: (value: string) => void;
+    setLastName: (value: string) => void;
     setEmail: (value: string) => void;
     setPassword: (value: string) => void;
     showPassword: boolean;
@@ -20,12 +20,12 @@ interface RegisterFormProps {
 }
 
 export default function RegisterForm({
-                                         name,
-                                         surname,
+                                         firstName,
+                                         lastName,
                                          email,
                                          password,
-                                         setName,
-                                         setSurname,
+                                         setFirstName,
+                                         setLastName,
                                          setEmail,
                                          setPassword,
                                          showPassword,
@@ -43,13 +43,13 @@ export default function RegisterForm({
                         <User className="h-5 w-5 text-muted-foreground"/>
                     </div>
                     <Input
-                        id="name"
+                        id="firstName"
                         type="text"
                         placeholder="Name"
                         className="text-[16px] py-5 px-7 rounded-2xl pl-10 w-full"
                         required
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
                     />
                 </div>
                 <div className="relative flex items-center gap-2">
@@ -57,12 +57,12 @@ export default function RegisterForm({
                         <User className="h-5 w-5 text-muted-foreground"/>
                     </div>
                     <Input
-                        id="surname"
+                        id="lastName"
                         type="text"
                         placeholder="Surname"
                         className="text-[16px] py-5 px-7 rounded-2xl pl-10 w-full"
-                        value={surname}
-                        onChange={(e) => setSurname(e.target.value)}
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
                     />
                 </div>
                 <div className="relative flex items-center gap-2">
@@ -107,7 +107,7 @@ export default function RegisterForm({
                 <Button
                     type="submit"
                     className="text-[16px] py-5 px-7 rounded-full cursor-pointer w-full"
-                    disabled={!name || !email || !password}
+                    disabled={!firstName || !email || !password}
                 >
                     Register
                 </Button>
