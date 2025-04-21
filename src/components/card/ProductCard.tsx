@@ -3,7 +3,7 @@ import Image from "next/image";
 import {useRouter} from "next/navigation";
 import {Card, CardContent} from "@/components/ui/card";
 import {CalendarDays, MapPinned, Tag} from "lucide-react";
-import {Event} from "@/lib/event";
+import { Event } from "@/types";
 import {format} from "date-fns";
 
 interface ProductCardProps {

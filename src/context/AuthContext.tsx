@@ -2,7 +2,8 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import Cookies from "js-cookie";
-import { getUserMe, User } from "@/lib/user";
+import { getUserMe } from "@/lib/user";
+import { User } from "@/types";
 
 interface AuthContextType {
     isAuthenticated: boolean;

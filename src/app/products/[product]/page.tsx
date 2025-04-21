@@ -95,7 +95,7 @@ export default async function PageCard({ params }: { params: Promise<{ product: 
                         alt={event.title}
                         width={384}
                         height={384}
-                        className="md:h-130 w-full object-contain"
+                        className="md:h-130 object-cover w-full object-contain"
                     />
                 </div>
 

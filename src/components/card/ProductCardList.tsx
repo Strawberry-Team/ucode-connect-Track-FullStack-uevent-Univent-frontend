@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import ProductCard from "./ProductCard";
-import { getEvents, Event } from "@/lib/event";
+import { getEvents } from "@/lib/event";
+import { Event } from "@/types";
 import { Skeleton } from "@/components/ui/skeleton"; // Импортируем наш кастомный Skeleton
 
 const ProductCardList = () => {

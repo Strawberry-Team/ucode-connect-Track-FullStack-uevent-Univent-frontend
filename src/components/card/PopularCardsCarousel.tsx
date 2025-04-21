@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Event, getEvents } from "@/lib/event";
+import { getEvents } from "@/lib/event";
+import { Event } from "@/types";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton"; // Импортируем наш кастомный Skeleton
 

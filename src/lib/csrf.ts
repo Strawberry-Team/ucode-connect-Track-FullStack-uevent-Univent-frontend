@@ -25,11 +25,3 @@ export async function fetchCsrfToken(): Promise<string> {
         throw error;
     }
 }
-
-export function useApi() {
-    // const { csrfToken } = useCsrf();
-    const fetchWithCsrf = async (url: string, config: AxiosRequestConfig = {}) => {
-        return api.request({ url, ...config });
-    };
-    return fetchWithCsrf;
-}

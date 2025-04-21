@@ -1,169 +1,41 @@
 import api from "@/lib/api";
-import { AxiosError } from "axios";
+import { executeApiRequest } from "@/utils/api-request";
+import { Company, CompanyNews, Event, ApiResponse } from "@/types";
 
-export interface Company {
-    id: number;
-    ownerId: number;
-    email: string;
-    title: string;
-    description: string;
-    createdAt: string;
-    logoName: string;
+export async function createCompany(data: { email: string; title: string; description: string; ownerId: number }): Promise<ApiResponse<Company>> {
+    return executeApiRequest(() => api.post("/companies", data), "Failed to create company");
 }
 
-interface CompanyNews {
-    id: number;
-    authorId: number;
-    companyId: number;
-    eventId: number | null;
-    title: string;
-    description: string;
-    createdAt: string;
+export async function updateCompany(companyId: number, data: { title: string; description: string }): Promise<ApiResponse<Company>> {
+    return executeApiRequest(() => api.patch(`/companies/${companyId}`, data), `Failed to update company with ID ${companyId}`);
 }
 
-export async function createCompany(
-    data: { email: string; title: string; description: string; ownerId: number }
-): Promise<{ success: boolean; data?: Company; errors: string | string[] }> {
-    try {
-        const response = await api.post("/companies", data);
-
-        return { success: true, data: response.data, errors: "" };
-    } catch (error) {
-        const axiosError = error as AxiosError<{ message?: string | string[] }>;
-        const errorData = axiosError.response?.data;
-
-        if (errorData?.message) {
-            return {
-                success: false,
-                data: undefined,
-                errors: Array.isArray(errorData.message) ? errorData.message : [errorData.message],
-            };
-        }
-
-        return { success: false, data: undefined, errors: "Failed to create company" };
-    }
+export async function deleteCompany(companyId: number): Promise<ApiResponse<void>> {
+    return executeApiRequest(() => api.delete(`/companies/${companyId}`), `Failed to delete company with ID ${companyId}`);
 }
 
-export async function updateCompany(
-    companyId: number,
-    data: { title: string; description: string }
-): Promise<{ success: boolean; data?: Company; errors: string | string[] }> {
-    try {
-        const response = await api.patch(`/companies/${companyId}`, data);
-        return { success: true, data: response.data, errors: "" };
-    } catch (error) {
-        const axiosError = error as AxiosError<{ message?: string | string[] }>;
-        const errorData = axiosError.response?.data;
-
-        if (errorData?.message) {
-            return {
-                success: false,
-                data: undefined,
-                errors: Array.isArray(errorData.message) ? errorData.message : [errorData.message],
-            };
-        }
-
-        return { success: false, data: undefined, errors: `Failed to update company with ID ${companyId}` };
-    }
+export async function uploadCompanyLogo(companyId: number, file: File): Promise<ApiResponse<{ server_filename: string }>> {
+    return executeApiRequest(() => {
+            const form = new FormData();
+            form.append("file", file);
+            return api.post(`/companies/${companyId}/upload-logo`, form, {
+                headers: { "Content-Type": "multipart/form-data" }});
+            }, "Failed to upload company logo"
+    );
 }
 
-export async function deleteCompany(
-    companyId: number
-): Promise<{ success: boolean; errors: string | string[] }> {
-    try {
-        await api.delete(`/companies/${companyId}`);
-        return { success: true, errors: "" };
-    } catch (error) {
-        const axiosError = error as AxiosError<{ message?: string | string[] }>;
-        const errorData = axiosError.response?.data;
-
-        if (errorData?.message) {
-            return {
-                success: false,
-                errors: Array.isArray(errorData.message) ? errorData.message : [errorData.message],
-            };
-        }
-
-        return { success: false, errors: `Failed to delete company with ID ${companyId}` };
-    }
+export async function getCompanyById(id: number): Promise<ApiResponse<Company>> {
+    return executeApiRequest(() => api.get(`/companies/${id}`), `Failed to fetch company with ID ${id}`);
 }
 
-export async function uploadCompanyLogo(
-    companyId: number,
-    file: File
-): Promise<{ success: boolean; data?: { server_filename: string }; errors: string | string[] }> {
-    try {
-        const form = new FormData();
-        form.append("file", file);
-
-        const response = await api.post(`/companies/${companyId}/upload-logo`, form, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        });
-
-        return { success: true, data: response.data, errors: "" };
-    } catch (error) {
-        const axiosError = error as AxiosError<{ message?: string | string[] }>;
-        const errorData = axiosError.response?.data;
-
-        if (errorData?.message) {
-            return {
-                success: false,
-                data: undefined,
-                errors: Array.isArray(errorData.message) ? errorData.message : [errorData.message],
-            };
-        }
-
-        return { success: false, data: undefined, errors: "Failed to upload company logo" };
-    }
+export async function getCompanyNewsById(id: number): Promise<ApiResponse<CompanyNews[]>> {
+    return executeApiRequest(() => api.get(`/companies/${id}/news`), `Failed to fetch news for company with ID ${id}`);
 }
 
-export async function getCompanyById(id: number): Promise<{
-    success: boolean;
-    data?: Company;
-    errors: string | string[];
-}> {
-    try {
-        const response = await api.get(`/companies/${id}`);
-
-        return { success: true, data: response.data, errors: "" };
-    } catch (error) {
-        const axiosError = error as AxiosError<{ message?: string | string[] }>;
-        const errorData = axiosError.response?.data;
-
-        if (errorData?.message) {
-            return {
-                success: false,
-                data: undefined,
-                errors: Array.isArray(errorData.message) ? errorData.message : [errorData.message],
-            };
-        }
-
-        return { success: false, data: undefined, errors: `Failed to fetch company with ID ${id}` };
-    }
+export async function getCompanyEvents(companyId: number): Promise<ApiResponse<Event[]>> {
+    return executeApiRequest(() => api.get(`/companies/${companyId}/events`), `Failed to fetch events for company with ID ${companyId}`);
 }
 
-export async function getCompanyNewsById(id: number): Promise<{
-    success: boolean;
-    data?: CompanyNews[];
-    errors: string | string[];
-}> {
-    try {
-        const response = await api.get(`/companies/${id}/news`);
-        return { success: true, data: response.data, errors: "" };
-    } catch (error) {
-        const axiosError = error as AxiosError<{ message?: string | string[] }>;
-        const errorData = axiosError.response?.data;
-
-        if (errorData?.message) {
-            return {
-                success: false,
-                data: undefined,
-                errors: Array.isArray(errorData.message) ? errorData.message : [errorData.message],
-            };
-        }
-
-        return { success: false, data: undefined, errors: `Failed to fetch news for company with ID ${id}` };
-    }
+export async function createCompanyNews(companyId: number, data: { title: string; description: string }): Promise<ApiResponse<CompanyNews>> {
+    return executeApiRequest(() => api.post(`/companies/${companyId}/news`, data), `Failed to create news for company with ID ${companyId}`);
 }

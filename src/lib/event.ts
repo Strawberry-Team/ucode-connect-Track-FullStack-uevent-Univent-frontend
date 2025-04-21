@@ -1,112 +1,39 @@
 import api from "@/lib/api";
-import { AxiosError } from "axios";
+import { executeApiRequest } from "@/utils/api-request";
+import { ApiResponse, Event, Notification } from "@/types";
 
-// Интерфейс для события
-export interface Event {
-    id: number;
-    companyId: number;
-    formatId: number;
-    title: string;
-    description: string;
-    venue: string;
-    locationCoordinates: string;
-    startedAt: string;
-    endedAt: string;
-    publishedAt: string;
-    ticketsAvailableFrom: string;
-    posterName: string;
-    attendeeVisibility: string;
-    status: string;
-    format: {
-        id: number;
-        title: string;
-    };
-    themes: {
-        id: number;
-        title: string;
-    }[];
-    company: {
-        id: number;
-        title: string;
-        logoName: string;
-    };
+export async function getEvents(): Promise<ApiResponse<Event[]>> {
+    return executeApiRequest<Event[]>(() => api.get("/events"), "Failed to fetch events");
 }
 
-export interface Notification {
-    title: string;
-    description: string;
-    createdAt: string;
+export async function createEvent(
+    data: { title: string; description: string; venue: string; companyId: number; formatId: number; locationCoordinates: string; startedAt: string; endedAt: string; }): Promise<ApiResponse<Event>> {
+    return executeApiRequest<Event>(() => api.post("/events", data), "Failed to create event");
 }
 
-export async function getEvents(): Promise<{
-    success: boolean;
-    data?: Event[];
-    errors: string | string[];
-}> {
-    try {
-        const response = await api.get("/events");
-
-        return { success: true, data: response.data, errors: "" };
-    } catch (error) {
-        const axiosError = error as AxiosError<{ message?: string | string[] }>;
-        const errorData = axiosError.response?.data;
-
-        if (errorData?.message) {
-            return {
-                success: false,
-                data: undefined,
-                errors: Array.isArray(errorData.message) ? errorData.message : [errorData.message],
-            };
-        }
-
-        return { success: false, data: undefined, errors: "Failed to fetch events" };
-    }
+export async function updateEvent(eventId: number, data: { title: string; description: string; venue: string; formatId: number; locationCoordinates: string; startedAt: string; endedAt: string; publishedAt?: string; ticketsAvailableFrom?: string; attendeeVisibility?: string; status?: string; }): Promise<ApiResponse<Event>> {
+    return executeApiRequest<Event>(() => api.patch(`/events/${eventId}`, data), `Failed to update event with ID ${eventId}`);
 }
 
-export async function getEventById(id: number): Promise<{
-    success: boolean;
-    data?: Event;
-    errors: string | string[];
-}> {
-    try {
-        const response = await api.get(`/events/${id}`);
-
-        return { success: true, data: response.data, errors: "" };
-    } catch (error) {
-        const axiosError = error as AxiosError<{ message?: string | string[] }>;
-        const errorData = axiosError.response?.data;
-
-        if (errorData?.message) {
-            return {
-                success: false,
-                data: undefined,
-                errors: Array.isArray(errorData.message) ? errorData.message : [errorData.message],
-            };
-        }
-
-        return { success: false, data: undefined, errors: `Failed to fetch event with ID ${id}` };
-    }
+export async function uploadEventPoster(eventId: number, file: File): Promise<ApiResponse<{ server_filename: string }>> {
+    return executeApiRequest<{ server_filename: string }>(
+        () => {
+            const form = new FormData();
+            form.append("file", file);
+            return api.post(`/events/${eventId}/upload-poster`, form, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+        }, `Failed to upload poster for event with ID ${eventId}`);
 }
 
-export async function getEventByIdNews(eventId: number): Promise<{
-    success: boolean;
-    data?: Notification[];
-    errors: string | string[];
-}> {
-    try {
-        const response = await api.get(`/events/${eventId}/news`);
-        return {success: true, data: response.data, errors: ""};
-    } catch (error) {
-        const axiosError = error as AxiosError<{ message?: string | string[] }>;
-        const errorData = axiosError.response?.data;
+export async function getEventById(id: number): Promise<ApiResponse<Event>> {
+    return executeApiRequest<Event>(() => api.get(`/events/${id}`), `Failed to fetch event with ID ${id}`);
+}
 
-        if (errorData?.message) {
-            return {
-                success: false,
-                data: undefined,
-                errors: Array.isArray(errorData.message) ? errorData.message : [errorData.message],
-            };
-        }
-        return {success: false, data: undefined, errors: `Failed to fetch news for event ${eventId}`};
-    }
+export async function getEventByIdNews(eventId: number): Promise<ApiResponse<Notification[]>> {
+    return executeApiRequest<Notification[]>(() => api.get(`/events/${eventId}/news`), `Failed to fetch news for event with ID ${eventId}`);
+}
+
+export async function assignThemesToEvent(eventId: number, themeIds: number[]): Promise<ApiResponse<void>> {
+    return executeApiRequest<void>(() => api.post(`/events/${eventId}/themes`, { themes: themeIds.map((id) => ({ id })) }), `Failed to assign themes to event with ID ${eventId}`);
 }

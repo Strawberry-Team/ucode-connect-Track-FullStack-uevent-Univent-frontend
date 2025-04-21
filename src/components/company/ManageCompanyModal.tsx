@@ -1,3 +1,4 @@
+// components/company/ManageCompanyModal.tsx
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -6,27 +7,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/context/AuthContext";
-import { createCompany, uploadCompanyLogo, updateCompany, Company } from "@/lib/company";
+import { useCompanyStore } from "@/stores/company-store";
+import { companyService } from "@/services/company-service";
 import { showErrorToasts, showSuccessToast } from "@/lib/toast";
 import { Camera } from "lucide-react";
 import { companyCreateZodSchema, companyUpdateZodSchema } from "@/zod/shemas";
+import { Company } from "@/types";
 
-interface CreateCompanyModalProps {
+interface ManageCompanyModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onCompanyCreated: (newCompany: Company) => void;
-    onCompanyUpdated: (updatedCompany: Company) => void;
     editingCompany: Company | null;
 }
 
 export default function ManageCompanyModal({
                                                isOpen,
                                                onClose,
-                                               onCompanyCreated,
-                                               onCompanyUpdated,
-                                               editingCompany
-                                           }: CreateCompanyModalProps) {
+                                               editingCompany,
+                                           }: ManageCompanyModalProps) {
     const { user } = useAuth();
+    const { addCompany, updateCompany } = useCompanyStore();
     const [formData, setFormData] = useState({
         title: "",
         email: "",
@@ -40,6 +40,7 @@ export default function ManageCompanyModal({
         email?: string;
         description?: string;
     }>({});
+    const [isLoading, setIsLoading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -49,9 +50,11 @@ export default function ManageCompanyModal({
                 email: editingCompany.email,
                 description: editingCompany.description,
             });
-            setLogoPreview(editingCompany.logoName
-                ? `http://localhost:8080/uploads/company-logos/${editingCompany.logoName}`
-                : null);
+            setLogoPreview(
+                editingCompany.logoName
+                    ? `http://localhost:8080/uploads/company-logos/${editingCompany.logoName}`
+                    : null
+            );
         } else {
             setFormData({ title: "", email: "", description: "" });
             setLogoPreview(null);
@@ -95,9 +98,8 @@ export default function ManageCompanyModal({
             description: formData.description,
         };
 
-        // Разделяем валидацию в зависимости от режима
+        // Валидация
         if (editingCompany) {
-            // Валидация для обновления (без email)
             const updateValidation = companyUpdateZodSchema.safeParse({
                 title: formData.title,
                 description: formData.description,
@@ -117,7 +119,6 @@ export default function ManageCompanyModal({
                 return;
             }
         } else {
-            // Валидация для создания (с email)
             const createValidation = companyCreateZodSchema.safeParse({
                 title: formData.title,
                 email: formData.email,
@@ -144,68 +145,46 @@ export default function ManageCompanyModal({
 
         if (!user?.id) return;
 
-        if (editingCompany) {
-            // Обновление компании
-            const updateResult = await updateCompany(editingCompany.id, {
-                title: formData.title,
-                description: formData.description,
-            });
-
-            if (!updateResult.success || !updateResult.data) {
-                showErrorToasts(updateResult.errors);
-                return;
+        setIsLoading(true);
+        try {
+            if (editingCompany) {
+                const updatedCompany = await companyService.updateCompany(
+                    editingCompany.id,
+                    {
+                        title: formData.title,
+                        description: formData.description,
+                    },
+                    logoFile
+                );
+                updateCompany(updatedCompany);
+                showSuccessToast("Company updated successfully");
+            } else {
+                const newCompany = await companyService.createCompany(
+                    {
+                        email: formData.email,
+                        title: formData.title,
+                        description: formData.description,
+                        ownerId: user.id,
+                    },
+                    logoFile
+                );
+                addCompany(newCompany);
+                showSuccessToast("Company created successfully");
             }
 
-            let updatedCompany = updateResult.data;
-
-            if (logoFile) {
-                const uploadResult = await uploadCompanyLogo(updatedCompany.id, logoFile);
-                if (!uploadResult.success || !uploadResult.data) {
-                    showErrorToasts(uploadResult.errors);
-                    return;
-                }
-                updatedCompany.logoName = uploadResult.data.server_filename;
+            setFormData({ title: "", email: "", description: "" });
+            setLogoFile(null);
+            setLogoPreview(null);
+            setError(null);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = "";
             }
-
-            onCompanyUpdated(updatedCompany);
-            showSuccessToast("Company updated successfully");
-        } else {
-            // Создание компании
-            let newCompany: Company | null = null;
-            const createResult = await createCompany({
-                email: formData.email,
-                title: formData.title,
-                description: formData.description,
-                ownerId: user.id,
-            });
-
-            if (!createResult.success || !createResult.data) {
-                showErrorToasts(createResult.errors);
-                return;
-            }
-            newCompany = createResult.data;
-
-            if (logoFile) {
-                const uploadResult = await uploadCompanyLogo(newCompany.id, logoFile);
-                if (!uploadResult.success || !uploadResult.data) {
-                    showErrorToasts(uploadResult.errors);
-                    return;
-                }
-                newCompany.logoName = uploadResult.data.server_filename;
-            }
-
-            onCompanyCreated(newCompany);
-            showSuccessToast("Company created successfully");
+            onClose();
+        } catch (error: any) {
+            showErrorToasts(error.errors || ["Failed to save company"]);
+        } finally {
+            setIsLoading(false);
         }
-
-        setFormData({ title: "", email: "", description: "" });
-        setLogoFile(null);
-        setLogoPreview(null);
-        setError(null);
-        if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-        }
-        onClose();
     };
 
     const handleClose = () => {
@@ -229,7 +208,7 @@ export default function ManageCompanyModal({
                     <div className="space-y-2 flex justify-center">
                         <div className="relative group">
                             <div
-                                className="w-55 h-65 bg-gray-200 rounded-md flex items-center justify-center cursor-pointer relative overflow-hidden group-hover:brightness-75 transition-all duration-200"
+                                className="w-30 h-35 bg-gray-200 rounded-md flex items-center justify-center cursor-pointer relative overflow-hidden group-hover:brightness-75 transition-all duration-200"
                                 onClick={handleFileClick}
                             >
                                 {logoPreview ? (
@@ -266,6 +245,7 @@ export default function ManageCompanyModal({
                             onChange={handleInputChange}
                             placeholder="Title"
                             className="!text-[15px] w-full rounded-md"
+                            disabled={isLoading}
                         />
                     </div>
 
@@ -279,6 +259,7 @@ export default function ManageCompanyModal({
                                 onChange={handleInputChange}
                                 placeholder="Company Email"
                                 className="!text-[15px] w-full rounded-md"
+                                disabled={isLoading}
                             />
                         </div>
                     )}
@@ -291,15 +272,25 @@ export default function ManageCompanyModal({
                             onChange={handleInputChange}
                             placeholder="Enter a brief description of the company..."
                             className="!text-[15px] w-full rounded-md min-h-[100px]"
+                            disabled={isLoading}
                         />
                     </div>
 
                     <Button
                         type="submit"
-                        disabled={!formData.title || !formData.description || (!editingCompany && !formData.email)}
+                        disabled={
+                            isLoading ||
+                            !formData.title ||
+                            !formData.description ||
+                            (!editingCompany && !formData.email)
+                        }
                         className="w-full"
                     >
-                        {editingCompany ? "Update Company" : "Create Company"}
+                        {isLoading
+                            ? "Loading..."
+                            : editingCompany
+                                ? "Update Company"
+                                : "Create Company"}
                     </Button>
                 </form>
             </DialogContent>
