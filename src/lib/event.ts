@@ -7,7 +7,7 @@ export async function getEvents(): Promise<ApiResponse<Event[]>> {
 }
 
 export async function createEvent(
-    data: { title: string; description: string; venue: string; companyId: number; formatId: number; locationCoordinates: string; startedAt: string; endedAt: string; }): Promise<ApiResponse<Event>> {
+    data: { title: string; description: string; venue: string; companyId: number; formatId: number; locationCoordinates: string; startedAt: string; endedAt: string; publishedAt: string; ticketsAvailableFrom: string;status: string;attendeeVisibility: string;}): Promise<ApiResponse<Event>> {
     return executeApiRequest<Event>(() => api.post("/events", data), "Failed to create event");
 }
 

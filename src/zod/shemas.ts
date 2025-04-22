@@ -20,14 +20,6 @@ export const zodSchema = z.object({
     description: z.string().min(3, { message: "Description must be longer than or equal to 3 characters" }),
 });
 
-export const loginZodSchema = zodSchema.pick({ email: true, password: true });
-export const registerZodSchema = zodSchema.pick({ firstName: true, lastName: true, email: true, password: true });
-export const resetPasswordZodSchema = zodSchema.pick({ email: true });
-export const userZodSchema = zodSchema.pick({ firstName: true, lastName: true});
-export const companyCreateZodSchema = zodSchema.pick({ title: true, email: true, description: true });
-export const companyUpdateZodSchema = zodSchema.pick({ title: true, description: true });
-
-// Схема для создания события
 export const eventCreateZodSchema = z.object({
     title: z.string().min(1, "Title is required").max(100, "Title is too long"),
     description: z
@@ -50,10 +42,6 @@ export const eventCreateZodSchema = z.object({
         .refine((val) => !isNaN(Date.parse(val)), "Invalid end date"),
 });
 
-// Схема для обновления события (без companyId)
-export const eventUpdateZodSchema = eventCreateZodSchema.omit({ companyId: true });
-
-// Дополнительная проверка: endedAt должен быть позже startedAt
 export const validateEventDates = (data: {
     startedAt: string;
     endedAt: string;
@@ -64,3 +52,10 @@ export const validateEventDates = (data: {
         throw new Error("End date must be after start date");
     }
 };
+
+export const loginZodSchema = zodSchema.pick({ email: true, password: true });
+export const registerZodSchema = zodSchema.pick({ firstName: true, lastName: true, email: true, password: true });
+export const resetPasswordZodSchema = zodSchema.pick({ email: true });
+export const userZodSchema = zodSchema.pick({ firstName: true, lastName: true});
+export const companyCreateZodSchema = zodSchema.pick({ title: true, email: true, description: true });
+export const companyUpdateZodSchema = zodSchema.pick({ title: true, description: true });

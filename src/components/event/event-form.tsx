@@ -19,7 +19,7 @@ export default function EventForm({ eventId }: EventFormProps) {
             {/* Контейнер для всей формы с максимальной шириной */}
             <div className="w-full max-w-[1200px] flex flex-col gap-6">
                 {/* Карточка события с фиксированными размерами */}
-                <div className="w-[1200px] h-[600px]">
+                <div className="flex sm:flex-row  w-full">
                     <EventInfoCard
                         editMode={editMode}
                         setEditMode={setEditMode}

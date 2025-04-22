@@ -8,12 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import AnimatedButton from "@/components/ui/animated-button";
-import ManageEventModal from "@/components/event/CreateEventModal";
+import ManageEventModal from "@/components/event/event-create-modal";
 import { Calendar, CalendarDays, Pencil, Plus } from "lucide-react";
 import { getCompanyEvents } from "@/lib/company";
 import { showErrorToasts } from "@/lib/toast";
 import { Event } from "@/types";
-import CreateEventModal from "@/components/event/CreateEventModal";
+import EventCreateModal from "@/components/event/event-create-modal";
 
 // Типы пропсов
 type EventsCardProps = {
@@ -176,7 +176,7 @@ export default function EventsCard({ companyId }: EventsCardProps) {
                 </CardContent>
             </Card>
 
-            <CreateEventModal
+            <EventCreateModal
                 companyId={companyId}
                 isOpen={isModalOpen}
                 onClose={() => {
