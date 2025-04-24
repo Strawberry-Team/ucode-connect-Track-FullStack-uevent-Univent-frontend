@@ -1,16 +1,28 @@
 // components/promo-codes/PromoCodeCreateModal.tsx
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { showErrorToasts, showSuccessToast } from "@/lib/toast";
 import { createEventPromoCode } from "@/lib/event";
 import { updatePromoCode } from "@/lib/promo-codes";
 import { PromoCode, CreatePromoCodeRequest } from "@/types";
+import { z } from "zod";
+
+// Схема валидации для промокода
+const promoCodeZodSchema = z.object({
+    title: z.string().min(1, "Title is required"),
+    code: z.string().min(1, "Code is required").optional(),
+    discountPercent: z
+        .string()
+        .min(1, "Discount percent is required")
+        .transform((val) => Number(val))
+        .refine((val) => !isNaN(val) && val > 0 && val <= 100, "Discount must be a number between 1 and 100"),
+    isActive: z.boolean(),
+});
 
 // Типы пропсов для модалки
 type PromoCodeCreateModalProps = {
@@ -30,73 +42,100 @@ export default function PromoCodeCreateModal({
                                                  onPromoCodeUpdated,
                                                  promoCodeToEdit,
                                              }: PromoCodeCreateModalProps) {
-    const [title, setTitle] = useState(promoCodeToEdit?.title || "");
-    const [code, setCode] = useState(promoCodeToEdit?.code || "");
-    const [discountPercent, setDiscountPercent] = useState(
-        promoCodeToEdit?.discountPercent ? String(promoCodeToEdit.discountPercent * 100) : ""
-    );
-    const [isActive, setIsActive] = useState(promoCodeToEdit?.isActive || false);
+    const [formData, setFormData] = useState({
+        title: promoCodeToEdit?.title || "",
+        code: promoCodeToEdit?.code || "",
+        discountPercent: promoCodeToEdit?.discountPercent
+            ? String(promoCodeToEdit.discountPercent * 100)
+            : "",
+        isActive: promoCodeToEdit?.isActive || false,
+    });
+    const [displayDiscountPercent, setDisplayDiscountPercent] = useState("");
+    const [errors, setErrors] = useState<{
+        title?: string;
+        code?: string;
+        discountPercent?: string;
+    }>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-    // Очищаем данные при закрытии модального окна и обновляем при изменении promoCodeToEdit
+    useEffect(() => {
+        if (formData.discountPercent) {
+            setDisplayDiscountPercent(`${formData.discountPercent}%`);
+        } else {
+            setDisplayDiscountPercent("");
+        }
+    }, [formData.discountPercent]);
+
     useEffect(() => {
         if (!isOpen) {
-            // Очищаем поля, когда модалка закрывается
-            setTitle("");
-            setCode("");
-            setDiscountPercent("");
-            setIsActive(false);
+            setFormData({
+                title: "",
+                code: "",
+                discountPercent: "",
+                isActive: false,
+            });
             setErrors({});
         } else if (promoCodeToEdit) {
-            // Обновляем поля, если передан promoCodeToEdit (режим редактирования)
-            setTitle(promoCodeToEdit.title);
-            setCode(promoCodeToEdit.code || "");
-            setDiscountPercent(String(promoCodeToEdit.discountPercent * 100));
-            setIsActive(promoCodeToEdit.isActive);
+            setFormData({
+                title: promoCodeToEdit.title,
+                code: promoCodeToEdit.code || "",
+                discountPercent: String(promoCodeToEdit.discountPercent * 100),
+                isActive: promoCodeToEdit.isActive,
+            });
         }
     }, [isOpen, promoCodeToEdit]);
 
-    // Валидация формы
-    const validateForm = useCallback(() => {
-        const newErrors: { [key: string]: string } = {};
-
-        if (!title.trim()) {
-            newErrors.title = "Title is required";
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        if (name === "discountPercent") {
+            const numericValue = value.replace(/[^0-9]/g, "");
+            setFormData((prev) => ({ ...prev, [name]: numericValue }));
+        } else {
+            setFormData((prev) => ({ ...prev, [name]: value }));
         }
-        if (!promoCodeToEdit && !code.trim()) {
-            newErrors.code = "Code is required";
-        }
-        if (
-            !discountPercent ||
-            isNaN(Number(discountPercent)) ||
-            Number(discountPercent) <= 0 ||
-            Number(discountPercent) > 100
-        ) {
-            newErrors.discountPercent = "Discount must be a number between 1 and 100";
-        }
+    };
 
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    }, [title, code, discountPercent, promoCodeToEdit]);
+    const handleSwitchChange = (checked: boolean) => {
+        setFormData((prev) => ({ ...prev, isActive: checked }));
+    };
 
-    // Обработчик отправки формы
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!validateForm()) {
+        const promoCodeData = {
+            title: formData.title.trim(),
+            code: formData.code.trim(),
+            discountPercent: formData.discountPercent,
+            isActive: formData.isActive,
+        };
+
+        const validationSchema = promoCodeToEdit
+            ? promoCodeZodSchema.omit({ code: true })
+            : promoCodeZodSchema;
+        const validation = validationSchema.safeParse(promoCodeData);
+        if (!validation.success) {
+            const validationErrors = validation.error.flatten().fieldErrors;
+            setErrors({
+                title: validationErrors.title?.[0],
+                discountPercent: validationErrors.discountPercent?.[0],
+            });
+            const errorMessages = Object.values(validationErrors)
+                .filter((error): error is string[] => error !== undefined)
+                .flatMap((error) => error);
+            showErrorToasts(errorMessages);
             return;
         }
+
+        setErrors({});
 
         setIsSubmitting(true);
 
         if (promoCodeToEdit) {
-            // Логика редактирования
-            const promoCodeData = {
-                title: title.trim(),
-                isActive,
+            const updatedData = {
+                title: formData.title.trim(),
+                isActive: formData.isActive,
             };
-            const result = await updatePromoCode(promoCodeToEdit.id, promoCodeData);
+            const result = await updatePromoCode(promoCodeToEdit.id, updatedData);
             if (result.success && result.data) {
                 showSuccessToast("Promo code updated successfully");
                 onPromoCodeUpdated(result.data);
@@ -105,14 +144,13 @@ export default function PromoCodeCreateModal({
                 showErrorToasts(result.errors || ["Failed to update promo code"]);
             }
         } else {
-            // Логика создания
-            const promoCodeData: CreatePromoCodeRequest = {
-                title: title.trim(),
-                code: code.trim(),
-                discountPercent: Number(discountPercent) / 100,
-                isActive,
+            const createData: CreatePromoCodeRequest = {
+                title: formData.title.trim(),
+                code: formData.code.trim(),
+                discountPercent: Number(formData.discountPercent) / 100,
+                isActive: formData.isActive,
             };
-            const result = await createEventPromoCode(eventId, promoCodeData);
+            const result = await createEventPromoCode(eventId, createData);
             if (result.success && result.data) {
                 showSuccessToast("Promo code created successfully");
                 onPromoCodeCreated(result.data);
@@ -125,81 +163,100 @@ export default function PromoCodeCreateModal({
         setIsSubmitting(false);
     };
 
+    const handleClose = () => {
+        setFormData({
+            title: "",
+            code: "",
+            discountPercent: "",
+            isActive: false,
+        });
+        setErrors({});
+        onClose();
+    };
+
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                    <DialogTitle>{promoCodeToEdit ? "Edit Promo Code" : "Create Promo Code"}</DialogTitle>
-                </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <Label htmlFor="title">Title</Label>
+        <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+            <DialogContent className="w-[500px] bg-white rounded-lg shadow-lg">
+                <DialogTitle className="sr-only">
+                    {promoCodeToEdit ? "Edit Promo Code" : "Create Promo Code"}
+                </DialogTitle>
+                <form onSubmit={handleSubmit} className="space-y-4 px-2">
+                    {/* Title */}
+                    <div className="space-y-2">
                         <Input
                             id="title"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            placeholder="e.g., For the tech enthusiasts"
-                            className={errors.title ? "border-red-500" : ""}
+                            name="title"
+                            value={formData.title}
+                            onChange={handleInputChange}
+                            placeholder="Title (e.g., For the tech enthusiasts)"
+                            className="!text-[15px] w-full mt-3 rounded-md"
                             disabled={isSubmitting}
                         />
-                        {errors.title && <p className="text-sm text-red-500 mt-1">{errors.title}</p>}
-                    </div>
-
-                    {!promoCodeToEdit && (
-                        <div>
-                            <Label htmlFor="code">Code</Label>
-                            <Input
-                                id="code"
-                                value={code}
-                                onChange={(e) => setCode(e.target.value)}
-                                placeholder="e.g., TECH2023"
-                                className={errors.code ? "border-red-500" : ""}
-                                disabled={isSubmitting}
-                            />
-                            {errors.code && <p className="text-sm text-red-500 mt-1">{errors.code}</p>}
-                        </div>
-                    )}
-
-                    <div>
-                        <Label htmlFor="discountPercent">Discount Percent (%)</Label>
-                        <Input
-                            id="discountPercent"
-                            type="number"
-                            step="1"
-                            value={discountPercent}
-                            onChange={(e) => setDiscountPercent(e.target.value)}
-                            placeholder="e.g., 15"
-                            className={errors.discountPercent ? "border-red-500" : ""}
-                            disabled={isSubmitting || !!promoCodeToEdit}
-                        />
-                        {errors.discountPercent && (
-                            <p className="text-sm text-red-500 mt-1">{errors.discountPercent}</p>
+                        {errors.title && (
+                            <p className="text-sm text-red-500">{errors.title}</p>
                         )}
                     </div>
 
+                    {/* Code (только для создания) */}
+                    {!promoCodeToEdit && (
+                        <div className="space-y-2">
+                            <Input
+                                id="code"
+                                name="code"
+                                value={formData.code}
+                                onChange={handleInputChange}
+                                placeholder="Code (e.g., TECH2023)"
+                                className="!text-[15px] w-full rounded-md"
+                                disabled={isSubmitting}
+                            />
+                            {errors.code && (
+                                <p className="text-sm text-red-500">{errors.code}</p>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Discount Percent */}
+                    <div className="space-y-2">
+                        <Input
+                            id="discountPercent"
+                            name="discountPercent"
+                            value={displayDiscountPercent}
+                            onChange={handleInputChange}
+                            placeholder="Discount Percent (e.g., 15%)"
+                            className="!text-[15px] w-full rounded-md"
+                            disabled={isSubmitting || !!promoCodeToEdit}
+                        />
+                        {errors.discountPercent && (
+                            <p className="text-sm text-red-500">{errors.discountPercent}</p>
+                        )}
+                    </div>
+
+                    {/* Active Switch */}
                     <div className="flex items-center space-x-2">
-                        <Label htmlFor="isActive">Active</Label>
+                        <span className="text-[15px] text-gray-700">Active</span>
                         <Switch
                             id="isActive"
-                            checked={isActive}
-                            onCheckedChange={setIsActive}
+                            checked={formData.isActive}
+                            onCheckedChange={handleSwitchChange}
                             disabled={isSubmitting}
+                            className={`${
+                                formData.isActive ? "!bg-green-500" : "!bg-red-500"
+                            } transition-colors duration-200`}
                         />
                     </div>
 
-                    <div className="flex justify-end gap-2">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={onClose}
-                            disabled={isSubmitting}
-                        >
-                            Cancel
-                        </Button>
-                        <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting ? "Submitting..." : promoCodeToEdit ? "Update" : "Create"}
-                        </Button>
-                    </div>
+                    <Button
+                        type="submit"
+                        disabled={
+                            isSubmitting ||
+                            !formData.title ||
+                            (!promoCodeToEdit && !formData.code) ||
+                            !formData.discountPercent
+                        }
+                        className="w-full"
+                    >
+                        {isSubmitting ? "Submitting..." : promoCodeToEdit ? "Update" : "Create"}
+                    </Button>
                 </form>
             </DialogContent>
         </Dialog>

@@ -1,3 +1,4 @@
+// components/promo-codes/PromoCodesCard.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -127,12 +128,18 @@ export default function PromoCodesCard({ eventId }: PromoCodesCardProps) {
                                                 >
                                                     {promoCode.title}
                                                 </h4>
-                                                <div className="flex flex-col gap-1 text-gray-500">
-                                                    <span className="text-[12px]">
+                                                <div className="flex items-center gap-2 text-gray-500 text-[12px]">
+                                                    <span>
                                                         Discount: {(promoCode.discountPercent * 100).toFixed(0)}%
                                                     </span>
-                                                    <span className="text-[12px]">
-                                                        Active: {promoCode.isActive ? "Yes" : "No"}
+                                                    <span
+                                                        className={`border px-2 rounded-md text-[12px] ${
+                                                            promoCode.isActive
+                                                                ? "bg-green-100 text-green-700 border-green-300"
+                                                                : "bg-red-100 text-red-700 border-red-300"
+                                                        }`}
+                                                    >
+                                                        {promoCode.isActive ? "Active" : "Inactive"}
                                                     </span>
                                                 </div>
                                             </div>
@@ -158,9 +165,6 @@ export default function PromoCodesCard({ eventId }: PromoCodesCardProps) {
                                     )}
                                 </div>
                             ))}
-                            <div className="text-sm text-gray-500 mt-2">
-                                Total promo codes: {promoCodes.length}
-                            </div>
                         </div>
                     ) : (
                         <div className="flex h-full items-center justify-center">

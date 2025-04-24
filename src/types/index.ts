@@ -79,15 +79,15 @@ export interface Theme {
     title: string;
 }
 
-export type Notification = {
+export interface Notification {
     id: number;
     authorId: number;
-    companyId: null;
-    eventId: number;
+    companyId: number | null;
+    eventId: number | null;
     title: string;
     description: string;
     createdAt: string;
-};
+}
 
 export interface Ticket {
     id: number;

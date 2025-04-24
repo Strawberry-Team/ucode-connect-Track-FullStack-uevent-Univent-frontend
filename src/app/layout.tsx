@@ -8,7 +8,8 @@ import ScrollToTopButton from "@/components/ui/scroll-to-top-button";
 import { AuthProvider } from "@/context/auth-context";
 import { cookies } from "next/headers";
 import { Toaster } from "@/components/ui/sonner";
-import { getUserMe, User } from "@/lib/user";
+import { getUserMe } from "@/lib/user";
+import { User } from "@/types";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",

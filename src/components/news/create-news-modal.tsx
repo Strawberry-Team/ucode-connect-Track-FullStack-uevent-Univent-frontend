@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { showErrorToasts, showSuccessToast } from "@/lib/toast";
 import { createCompanyNews } from "@/lib/company";
-import { createEventNews } from "@/lib/event"; // Импортируем новую функцию
+import { createEventNews } from "@/lib/event";
+import { updateNews } from "@/lib/news";
 import { useAuth } from "@/context/auth-context";
 import { z } from "zod";
 import { CompanyNews, Notification } from "@/types";
@@ -23,17 +24,21 @@ const newsCreateZodSchema = z.object({
 interface CreateNewsModalProps {
     companyId?: number; // Опционально для компании
     eventId?: number;   // Опционально для события
+    newsToEdit?: CompanyNews | Notification | null; // Данные новости для редактирования
     isOpen: boolean;
     onClose: () => void;
     onNewsCreated: (newNews: CompanyNews | Notification) => void;
+    onNewsUpdated: (updatedNews: CompanyNews | Notification) => void; // Новый коллбэк для обновления
 }
 
 export default function CreateNewsModal({
                                             companyId,
                                             eventId,
+                                            newsToEdit,
                                             isOpen,
                                             onClose,
                                             onNewsCreated,
+                                            onNewsUpdated,
                                         }: CreateNewsModalProps) {
     const { user } = useAuth();
     const [formData, setFormData] = useState({
@@ -53,6 +58,16 @@ export default function CreateNewsModal({
     if (companyId === undefined && eventId === undefined) {
         throw new Error("Either companyId or eventId must be provided");
     }
+
+    // Заполняем поля данными из newsToEdit при открытии модального окна
+    useEffect(() => {
+        if (isOpen && newsToEdit) {
+            setFormData({
+                title: newsToEdit.title,
+                description: newsToEdit.description,
+            });
+        }
+    }, [isOpen, newsToEdit]);
 
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -89,21 +104,35 @@ export default function CreateNewsModal({
 
         setIsLoading(true);
         try {
-            let createResult;
-            if (companyId !== undefined) {
-                createResult = await createCompanyNews(companyId, newsData);
-            } else if (eventId !== undefined) {
-                createResult = await createEventNews(eventId, newsData);
-            }
+            if (newsToEdit) {
+                // Режим редактирования
+                const updateResult = await updateNews(newsToEdit.id, newsData);
+                if (!updateResult?.success || !updateResult.data) {
+                    showErrorToasts(updateResult?.errors || ["Failed to update news"]);
+                    return;
+                }
 
-            if (!createResult?.success || !createResult.data) {
-                showErrorToasts(createResult?.errors || ["Failed to create news"]);
-                return;
-            }
+                const updatedNews = updateResult.data;
+                onNewsUpdated(updatedNews);
+                showSuccessToast("News updated successfully");
+            } else {
+                // Режим создания
+                let createResult;
+                if (companyId !== undefined) {
+                    createResult = await createCompanyNews(companyId, newsData);
+                } else if (eventId !== undefined) {
+                    createResult = await createEventNews(eventId, newsData);
+                }
 
-            const newNews = createResult.data;
-            onNewsCreated(newNews);
-            showSuccessToast("News created successfully");
+                if (!createResult?.success || !createResult.data) {
+                    showErrorToasts(createResult?.errors || ["Failed to create news"]);
+                    return;
+                }
+
+                const newNews = createResult.data;
+                onNewsCreated(newNews);
+                showSuccessToast("News created successfully");
+            }
 
             setFormData({
                 title: "",
@@ -111,7 +140,7 @@ export default function CreateNewsModal({
             });
             onClose();
         } catch (error: any) {
-            showErrorToasts(error.errors || ["Failed to create news"]);
+            showErrorToasts(error.errors || ["Failed to create or update news"]);
         } finally {
             setIsLoading(false);
         }
@@ -129,7 +158,9 @@ export default function CreateNewsModal({
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
             <DialogContent className="w-[500px] bg-white rounded-lg shadow-lg">
-                <DialogTitle className="sr-only">Create a New News</DialogTitle>
+                <DialogTitle className="sr-only">
+                    {newsToEdit ? "Edit News" : "Create a New News"}
+                </DialogTitle>
                 <form onSubmit={handleSubmit} className="space-y-4 px-2">
                     {/* Заголовок */}
                     <div className="space-y-2">
@@ -172,7 +203,7 @@ export default function CreateNewsModal({
                         }
                         className="w-full"
                     >
-                        {isLoading ? "Loading..." : "Create News"}
+                        {isLoading ? "Loading..." : newsToEdit ? "Update News" : "Create News"}
                     </Button>
                 </form>
             </DialogContent>

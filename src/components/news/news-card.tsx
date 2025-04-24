@@ -9,9 +9,9 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import AnimatedButton from "@/components/ui/animated-button";
 import CreateNewsModal from "@/components/news/create-news-modal";
-import { Calendar, CalendarDays, Plus } from "lucide-react";
+import { Calendar, CalendarDays, Plus, Pencil } from "lucide-react";
 import { getCompanyNewsById } from "@/lib/company";
-import { getEventByIdNews } from "@/lib/event"; // Импортируем запрос для новостей события
+import { getEventByIdNews } from "@/lib/event";
 import { showErrorToasts } from "@/lib/toast";
 import { CompanyNews, Notification } from "@/types";
 
@@ -27,6 +27,7 @@ export default function NewsCard({ companyId, eventId }: NewsCardProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isClicked, setIsClicked] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [editingNews, setEditingNews] = useState<CompanyNews | Notification | null>(null); // Состояние для редактируемой новости
 
     // Проверяем, что передан либо companyId, либо eventId, но не оба
     if (companyId !== undefined && eventId !== undefined) {
@@ -78,6 +79,19 @@ export default function NewsCard({ companyId, eventId }: NewsCardProps) {
         );
     };
 
+    // Обработчик обновления новости
+    const handleNewsUpdated = (updatedNews: CompanyNews | Notification) => {
+        setNews((prev) => {
+            const updatedNewsList = prev.map((newsItem) =>
+                newsItem.id === updatedNews.id ? updatedNews : newsItem
+            );
+            // Сортируем по дате создания (от новых к старым)
+            return updatedNewsList.sort(
+                (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+        });
+    };
+
     return (
         <>
             <Card className="flex h-[246px] flex-col shadow-lg transition-all duration-300 hover:shadow-xl">
@@ -92,6 +106,7 @@ export default function NewsCard({ companyId, eventId }: NewsCardProps) {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => {
+                                    setEditingNews(null); // Сбрасываем редактируемую новость
                                     setIsModalOpen(true);
                                 }}
                             >
@@ -120,8 +135,7 @@ export default function NewsCard({ companyId, eventId }: NewsCardProps) {
                         <div className="max-h-[160px] overflow-y-auto px-3 pt-3 custom-scroll">
                             {news.map((newsItem, index) => (
                                 <div key={newsItem.id} className="flex flex-col">
-                                    <div className="flex items-center justify-between rounded-lg px-2 transition-all duration-500 hover:shadow-[0_0_15px_rgba(0,0,0,0.15)] cursor-pointer">
-                                        <Link href={`/news/${newsItem.id}`} className="flex-1">
+                                    <div className="flex items-center justify-between rounded-lg px-2 transition-all duration-500 hover:shadow-[0_0_15px_rgba(0,0,0,0.15)]">
                                             <div className="flex items-center gap-4 rounded-lg py-1 transition-all">
                                                 <div className="flex flex-col">
                                                     <h4
@@ -143,7 +157,18 @@ export default function NewsCard({ companyId, eventId }: NewsCardProps) {
                                                     </div>
                                                 </div>
                                             </div>
-                                        </Link>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setEditingNews(newsItem);
+                                                setIsModalOpen(true);
+                                            }}
+                                            className="h-10 w-10"
+                                        >
+                                            <Pencil strokeWidth={2.5} className="!h-5 !w-5" />
+                                        </Button>
                                     </div>
                                     <div className="my-2">
                                         {index < news.length - 1 && <hr className="border-gray-200" />}
@@ -156,6 +181,7 @@ export default function NewsCard({ companyId, eventId }: NewsCardProps) {
                             <AnimatedButton
                                 title="Create news"
                                 onClick={() => {
+                                    setEditingNews(null); // Сбрасываем редактируемую новость
                                     setIsModalOpen(true);
                                 }}
                                 isClicked={isClicked}
@@ -174,12 +200,15 @@ export default function NewsCard({ companyId, eventId }: NewsCardProps) {
             <CreateNewsModal
                 companyId={companyId}
                 eventId={eventId}
+                newsToEdit={editingNews} // Передаем редактируемую новость
                 isOpen={isModalOpen}
                 onClose={() => {
                     setIsModalOpen(false);
                     setIsClicked(false);
+                    setEditingNews(null); // Сбрасываем редактируемую новость при закрытии
                 }}
                 onNewsCreated={handleNewsCreated}
+                onNewsUpdated={handleNewsUpdated} // Передаем обработчик обновления
             />
         </>
     );
