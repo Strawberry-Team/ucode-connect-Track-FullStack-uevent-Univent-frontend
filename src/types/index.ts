@@ -67,6 +67,13 @@ export interface Event {
         title: string;
         logoName: string;
     };
+    tickets: {
+        id: number;
+        eventId: number;
+        title: string;
+        price: number;
+        status: string;
+    }[];
 }
 
 export interface EventFormat {

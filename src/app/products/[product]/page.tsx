@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import Link from "next/link";
-import { getEventById, getEventByIdNews } from "@/lib/event";
-import { generateMapEmbedUrl } from "@/utils/generateMapEmbedUrl"; // Импортируем новую утилиту
+import { getEventById, getEventByIdNews, getEventTicketTypes } from "@/lib/event";
+import { generateMapEmbedUrl } from "@/utils/generateMapEmbedUrl";
 import { CalendarDays, MapPinned, MapPin, Tag, Building } from "lucide-react";
 import TicketActions from "@/components/card/TicketActions";
 import AttendeesAndNewsBlock from "@/components/attendees-and-news/attendees-and-news-block";
@@ -34,8 +34,16 @@ export default async function PageCard({ params }: { params: Promise<{ product: 
         return <div className="px-custom py-4">Event not found: {eventResponse.errors}</div>;
     }
 
+    // Запрашиваем типы билетов
+    const ticketTypesResponse = await getEventTicketTypes(id);
+    const ticketTypes = ticketTypesResponse.success && ticketTypesResponse.data?.items
+        ? ticketTypesResponse.data.items
+        : [];
+
     const notificationsResponse = await getEventByIdNews(id);
-    const rawNewsNotifications = notificationsResponse.success && notificationsResponse.data ? notificationsResponse.data : [];
+    const rawNewsNotifications = notificationsResponse.success && notificationsResponse.data
+        ? notificationsResponse.data
+        : [];
 
     const newsNotifications: NewsNotification[] = rawNewsNotifications.map((notification) => ({
         type: "news" as const,
@@ -79,11 +87,25 @@ export default async function PageCard({ params }: { params: Promise<{ product: 
     const event = eventResponse.data;
     const dateStart = format(new Date(event.startedAt), "MMMM d, yyyy HH:mm");
     const dateEnd = format(new Date(event.endedAt), "MMMM d, yyyy HH:mm");
-    const price = `${(event.id * 10).toFixed(2)} - ${(event.id * 20).toFixed(2)} $`;
+
+    const getPriceRange = (): string => {
+        if (!ticketTypes || ticketTypes.length === 0) {
+            return "No tickets";
+        }
+
+        const prices = ticketTypes.map((ticket) => ticket.price);
+        const minPrice = Math.min(...prices);
+        const maxPrice = Math.max(...prices);
+
+        return `${minPrice} - ${maxPrice} $`;
+    };
+
+    const price = getPriceRange();
+
     const imageUrl = event.posterName
         ? `http://localhost:8080/uploads/event-posters/${event.posterName}`
         : "https://via.placeholder.com/384x384";
-    
+
     const mapEmbedUrl = generateMapEmbedUrl(event.locationCoordinates);
 
     return (

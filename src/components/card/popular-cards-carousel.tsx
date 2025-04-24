@@ -1,7 +1,6 @@
 "use client";
 
-import Image from "next/image";
-import { CalendarDays, Guitar, MapPinned, Palette, Tag } from "lucide-react";
+import { CalendarDays, MapPinned, Tag } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { getEvents } from "@/lib/event";
 import { Event } from "@/types";
 import { format } from "date-fns";
-import { Skeleton } from "@/components/ui/skeleton"; // Импортируем наш кастомный Skeleton
+import { Skeleton } from "@/components/ui/skeleton";
 
 const PopularCardsCarousel = () => {
     const [events, setEvents] = useState<Event[]>([]);
@@ -20,14 +19,14 @@ const PopularCardsCarousel = () => {
     const isProcessingRef = useRef<boolean>(false);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const router = useRouter();
-    const [isLoading, setIsLoading] = useState(true); // Состояние загрузки
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchEvents = async () => {
             const start = Date.now();
             const response = await getEvents();
             const elapsed = Date.now() - start;
-            const remaining = 300 - elapsed; // Минимальная задержка 300 мс
+            const remaining = 300 - elapsed;
             if (remaining > 0) {
                 await new Promise((resolve) => setTimeout(resolve, remaining));
             }
@@ -46,6 +45,19 @@ const PopularCardsCarousel = () => {
         .slice(0, 4);
 
     const totalSlides: number = popularEvents.length || 1;
+
+    // Функция для получения диапазона цен
+    const getPriceRange = (event: Event): string => {
+        if (!event.tickets || event.tickets.length === 0) {
+            return "No tickets";
+        }
+
+        const prices = event.tickets.map((ticket) => ticket.price);
+        const minPrice = Math.min(...prices);
+        const maxPrice = Math.max(...prices);
+
+        return `${minPrice} - ${maxPrice} $`;
+    };
 
     // Автоматическое переключение каждые 5 секунд
     useEffect(() => {
@@ -130,7 +142,6 @@ const PopularCardsCarousel = () => {
         return currentIndex - 1;
     };
 
-
     if (isLoading) {
         return (
             <div className="px-custom w-full relative z-10">
@@ -143,12 +154,10 @@ const PopularCardsCarousel = () => {
                             <div key={`skeleton-${index}`} className="w-full flex-shrink-0">
                                 <Card className="w-full h-[400px] relative border-none">
                                     <Skeleton className="absolute inset-0 w-full h-full" />
-
                                 </Card>
                             </div>
                         ))}
                     </div>
-
                 </div>
             </div>
         );
@@ -193,17 +202,16 @@ const PopularCardsCarousel = () => {
                                                 </span>
                                             </p>
                                             <p className="text-base flex items-center gap-1.5">
-                                                <CalendarDays strokeWidth={2} className="w-4 h-4 text-white" />{" "}
+                                                <CalendarDays strokeWidth={2} className="w-4 h-4 flex-shrink-0" />
                                                 {format(new Date(popularEvents[popularEvents.length - 1].startedAt), "MMMM d, yyyy HH:mm")}
                                             </p>
                                             <p className="text-base flex items-center gap-1.5">
-                                                <MapPinned strokeWidth={2} className="w-4 h-4 text-white" />{" "}
+                                                <MapPinned strokeWidth={2} className="w-4 h-4 flex-shrink-0" />
                                                 <span className="truncate">{popularEvents[popularEvents.length - 1].venue}</span>
                                             </p>
                                         </div>
                                         <p className="text-xl font-semibold">
-                                            {(popularEvents[popularEvents.length - 1].id * 10).toFixed(2)} -{" "}
-                                            {(popularEvents[popularEvents.length - 1].id * 20).toFixed(2)} $
+                                            {getPriceRange(popularEvents[popularEvents.length - 1])}
                                         </p>
                                     </div>
                                 </CardContent>
@@ -236,16 +244,16 @@ const PopularCardsCarousel = () => {
                                                 </span>
                                             </p>
                                             <p className="text-base flex items-center gap-1.5">
-                                                <CalendarDays strokeWidth={2} className="w-4 h-4 text-white" />{" "}
+                                                <CalendarDays strokeWidth={2} className="w-4 h-4 text-white" />
                                                 {format(new Date(event.startedAt), "MMMM d, yyyy HH:mm")}
                                             </p>
                                             <p className="text-base flex items-center gap-1.5">
-                                                <MapPinned strokeWidth={2} className="w-4 h-4 text-white" />{" "}
+                                                <MapPinned strokeWidth={2} className="w-4 h-4 flex-shrink-0" />
                                                 <span className="truncate">{event.venue}</span>
                                             </p>
                                         </div>
                                         <p className="text-xl font-semibold">
-                                            {(event.id * 10).toFixed(2)} - {(event.id * 20).toFixed(2)} $
+                                            {getPriceRange(event)}
                                         </p>
                                     </div>
                                 </CardContent>
@@ -278,16 +286,16 @@ const PopularCardsCarousel = () => {
                                                 </span>
                                             </p>
                                             <p className="text-base flex items-center gap-1.5">
-                                                <CalendarDays strokeWidth={2} className="w-4 h-4 text-white" />{" "}
+                                                <CalendarDays strokeWidth={2} className="w-4 h-4 text-white" />
                                                 {format(new Date(popularEvents[0].startedAt), "MMMM d, yyyy HH:mm")}
                                             </p>
                                             <p className="text-base flex items-center gap-1.5">
-                                                <MapPinned strokeWidth={2} className="w-4 h-4 text-white" />{" "}
+                                                <MapPinned strokeWidth={2} className="w-4 h-4 flex-shrink-0" />
                                                 <span className="truncate">{popularEvents[0].venue}</span>
                                             </p>
                                         </div>
                                         <p className="text-xl font-semibold">
-                                            {(popularEvents[0].id * 10).toFixed(2)} - {(popularEvents[0].id * 20).toFixed(2)} $
+                                            {getPriceRange(popularEvents[0])}
                                         </p>
                                     </div>
                                 </CardContent>
