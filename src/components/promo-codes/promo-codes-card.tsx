@@ -176,11 +176,11 @@ export default function PromoCodesCard({ eventId }: PromoCodesCardProps) {
                                 }}
                                 isClicked={isClicked}
                                 setIsClicked={setIsClicked}
-                                topLeftHover={{ left: 4.5, top: 6.4 }}
-                                topRightHover={{ right: 4.5, top: 6.4 }}
-                                bottomLeftHover={{ left: 4.5, bottom: 6.4 }}
-                                bottomRightHover={{ right: 4.5, bottom: 6.4 }}
-                                centerPadding={{ left: 4.5, top: 6.4, right: 4.5, bottom: 6.4 }}
+                                topLeftHover={{ left: 2, top: 2.4 }}
+                                topRightHover={{ right: 1.5, top: 2.4 }}
+                                bottomLeftHover={{ left: 2, bottom: 2.4 }}
+                                bottomRightHover={{ right: 1.5, bottom: 2.4 }}
+                                centerPadding={{ left: 2, top: 2.4, right: 1.5, bottom: 2.4 }}
                             />
                         </div>
                     )}

@@ -187,10 +187,10 @@ export default function NewsCard({ companyId, eventId }: NewsCardProps) {
                                 isClicked={isClicked}
                                 setIsClicked={setIsClicked}
                                 topLeftHover={{ left: 4.5, top: 2.4 }}
-                                topRightHover={{ right: 4.5, top: 2.4 }}
+                                topRightHover={{ right: 4, top: 2.4 }}
                                 bottomLeftHover={{ left: 4.5, bottom: 2.4 }}
-                                bottomRightHover={{ right: 4.5, bottom: 2.4 }}
-                                centerPadding={{ left: 4.5, top: 2.4, right: 4.5, bottom: 2.4 }}
+                                bottomRightHover={{ right: 4, bottom: 2.4 }}
+                                centerPadding={{ left: 4.5, top: 2.4, right: 4, bottom: 2.4 }}
                             />
                         </div>
                     )}

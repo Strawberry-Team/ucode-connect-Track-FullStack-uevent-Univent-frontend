@@ -4,24 +4,28 @@ import { useState, useEffect } from "react";
 import ProductCard from "./product-card";
 import { getEvents } from "@/lib/event";
 import { Event } from "@/types";
-import { Skeleton } from "@/components/ui/skeleton"; // Импортируем наш кастомный Skeleton
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ProductCardList = () => {
     const [events, setEvents] = useState<Event[]>([]);
-    const [isLoading, setIsLoading] = useState(true); // Изменили начальное значение на true
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchEvents = async () => {
             const start = Date.now();
             const response = await getEvents();
+            console.log("getEvents response:", response); // Для отладки
+
             const elapsed = Date.now() - start;
             const remaining = 300 - elapsed;
             if (remaining > 0) {
                 await new Promise((resolve) => setTimeout(resolve, remaining));
             }
-            if (response.success && response.data) {
+
+            if (response.success && Array.isArray(response.data)) {
                 setEvents(response.data);
             } else {
+                console.error("Failed to fetch events or data is not an array:", response);
                 setEvents([]);
             }
             setIsLoading(false);

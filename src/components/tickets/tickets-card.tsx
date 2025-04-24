@@ -21,10 +21,10 @@ type TicketsInfoCardProps = {
 type GroupedTicket = {
     title: string;
     price: string;
-    totalQuantity: number;    // Всего тикетов
+    totalQuantity: number; // Всего тикетов
     availableQuantity: number; // Доступно тикетов
-    soldQuantity: number;     // Продано тикетов
-    ticketType: TicketType;   // Храним оригинальный тип тикета
+    soldQuantity: number; // Продано тикетов
+    ticketType: TicketType; // Храним оригинальный тип тикета
 };
 
 // Функция для форматирования цены
@@ -60,31 +60,36 @@ export default function TicketsCard({ eventId }: TicketsInfoCardProps) {
                 setTicketTypes(ticketTypesResult.data.items);
 
                 // Группируем тикеты по title и price для подсчета общего и проданных
-                const ticketCounts = ticketsResult.data.items.reduce((acc: { [key: string]: { total: number; sold: number } }, ticket) => {
-                    const key = `${ticket.title}-${ticket.price}`;
-                    if (!acc[key]) {
-                        acc[key] = { total: 0, sold: 0 };
-                    }
-                    acc[key].total += 1;
-                    if (ticket.status === "sold") {
-                        acc[key].sold += 1;
-                    }
-                    return acc;
-                }, {});
+                const ticketCounts = ticketsResult.data.items.reduce(
+                    (acc: { [key: string]: { total: number; sold: number } }, ticket) => {
+                        const key = `${ticket.title}-${ticket.price}`;
+                        if (!acc[key]) {
+                            acc[key] = { total: 0, sold: 0 };
+                        }
+                        acc[key].total += 1;
+                        if (ticket.status === "sold") {
+                            acc[key].sold += 1;
+                        }
+                        return acc;
+                    },
+                    {}
+                );
 
                 // Создаем сгруппированный массив на основе ticketTypes
-                const groupedArray = ticketTypesResult.data.items.map((ticketType) => {
-                    const key = `${ticketType.title}-${ticketType.price}`;
-                    const ticketCount = ticketCounts[key] || { total: 0, sold: 0 };
-                    return {
-                        title: ticketType.title,
-                        price: formatPrice(ticketType.price), // Форматируем цену
-                        totalQuantity: ticketCount.total,
-                        availableQuantity: ticketType.count,
-                        soldQuantity: ticketCount.sold,
-                        ticketType,
-                    };
-                }).sort((a, b) => Number(a.price) - Number(b.price));
+                const groupedArray = ticketTypesResult.data.items
+                    .map((ticketType) => {
+                        const key = `${ticketType.title}-${ticketType.price}`;
+                        const ticketCount = ticketCounts[key] || { total: 0, sold: 0 };
+                        return {
+                            title: ticketType.title,
+                            price: formatPrice(ticketType.price), // Форматируем цену
+                            totalQuantity: ticketCount.total,
+                            availableQuantity: ticketType.count,
+                            soldQuantity: ticketCount.sold,
+                            ticketType,
+                        };
+                    })
+                    .sort((a, b) => Number(a.price) - Number(b.price));
 
                 setGroupedTickets(groupedArray);
             } else {
@@ -105,7 +110,7 @@ export default function TicketsCard({ eventId }: TicketsInfoCardProps) {
     }, [eventId]);
 
     // Обработчик создания тикета
-    const handleTicketCreated = (newTickets: Ticket[]) => {
+    const handleTicketCreated = async (newTickets: Ticket[]) => {
         // Обновляем общее количество тикетов
         setTicketsData((prev) => {
             if (!prev) {
@@ -117,59 +122,48 @@ export default function TicketsCard({ eventId }: TicketsInfoCardProps) {
             };
         });
 
-        // Обновляем сгруппированный список
-        setGroupedTickets((prev) => {
-            let updatedGrouped = [...prev];
-            const groupedNewTickets = newTickets.reduce((acc: { [key: string]: Ticket[] }, ticket) => {
-                const key = `${ticket.title}-${ticket.price}`;
-                if (!acc[key]) {
-                    acc[key] = [];
-                }
-                acc[key].push(ticket);
-                return acc;
-            }, {});
+        // Выполняем запрос для получения обновленных типов тикетов
+        const ticketTypesResult = await getEventTicketTypes(eventId);
 
-            Object.entries(groupedNewTickets).forEach(([key, tickets]) => {
-                const [title, price] = key.split("-");
-                const priceNum = Number(price);
-                const existingTicketIndex = updatedGrouped.findIndex((t) => `${t.title}-${t.price}` === key);
+        if (ticketTypesResult.success && ticketTypesResult.data) {
+            setTicketTypes(ticketTypesResult.data.items);
 
-                const newAvailable = tickets.filter((t) => t.status === "available").length;
-                const newSold = tickets.filter((t) => t.status === "sold").length;
-
-                if (existingTicketIndex !== -1) {
-                    // Если тип тикета уже существует, обновляем количества
-                    updatedGrouped[existingTicketIndex] = {
-                        ...updatedGrouped[existingTicketIndex],
-                        totalQuantity: updatedGrouped[existingTicketIndex].totalQuantity + tickets.length,
-                        availableQuantity: updatedGrouped[existingTicketIndex].availableQuantity + newAvailable,
-                        soldQuantity: updatedGrouped[existingTicketIndex].soldQuantity + newSold,
-                    };
-                } else {
-                    // Иначе добавляем новый тип тикета в правильное место
-                    const newGroupedTicket: GroupedTicket = {
-                        title,
-                        price: formatPrice(priceNum),
-                        totalQuantity: tickets.length,
-                        availableQuantity: newAvailable,
-                        soldQuantity: newSold,
-                        ticketType: { title, price: priceNum, count: newAvailable },
-                    };
-
-                    // Находим позицию для вставки, чтобы сохранить сортировку по цене
-                    let insertIndex = updatedGrouped.findIndex((ticket) => Number(ticket.price) > priceNum);
-                    if (insertIndex === -1) {
-                        // Если цена больше всех существующих, добавляем в конец
-                        updatedGrouped.push(newGroupedTicket);
-                    } else {
-                        // Вставляем на найденную позицию
-                        updatedGrouped.splice(insertIndex, 0, newGroupedTicket);
+            // Группируем новые тикеты для подсчета общего и проданных
+            const ticketCounts = [...(ticketsData?.items || []), ...newTickets].reduce(
+                (acc: { [key: string]: { total: number; sold: number } }, ticket) => {
+                    const key = `${ticket.title}-${ticket.price}`;
+                    if (!acc[key]) {
+                        acc[key] = { total: 0, sold: 0 };
                     }
-                }
-            });
+                    acc[key].total += 1;
+                    if (ticket.status === "sold") {
+                        acc[key].sold += 1;
+                    }
+                    return acc;
+                },
+                {}
+            );
 
-            return updatedGrouped;
-        });
+            // Создаем новый сгруппированный массив на основе ticketTypes
+            const updatedGroupedArray = ticketTypesResult.data.items
+                .map((ticketType) => {
+                    const key = `${ticketType.title}-${ticketType.price}`;
+                    const ticketCount = ticketCounts[key] || { total: 0, sold: 0 };
+                    return {
+                        title: ticketType.title,
+                        price: formatPrice(ticketType.price),
+                        totalQuantity: ticketCount.total,
+                        availableQuantity: ticketType.count,
+                        soldQuantity: ticketCount.sold,
+                        ticketType,
+                    };
+                })
+                .sort((a, b) => Number(a.price) - Number(b.price));
+
+            setGroupedTickets(updatedGroupedArray);
+        } else {
+            showErrorToasts(ticketTypesResult.errors || ["Failed to fetch updated ticket types"]);
+        }
     };
 
     // Подсчитываем общее количество доступных тикетов для заголовка
@@ -185,9 +179,9 @@ export default function TicketsCard({ eventId }: TicketsInfoCardProps) {
                     <div className="-mt-2 flex items-center justify-between border-b pb-1 text-xl font-medium text-foreground">
                         <div className="flex items-center">
                             <TicketIcon strokeWidth={2.5} className="mr-2 h-5 w-5 text-gray-500" />
-                            Tickets: {totalAvailableTickets}
+                            Tickets{totalAvailableTickets > 0 ? `: ${totalAvailableTickets}` : ""}
                         </div>
-                        {!isLoading && (
+                        {!isLoading && groupedTickets.length > 0 && (
                             <Button
                                 variant="ghost"
                                 size="sm"
@@ -228,7 +222,7 @@ export default function TicketsCard({ eventId }: TicketsInfoCardProps) {
                                             <div className="flex flex-col">
                                                 <div className="flex items-center gap-2">
                                                     <h4
-                                                        className="text-[18px] -mt-1 md:text-[20px] font-medium text-gray-800"
+                                                        className="text-[18px] md:text-[20px] font-medium text-gray-800"
                                                         style={{
                                                             maxWidth: "150px",
                                                             whiteSpace: "nowrap",
@@ -247,12 +241,12 @@ export default function TicketsCard({ eventId }: TicketsInfoCardProps) {
                                             </div>
                                         </div>
                                         <span className="text-[14px] md:text-[16px] font-medium text-gray-800">
-                                            {groupedTicket.price}$
-                                        </span>
+                      {groupedTicket.price}$
+                    </span>
                                     </div>
                                     {index < groupedTickets.length - 1 && (
                                         <hr
-                                            className=" my-2"
+                                            className="my-2"
                                             key={`hr-${groupedTicket.title}-${groupedTicket.price}`}
                                         />
                                     )}
@@ -268,11 +262,11 @@ export default function TicketsCard({ eventId }: TicketsInfoCardProps) {
                                 }}
                                 isClicked={isClicked}
                                 setIsClicked={setIsClicked}
-                                topLeftHover={{ left: 4.5, top: 6.4 }}
-                                topRightHover={{ right: 4.5, top: 6.4 }}
-                                bottomLeftHover={{ left: 4.5, bottom: 6.4 }}
-                                bottomRightHover={{ right: 4.5, bottom: 6.4 }}
-                                centerPadding={{ left: 4.5, top: 6.4, right: 4.5, bottom: 6.4 }}
+                                topLeftHover={{ left: 4.5, top: 2.4 }}
+                                topRightHover={{ right: 4, top: 2.4 }}
+                                bottomLeftHover={{ left: 4.5, bottom: 2.4 }}
+                                bottomRightHover={{ right: 4, bottom: 2.4 }}
+                                centerPadding={{ left: 4.5, top: 2.4, right: 4, bottom: 2.4 }}
                             />
                         </div>
                     )}

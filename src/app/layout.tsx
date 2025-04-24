@@ -40,8 +40,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     }
 
     return (
-        <html lang="en">
-            <body>
+        <html lang="en" suppressHydrationWarning>
+            <body suppressHydrationWarning>
                 <AuthProvider initialAuthState={isAuthenticated} initialUser={initialUser}>
                     <Header />
                     {children}
