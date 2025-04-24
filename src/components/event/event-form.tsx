@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import EventInfoCard from "@/components/event/event-info-card";
-import TicketsInfoCard from "@/components/tickets/tickets-info-card";
-import PromoCodesInfoCard from "@/components/promocodes/promo-codes-info-card";
-import NewsInfoCard from "@/components/news/news-info-card";
+import TicketsCard from "@/components/tickets/tickets-card";
+import PromoCodesInfoCard from "@/components/promo-codes/promo-codes-card";
+import NewsCard from "@/components/news/news-card";
 
 
 type EventFormProps = {
@@ -30,13 +30,13 @@ export default function EventForm({ eventId }: EventFormProps) {
                 {/* Карточки билетов, промокодов и новостей в ряд */}
                 <div className="flex flex-col sm:flex-row gap-6 w-full">
                     <div className="flex-1">
-                        <TicketsInfoCard companyId={eventId} />
+                        <TicketsCard eventId={eventId} />
                     </div>
                     <div className="flex-1">
-                        <PromoCodesInfoCard companyId={eventId} />
+                        <PromoCodesInfoCard eventId={eventId} />
                     </div>
                     <div className="flex-1">
-                        <NewsInfoCard companyId={eventId} />
+                        <NewsCard eventId={eventId} />
                     </div>
                 </div>
             </div>

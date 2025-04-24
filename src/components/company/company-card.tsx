@@ -6,11 +6,11 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import AnimatedButton from "@/components/ui/animated-button";
-import ManageCompanyModal from "@/components/company/ManageCompanyModal";
+import ManageCompanyModal from "@/components/company/manage-company-modal";
 import { Building, CalendarDays } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
-import { useCompanyStore } from "@/stores/company-store";
-import { companyService } from "@/services/company-service";
+import { useAuth } from "@/context/auth-context";
+import { useCompanyStore } from "@/store/company-store";
+import { companyService } from "@/service/company-service";
 import { showErrorToasts } from "@/lib/toast";
 import { Company } from "@/types";
 

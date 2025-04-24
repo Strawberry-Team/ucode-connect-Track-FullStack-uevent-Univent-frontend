@@ -2,10 +2,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/header/Header";
+import Header from "@/components/header/header";
 import React from "react";
 import ScrollToTopButton from "@/components/ui/scroll-to-top-button";
-import { AuthProvider } from "@/context/AuthContext";
+import { AuthProvider } from "@/context/auth-context";
 import { cookies } from "next/headers";
 import { Toaster } from "@/components/ui/sonner";
 import { getUserMe, User } from "@/lib/user";

@@ -12,7 +12,7 @@ type TicketsCardProps = {
     initialTickets: Ticket[];
 };
 
-export default function TicketsCard({ initialTickets }: TicketsCardProps) {
+export default function OrdersCard({ initialTickets }: TicketsCardProps) {
     return (
         <Card className="shadow-lg transition-all duration-300 hover:shadow-xl h-[396px] flex flex-col">
             <CardContent className="flex-1">

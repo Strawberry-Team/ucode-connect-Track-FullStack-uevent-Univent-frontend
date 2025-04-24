@@ -28,7 +28,7 @@ import {
     FileText,
     Building,
     Users,
-    Clock, Ticket
+    Clock, Ticket, Palette
 } from "lucide-react";
 import {useJsApiLoader} from "@react-google-maps/api";
 import {cn} from "@/lib/utils";
@@ -42,7 +42,7 @@ import {eventCreateZodSchema, validateEventDates} from "@/zod/shemas";
 import {ScrollArea} from "@/components/ui/scroll-area";
 
 const CalendarComponent = dynamic(() => import("@/components/ui/calendar").then(mod => mod.Calendar), {ssr: false});
-const LocationPickerModal = dynamic(() => import("./LocationPickerModal"), {ssr: false});
+const LocationPickerModal = dynamic(() => import("./location-picker-modal"), {ssr: false});
 const GOOGLE_MAPS_LIBRARIES: ("places")[] = ["places"];
 
 type EventInfoCardProps = {
@@ -498,7 +498,7 @@ const FormatThemesFields = memo(
                         onValueChange={onFormatChange}
                         disabled={isLoading}
                     >
-                        <SelectTrigger className="cursor-pointer !text-[14px] w-[195px] rounded-md h-9 justify-start">
+                        <SelectTrigger className="cursor-pointer !text-[14px] w-[203px] rounded-md h-9 justify-start">
                             <Tag strokeWidth={2.5} className="w-4 h-4 text-gray-500"/>
                             <SelectValue placeholder="Format"/>
                         </SelectTrigger>
@@ -522,7 +522,7 @@ const FormatThemesFields = memo(
                                 className="rounded-md w-[120px] font-normal text-sm justify-start"
                                 disabled={isLoading}
                             >
-                                <Tag strokeWidth={2.5} className="w-4 h-4 text-gray-500"/> Themes
+                                <Palette strokeWidth={2.5} className="w-4 h-4 text-gray-500"/> Themes
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent
@@ -610,7 +610,7 @@ const StatusVisibilityFields = memo(
     }) => {
         return (
             <div className="max-w-[330px] space-y-4">
-                <div className="space-y-2 w-[323px]">
+                <div className="space-y-2">
                     <Select
                         value={status}
                         onValueChange={onStatusChange}
@@ -629,7 +629,7 @@ const StatusVisibilityFields = memo(
                         </SelectContent>
                     </Select>
                 </div>
-                <div className="space-y-2 w-[323px]">
+                <div className="space-y-2 ">
                     <Select
                         value={attendeeVisibility}
                         onValueChange={onAttendeeVisibilityChange}
@@ -1293,7 +1293,7 @@ export default function EventInfoCard({setEditMode, editMode, eventId}: EventInf
                                         <div className="text-[17px] flex items-center gap-2">
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
-                                                    <Tag className="w-5 h-5 text-gray-500 flex-shrink-0 self-center" strokeWidth={2.5} />
+                                                    <Palette className="w-5 h-5 text-gray-500 flex-shrink-0 self-center" strokeWidth={2.5} />
                                                 </TooltipTrigger>
                                                 <TooltipContent>
                                                     <p>Themes</p>

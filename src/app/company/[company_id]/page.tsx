@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Mail } from "lucide-react";
 import { getCompanyById, getCompanyNewsById } from "@/lib/company";
-import NotificationsBlock from "@/components/notification/NotificationsBlock";
+import NotificationsBlock from "@/components/notification/notifications-block";
 import {Button} from "@/components/ui/button";
 
 interface CompanyNewsNotification {

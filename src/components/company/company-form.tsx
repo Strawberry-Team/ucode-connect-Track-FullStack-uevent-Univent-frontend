@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import EventsCard from "@/components/company/EventsCard";
-import TicketsCard from "@/components/profile/TicketsCard";
-import CompanyInfoCard from "@/components/company/CompanyInfoCard";
-import NewsInfoCard from "@/components/news/news-info-card";
+import EventsCard from "@/components/event/events-card";
+import OrdersCard from "@/components/profile/orders-card";
+import CompanyInfoCard from "@/components/company/company-info-card";
+import NewsCard from "@/components/news/news-card";
 
 
 type ProfileFormProps = {
@@ -29,7 +29,7 @@ export default function ProfileForm({ companyId }: ProfileFormProps) {
                     {/* Карточка компании */}
                     <EventsCard companyId={companyId}/>
 
-                    <NewsInfoCard companyId={companyId} />
+                    <NewsCard companyId={companyId} />
                 </div>
             </div>
         </div>

@@ -1,4 +1,4 @@
-import CompanyForm from "@/components/company/CompanyForm";
+import CompanyForm from "@/components/company/company-form";
 
 export default async function CompanyPage({
                                               params,

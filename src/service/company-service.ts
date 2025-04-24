@@ -1,4 +1,4 @@
-// services/companyService.ts
+// service/companyService.ts
 import { getUserCompany, Company } from "@/lib/user";
 import { createCompany, updateCompany, uploadCompanyLogo, deleteCompany } from "@/lib/company";
 

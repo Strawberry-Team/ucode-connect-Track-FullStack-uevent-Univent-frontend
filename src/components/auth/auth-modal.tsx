@@ -4,13 +4,13 @@ import { useState, useEffect } from "react";
 import {login, register, resetPassword} from "@/lib/auth";
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/auth-context";
 import { showErrorToasts, showSuccessToast } from "@/lib/toast";
 import LogoImage from "@/assets/solo.png";
 import Image from "next/image";
-import LoginForm from "./LoginForm";
-import ResetPasswordForm from "./ResetPasswordForm";
-import RegisterForm from "./RegisterForm";
+import LoginForm from "./login-form";
+import ResetPasswordForm from "./reset-password-form";
+import RegisterForm from "./register-form";
 import {loginZodSchema, registerZodSchema, resetPasswordZodSchema} from "@/zod/shemas";
 
 interface AuthModalProps {

@@ -79,8 +79,67 @@ export interface Theme {
     title: string;
 }
 
-export interface Notification {
+export type Notification = {
+    id: number;
+    authorId: number;
+    companyId: null;
+    eventId: number;
     title: string;
     description: string;
     createdAt: string;
+};
+
+export interface Ticket {
+    id: number;
+    eventId: number;
+    title: string;
+    number: string;
+    price: string;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
 }
+
+export interface TicketType {
+    title: string;
+    price: number;
+    count: number;
+}
+
+export interface TicketTypesResponse {
+    items: TicketType[];
+    total: number;
+}
+
+export interface TicketsResponse {
+    items: Ticket[];
+    total: number;
+}
+
+export interface CreateTicketRequest {
+    title: string;
+    price: number;
+    status: string;
+    quantity: number;
+}
+
+export type PromoCode = {
+    id: number;
+    eventId: number;
+    title: string;
+    code?: string;
+    discountPercent: number;
+    isActive: boolean;
+};
+
+export type CreatePromoCodeRequest = {
+    title: string;
+    code: string;
+    discountPercent: number;
+    isActive: boolean;
+};
+
+export type UpdatePromoCodeRequest = {
+    title: string;
+    isActive: boolean;
+};

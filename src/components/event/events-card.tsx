@@ -1,4 +1,4 @@
-// components/EventsCard.tsx
+// components/events-card.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -72,20 +72,20 @@ export default function EventsCard({ companyId }: EventsCardProps) {
                             Events
                         </div>
                         {!isLoading && events.length > 0 && (
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                    setEditingEvent(null);
-                                    setIsModalOpen(true);
-                                }}
-                            >
-                                <div className="flex items-center gap-1 text-[15px]">
-                                    <Plus strokeWidth={2.5} className="h-5 w-5" />
-                                    Add event
-                                </div>
-                            </Button>
-                        )}
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                                setEditingEvent(null);
+                                setIsModalOpen(true);
+                            }}
+                        >
+                            <div className="flex items-center gap-1 text-[15px]">
+                                <Plus strokeWidth={2.5} className="h-5 w-5" />
+                                Add event
+                            </div>
+                        </Button>
+                            )}
                     </div>
                 </CardHeader>
                 <CardContent className="-mt-5 flex-1">

@@ -1,4 +1,4 @@
-// components/company/ManageCompanyModal.tsx
+// components/company/manage-company-modal.tsx
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -6,9 +6,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useAuth } from "@/context/AuthContext";
-import { useCompanyStore } from "@/stores/company-store";
-import { companyService } from "@/services/company-service";
+import { useAuth } from "@/context/auth-context";
+import { useCompanyStore } from "@/store/company-store";
+import { companyService } from "@/service/company-service";
 import { showErrorToasts, showSuccessToast } from "@/lib/toast";
 import { Camera } from "lucide-react";
 import { companyCreateZodSchema, companyUpdateZodSchema } from "@/zod/shemas";

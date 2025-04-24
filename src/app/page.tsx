@@ -1,14 +1,14 @@
 "use client";
-import ProductCardList from "@/components/card/ProductCardList";
-import PopularCardsCarousel from "@/components/card/PopularCardsCarousel";
-import ProductFilters from "@/components/filter/ProductFilters";
+import ProductCardList from "@/components/card/product-card-list";
+import PopularCardsCarousel from "@/components/card/popular-cards-carousel";
+import ProductFilters from "@/components/filter/product-filters";
 
 
 import { useState, useEffect } from "react";
 
 
 import { useSearchParams } from "next/navigation";
-import AuthModal from "@/components/auth/AuthModal";
+import AuthModal from "@/components/auth/auth-modal";
 export default function Home() {
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const searchParams = useSearchParams();

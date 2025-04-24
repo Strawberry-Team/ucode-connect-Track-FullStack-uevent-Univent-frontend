@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import ProductCard from "./ProductCard";
+import ProductCard from "./product-card";
 import { getEvents } from "@/lib/event";
 import { Event } from "@/types";
 import { Skeleton } from "@/components/ui/skeleton"; // Импортируем наш кастомный Skeleton

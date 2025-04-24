@@ -1,7 +1,7 @@
 "use client";
 
 import {useState} from "react";
-import {useAuth} from "@/context/AuthContext";
+import {useAuth} from "@/context/auth-context";
 import {updateUser, uploadAvatar} from "@/lib/user";
 import {showSuccessToast, showErrorToasts} from "@/lib/toast";
 import {Button} from "@/components/ui/button";
@@ -17,7 +17,7 @@ type ProfileCardProps = {
     editMode: boolean;
 };
 
-export default function ProfileCard({setEditMode, editMode}: ProfileCardProps) {
+export default function ProfileInfoCard({setEditMode, editMode}: ProfileCardProps) {
     const {user, setUser} = useAuth();
     if (!user) return null
     const [formData, setFormData] = useState({

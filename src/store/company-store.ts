@@ -1,4 +1,4 @@
-// stores/companyStore.ts
+// store/companyStore.ts
 import { create } from "zustand";
 import { Company } from "@/lib/user";
 

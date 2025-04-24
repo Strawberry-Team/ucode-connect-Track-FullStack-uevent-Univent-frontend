@@ -4,7 +4,7 @@ import { getEventById, getEventByIdNews } from "@/lib/event";
 import { generateMapEmbedUrl } from "@/utils/generateMapEmbedUrl"; // Импортируем новую утилиту
 import { CalendarDays, MapPinned, MapPin, Tag, Building } from "lucide-react";
 import TicketActions from "@/components/card/TicketActions";
-import NotificationsBlock from "@/components/notification/NotificationsBlock";
+import NotificationsBlock from "@/components/notification/notifications-block";
 
 interface NewsNotification {
     type: "news";

@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { CalendarIcon, ClockIcon, X, Camera, Tag, Users } from "lucide-react"
 import { useJsApiLoader } from "@react-google-maps/api"
-import { useAuth } from "@/context/AuthContext"
+import { useAuth } from "@/context/auth-context"
 import { createEvent, uploadEventPoster, assignThemesToEvent } from "@/lib/event"
 import { getEventFormats } from "@/lib/format"
 import type { Event, EventFormat, Theme } from "@/types"
@@ -38,7 +38,7 @@ function useDebounce<T>(value: T, delay: number): T {
     return debouncedValue
 }
 
-const LocationPickerModal = dynamic(() => import("./LocationPickerModal"), { ssr: false })
+const LocationPickerModal = dynamic(() => import("./location-picker-modal"), { ssr: false })
 
 interface CreateEventModalProps {
     companyId: number

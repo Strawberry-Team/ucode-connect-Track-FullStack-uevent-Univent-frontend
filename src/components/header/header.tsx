@@ -6,10 +6,10 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import AuthModal from "@/components/auth/AuthModal";
-import { useAuth } from "@/context/AuthContext";
+import AuthModal from "@/components/auth/auth-modal";
+import { useAuth } from "@/context/auth-context";
 import { showErrorToasts } from "@/lib/toast";
-import {NavUser} from "@/components/user/NavUser";
+import {NavUser} from "@/components/user/nav-user";
 
 export default function Header() {
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);

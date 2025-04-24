@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { logout } from "@/lib/auth";
 import { showSuccessToast, showErrorToasts } from "@/lib/toast";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/auth-context";
 import { User } from "@/types";
 import Link from "next/link";
 

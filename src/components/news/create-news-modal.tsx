@@ -8,9 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { showErrorToasts, showSuccessToast } from "@/lib/toast";
 import { createCompanyNews } from "@/lib/company";
-import { useAuth } from "@/context/AuthContext";
+import { createEventNews } from "@/lib/event"; // Импортируем новую функцию
+import { useAuth } from "@/context/auth-context";
 import { z } from "zod";
-import {CompanyNews} from "@/types";
+import { CompanyNews, Notification } from "@/types";
 
 // Схема валидации для новости
 const newsCreateZodSchema = z.object({
@@ -20,14 +21,16 @@ const newsCreateZodSchema = z.object({
 
 // Типы
 interface CreateNewsModalProps {
-    companyId: number;
+    companyId?: number; // Опционально для компании
+    eventId?: number;   // Опционально для события
     isOpen: boolean;
     onClose: () => void;
-    onNewsCreated: (newNews: CompanyNews) => void;
+    onNewsCreated: (newNews: CompanyNews | Notification) => void;
 }
 
 export default function CreateNewsModal({
                                             companyId,
+                                            eventId,
                                             isOpen,
                                             onClose,
                                             onNewsCreated,
@@ -42,6 +45,14 @@ export default function CreateNewsModal({
         description?: string;
     }>({});
     const [isLoading, setIsLoading] = useState(false);
+
+    // Проверяем, что передан либо companyId, либо eventId, но не оба
+    if (companyId !== undefined && eventId !== undefined) {
+        throw new Error("Cannot provide both companyId and eventId");
+    }
+    if (companyId === undefined && eventId === undefined) {
+        throw new Error("Either companyId or eventId must be provided");
+    }
 
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -78,9 +89,15 @@ export default function CreateNewsModal({
 
         setIsLoading(true);
         try {
-            const createResult = await createCompanyNews(companyId, newsData);
-            if (!createResult.success || !createResult.data) {
-                showErrorToasts(createResult.errors);
+            let createResult;
+            if (companyId !== undefined) {
+                createResult = await createCompanyNews(companyId, newsData);
+            } else if (eventId !== undefined) {
+                createResult = await createEventNews(eventId, newsData);
+            }
+
+            if (!createResult?.success || !createResult.data) {
+                showErrorToasts(createResult?.errors || ["Failed to create news"]);
                 return;
             }
 

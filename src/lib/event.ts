@@ -1,6 +1,14 @@
 import api from "@/lib/api";
 import { executeApiRequest } from "@/utils/api-request";
-import { ApiResponse, Event, Notification } from "@/types";
+import {
+    ApiResponse,
+    CreatePromoCodeRequest,
+    CreateTicketRequest,
+    Event,
+    Notification,
+    PromoCode, Ticket,
+    TicketsResponse, TicketTypesResponse
+} from "@/types";
 
 export async function getEvents(): Promise<ApiResponse<Event[]>> {
     return executeApiRequest<Event[]>(() => api.get("/events"), "Failed to fetch events");
@@ -34,6 +42,30 @@ export async function getEventByIdNews(eventId: number): Promise<ApiResponse<Not
     return executeApiRequest<Notification[]>(() => api.get(`/events/${eventId}/news`), `Failed to fetch news for event with ID ${eventId}`);
 }
 
+export async function createEventNews(eventId: number, newsData: { title: string; description: string }): Promise<ApiResponse<Notification>> {
+    return executeApiRequest<Notification>(() => api.post(`/events/${eventId}/news`, newsData), `Failed to create news for event with ID ${eventId}`);
+}
+
 export async function assignThemesToEvent(eventId: number, themeIds: number[]): Promise<ApiResponse<void>> {
     return executeApiRequest<void>(() => api.post(`/events/${eventId}/themes`, { themes: themeIds.map((id) => ({ id })) }), `Failed to assign themes to event with ID ${eventId}`);
+}
+
+export async function getEventPromoCodes(eventId: number): Promise<ApiResponse<PromoCode[]>> {
+    return executeApiRequest<PromoCode[]>(() => api.get(`/events/${eventId}/promo-codes`), `Failed to fetch promo codes for event with ID ${eventId}`);
+}
+
+export async function createEventPromoCode(eventId: number, promoCodeData: CreatePromoCodeRequest): Promise<ApiResponse<PromoCode>> {
+    return executeApiRequest<PromoCode>(() => api.post(`/events/${eventId}/promo-codes`, promoCodeData), `Failed to create promo code for event with ID ${eventId}`);
+}
+
+export async function getEventTickets(eventId: number): Promise<ApiResponse<TicketsResponse>> {
+    return executeApiRequest<TicketsResponse>(() => api.get(`/events/${eventId}/tickets`), `Failed to fetch tickets for event ${eventId}`);
+}
+
+export async function createEventTicket(eventId: number, ticketData: CreateTicketRequest): Promise<ApiResponse<Ticket>> {
+    return executeApiRequest<Ticket>(() => api.post(`/events/${eventId}/tickets`, ticketData), `Failed to create ticket for event ${eventId}`);
+}
+
+export async function getEventTicketTypes(eventId: number): Promise<ApiResponse<TicketTypesResponse>> {
+    return executeApiRequest<TicketTypesResponse>(() => api.get(`/events/${eventId}/ticket-types`), `Failed to fetch ticket types for event ${eventId}`);
 }
