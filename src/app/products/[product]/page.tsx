@@ -4,7 +4,7 @@ import { getEventById, getEventByIdNews } from "@/lib/event";
 import { generateMapEmbedUrl } from "@/utils/generateMapEmbedUrl"; // Импортируем новую утилиту
 import { CalendarDays, MapPinned, MapPin, Tag, Building } from "lucide-react";
 import TicketActions from "@/components/card/TicketActions";
-import NotificationsBlock from "@/components/notification/notifications-block";
+import AttendeesAndNewsBlock from "@/components/attendees-and-news/attendees-and-news-block";
 
 interface NewsNotification {
     type: "news";
@@ -144,10 +144,10 @@ export default async function PageCard({ params }: { params: Promise<{ product: 
 
             <div className="flex flex-col md:flex-row gap-6 mt-8">
                 <div className="flex-1 md:flex-[2]">
-                    <NotificationsBlock notifications={userNotifications} />
+                    <AttendeesAndNewsBlock notifications={userNotifications} />
                 </div>
                 <div className="flex-1 md:flex-[4]">
-                    <NotificationsBlock notifications={newsNotifications} />
+                    <AttendeesAndNewsBlock notifications={newsNotifications} />
                 </div>
             </div>
 

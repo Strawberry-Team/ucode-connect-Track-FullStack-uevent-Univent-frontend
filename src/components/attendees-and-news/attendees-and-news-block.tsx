@@ -105,7 +105,7 @@ function NotificationItem({ notification, isExpanded, isCollapsing }: { notifica
     );
 }
 
-export default function NotificationsBlock({ notifications }: NotificationsBlockProps) {
+export default function AttendeesAndNewsBlock({ notifications }: NotificationsBlockProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isCollapsing, setIsCollapsing] = useState(false);
     const [collapsedHeight, setCollapsedHeight] = useState(0);
@@ -120,7 +120,7 @@ export default function NotificationsBlock({ notifications }: NotificationsBlock
         }
 
         if (contentRef.current) {
-            const hiddenElements = contentRef.current.querySelectorAll(".notification-hidden");
+            const hiddenElements = contentRef.current.querySelectorAll(".attendees-and-news-hidden");
             hiddenElements.forEach((el) => {
                 (el as HTMLElement).style.display = "block";
                 (el as HTMLElement).style.opacity = "0";

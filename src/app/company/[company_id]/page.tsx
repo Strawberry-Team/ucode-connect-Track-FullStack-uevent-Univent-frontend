@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Mail } from "lucide-react";
 import { getCompanyById, getCompanyNewsById } from "@/lib/company";
-import NotificationsBlock from "@/components/notification/notifications-block";
+import AttendeesAndNewsBlock from "@/components/attendees-and-news/attendees-and-news-block";
 import {Button} from "@/components/ui/button";
 
 interface CompanyNewsNotification {
@@ -107,10 +107,10 @@ export default async function CompanyPage({ params }: { params: Promise<{ compan
                         </Button>
                         <div className="-mt-3 flex flex-wrap gap-2">
                             <div className="flex-1 min-w-[300px] md:flex-[2]">
-                                <NotificationsBlock notifications={eventNotifications} />
+                                <AttendeesAndNewsBlock notifications={eventNotifications} />
                             </div>
                             <div className="flex-1 min-w-[300px] md:flex-[4]">
-                                <NotificationsBlock notifications={companyNewsNotifications} />
+                                <AttendeesAndNewsBlock notifications={companyNewsNotifications} />
                             </div>
                         </div>
                     </div>
