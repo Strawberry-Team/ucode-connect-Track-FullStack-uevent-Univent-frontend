@@ -76,6 +76,12 @@ export interface Event {
     }[];
 }
 
+export interface EventsResponse {
+    items: Event[];
+    count: number;
+    total: number;
+}
+
 export interface EventFormat {
     id: number;
     title: string;

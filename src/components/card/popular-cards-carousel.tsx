@@ -30,9 +30,10 @@ const PopularCardsCarousel = () => {
             if (remaining > 0) {
                 await new Promise((resolve) => setTimeout(resolve, remaining));
             }
-            if (response.success && response.data) {
-                setEvents(response.data);
+            if (response.success && response.data?.items) {
+                setEvents(response.data.items);
             } else {
+                console.error("Failed to fetch events or items are missing:", response);
                 setEvents([]);
             }
             setIsLoading(false);

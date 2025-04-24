@@ -4,14 +4,14 @@ import {
     ApiResponse,
     CreatePromoCodeRequest,
     CreateTicketRequest,
-    Event,
+    Event, EventsResponse,
     Notification,
     PromoCode, Ticket,
     TicketsResponse, TicketTypesResponse
 } from "@/types";
 
-export async function getEvents(): Promise<ApiResponse<Event[]>> {
-    return executeApiRequest<Event[]>(() => api.get("/events"), "Failed to fetch events");
+export async function getEvents(): Promise<ApiResponse<EventsResponse>> {
+    return executeApiRequest<EventsResponse>(() => api.get("/events"), "Failed to fetch events");
 }
 
 export async function createEvent(

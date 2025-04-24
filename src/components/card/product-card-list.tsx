@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import ProductCard from "./product-card";
 import { getEvents } from "@/lib/event";
 import { Event } from "@/types";
-import { Skeleton } from "@/components/ui/skeleton"; // Импортируем наш кастомный Skeleton
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ProductCardList = () => {
     const [events, setEvents] = useState<Event[]>([]);
-    const [isLoading, setIsLoading] = useState(true); // Изменили начальное значение на true
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchEvents = async () => {
@@ -19,9 +19,10 @@ const ProductCardList = () => {
             if (remaining > 0) {
                 await new Promise((resolve) => setTimeout(resolve, remaining));
             }
-            if (response.success && response.data) {
-                setEvents(response.data);
+            if (response.success && response.data?.items) {
+                setEvents(response.data.items);
             } else {
+                console.error("Failed to fetch events or items are missing:", response);
                 setEvents([]);
             }
             setIsLoading(false);
