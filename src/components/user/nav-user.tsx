@@ -13,12 +13,8 @@ import {
 import { logout } from "@/lib/auth";
 import { showSuccessToast, showErrorToasts } from "@/lib/toast";
 import { useAuth } from "@/context/auth-context";
-import { User } from "@/types";
+import { NavUserProps, User } from "@/types";
 import Link from "next/link";
-
-interface NavUserProps {
-    user: User;
-}
 
 export function NavUser({ user }: NavUserProps) {
     const { setAuthenticated, setUser } = useAuth();
@@ -41,18 +37,18 @@ export function NavUser({ user }: NavUserProps) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger className="w-full">
-                <div className="flex items-center gap-2 cursor-pointer">
-                    <Avatar className="h-10 w-10 rounded-lg">
+                <div className="flex items-center gap-0 cursor-pointer h-10 px-0 rounded-full border border-gray-300 hover:bg-accent hover:text-accent-foreground">
+                    <Avatar className="h-10 w-10 rounded-full">
                         <img
                             src={imageUrl}
                             alt={user.firstName}
-                            className="h-full w-full object-cover rounded-lg"
+                            className="h-full w-full object-cover rounded-full"
                         />
-                        <AvatarFallback className="rounded-lg">
+                        <AvatarFallback className="rounded-full">
                             {user.firstName.charAt(0).toUpperCase()}
                         </AvatarFallback>
                     </Avatar>
-                    <div className="grid flex-1 text-left text-[16px] leading-tight">
+                    <div className="grid flex-1 text-left text-[14px] leading-tight px-2">
                         <span className="font-medium">{user.firstName} {user.lastName}</span>
                     </div>
                 </div>

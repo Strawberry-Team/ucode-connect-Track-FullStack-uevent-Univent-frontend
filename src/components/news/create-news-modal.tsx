@@ -12,7 +12,7 @@ import { createEventNews } from "@/lib/event";
 import { updateNews } from "@/lib/news";
 import { useAuth } from "@/context/auth-context";
 import { z } from "zod";
-import { CompanyNews, Notification } from "@/types";
+import { CompanyNews, NewsItem } from "@/types";
 
 // Схема валидации для новости
 const newsCreateZodSchema = z.object({
@@ -24,11 +24,11 @@ const newsCreateZodSchema = z.object({
 interface CreateNewsModalProps {
     companyId?: number; // Опционально для компании
     eventId?: number;   // Опционально для события
-    newsToEdit?: CompanyNews | Notification | null; // Данные новости для редактирования
+    newsToEdit?: CompanyNews | NewsItem | null; // Данные новости для редактирования
     isOpen: boolean;
     onClose: () => void;
-    onNewsCreated: (newNews: CompanyNews | Notification) => void;
-    onNewsUpdated: (updatedNews: CompanyNews | Notification) => void; // Новый коллбэк для обновления
+    onNewsCreated: (newNews: CompanyNews | NewsItem) => void;
+    onNewsUpdated: (updatedNews: CompanyNews | NewsItem) => void; // Новый коллбэк для обновления
 }
 
 export default function CreateNewsModal({

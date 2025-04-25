@@ -5,7 +5,7 @@ import {
     CreatePromoCodeRequest,
     CreateTicketRequest,
     Event, EventsResponse,
-    Notification,
+    NewsItem,
     PromoCode, Ticket,
     TicketsResponse, TicketTypesResponse
 } from "@/types";
@@ -55,12 +55,12 @@ export async function getEventById(id: number): Promise<ApiResponse<Event>> {
     return executeApiRequest<Event>(() => api.get(`/events/${id}`), `Failed to fetch event with ID ${id}`);
 }
 
-export async function getEventByIdNews(eventId: number): Promise<ApiResponse<Notification[]>> {
-    return executeApiRequest<Notification[]>(() => api.get(`/events/${eventId}/news`), `Failed to fetch news for event with ID ${eventId}`);
+export async function getEventByIdNews(eventId: number): Promise<ApiResponse<NewsItem[]>> {
+    return executeApiRequest<NewsItem[]>(() => api.get(`/events/${eventId}/news`), `Failed to fetch news for event with ID ${eventId}`);
 }
 
-export async function createEventNews(eventId: number, newsData: { title: string; description: string }): Promise<ApiResponse<Notification>> {
-    return executeApiRequest<Notification>(() => api.post(`/events/${eventId}/news`, newsData), `Failed to create news for event with ID ${eventId}`);
+export async function createEventNews(eventId: number, newsData: { title: string; description: string }): Promise<ApiResponse<NewsItem>> {
+    return executeApiRequest<NewsItem>(() => api.post(`/events/${eventId}/news`, newsData), `Failed to create news for event with ID ${eventId}`);
 }
 
 export async function assignThemesToEvent(eventId: number, themeIds: number[]): Promise<ApiResponse<void>> {

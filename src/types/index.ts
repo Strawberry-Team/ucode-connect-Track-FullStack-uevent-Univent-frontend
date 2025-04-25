@@ -94,7 +94,7 @@ export interface Theme {
     title: string;
 }
 
-export interface Notification {
+export interface NewsItem {
     id: number;
     authorId: number;
     companyId: number | null;
@@ -158,3 +158,52 @@ export type UpdatePromoCodeRequest = {
     title: string;
     isActive: boolean;
 };
+
+export interface NavUserProps {
+    user: User;
+}
+
+interface NotificationEvent {
+    id: number;
+    title: string;
+    logoName: string | null;
+}
+
+interface NotificationCompany {
+    id: number;
+    title: string;
+    logoName: string | null;
+}
+
+export interface Notification {
+    id: number;
+    userId: number;
+    eventId: number | null;
+    companyId: number | null;
+    title: string;
+    content: string;
+    readAt: string | null;
+    hiddenAt: string | null;
+    createdAt: string;
+    event?: NotificationEvent;
+    company?: NotificationCompany;
+}
+
+export interface NotificationsResponse {
+    notifications: Notification[];
+}
+
+export interface NotificationListProps {
+    notifications: Notification[];
+}
+
+export interface NotificationButtonProps {
+    unreadCount?: number;
+    onClick?: () => void;
+    notifications?: Notification[];
+    onUpdate: () => void;
+}
+
+export interface UpdateAllNotificationsResponse {
+    updatedCount: number;
+}

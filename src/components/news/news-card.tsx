@@ -13,7 +13,7 @@ import { Calendar, CalendarDays, Plus, Pencil } from "lucide-react";
 import { getCompanyNewsById } from "@/lib/company";
 import { getEventByIdNews } from "@/lib/event";
 import { showErrorToasts } from "@/lib/toast";
-import { CompanyNews, Notification } from "@/types";
+import { CompanyNews, NewsItem } from "@/types";
 
 // Типы пропсов
 type NewsCardProps = {
@@ -23,11 +23,11 @@ type NewsCardProps = {
 
 // Компонент карточки новостей
 export default function NewsCard({ companyId, eventId }: NewsCardProps) {
-    const [news, setNews] = useState<(CompanyNews | Notification)[]>([]);
+    const [news, setNews] = useState<(CompanyNews | NewsItem)[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isClicked, setIsClicked] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [editingNews, setEditingNews] = useState<CompanyNews | Notification | null>(null); // Состояние для редактируемой новости
+    const [editingNews, setEditingNews] = useState<CompanyNews | NewsItem | null>(null); // Состояние для редактируемой новости
 
     // Проверяем, что передан либо companyId, либо eventId, но не оба
     if (companyId !== undefined && eventId !== undefined) {
@@ -71,7 +71,7 @@ export default function NewsCard({ companyId, eventId }: NewsCardProps) {
     }, [companyId, eventId]);
 
     // Обработчик создания новости
-    const handleNewsCreated = (newNews: CompanyNews | Notification) => {
+    const handleNewsCreated = (newNews: CompanyNews | NewsItem) => {
         setNews((prev) =>
             [...prev, newNews].sort(
                 (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -80,7 +80,7 @@ export default function NewsCard({ companyId, eventId }: NewsCardProps) {
     };
 
     // Обработчик обновления новости
-    const handleNewsUpdated = (updatedNews: CompanyNews | Notification) => {
+    const handleNewsUpdated = (updatedNews: CompanyNews | NewsItem) => {
         setNews((prev) => {
             const updatedNewsList = prev.map((newsItem) =>
                 newsItem.id === updatedNews.id ? updatedNews : newsItem
