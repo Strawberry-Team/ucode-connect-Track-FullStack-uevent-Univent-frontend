@@ -21,6 +21,7 @@ import { eventCreateZodSchema, validateEventDates } from "@/zod/shemas"
 import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { getCityAndCountryFromComponents } from "./location-picker-modal";
 
 function useDebounce<T>(value: T, delay: number): T {
     const [debouncedValue, setDebouncedValue] = useState<T>(value)
@@ -731,25 +732,33 @@ export default function EventCreateModal({ companyId, isOpen, onClose, onEventCr
     }, [venue, filterPlaces])
 
     const handlePlaceSelect = useCallback((place: google.maps.places.AutocompletePrediction) => {
-        if (!isLoaded) return
+        if (!isLoaded) return;
 
-        const placesService = new google.maps.places.PlacesService(document.createElement("div"))
+        const placesService = new google.maps.places.PlacesService(document.createElement("div"));
         placesService.getDetails(
-            { placeId: place.place_id, fields: ["name", "formatted_address", "geometry"] },
+            {
+                placeId: place.place_id,
+                fields: ["name", "formatted_address", "geometry", "address_components"], // Добавляем address_components
+            },
             (placeDetails, status) => {
                 if (status === google.maps.places.PlacesServiceStatus.OK && placeDetails) {
-                    const venue = placeDetails.name || placeDetails.formatted_address || ""
+                    const venueName = placeDetails.name || placeDetails.formatted_address || "";
                     const coordinates = placeDetails.geometry?.location
                         ? `${placeDetails.geometry.location.lat()},${placeDetails.geometry.location.lng()}`
-                        : ""
-                    setVenue(venue)
-                    setLocationCoordinates(coordinates)
-                    setShowSuggestions(false)
-                    setFilteredPlaces([])
+                        : "";
+
+                    // Извлекаем город и страну
+                    const { city, country } = getCityAndCountryFromComponents(placeDetails);
+                    const formattedVenue = city && country ? `${venueName}, ${city}, ${country}` : venueName;
+
+                    setVenue(formattedVenue);
+                    setLocationCoordinates(coordinates);
+                    setShowSuggestions(false);
+                    setFilteredPlaces([]);
                 }
             }
-        )
-    }, [isLoaded])
+        );
+    }, [isLoaded]);
 
     const handleClearVenue = useCallback(() => {
         setVenue("")

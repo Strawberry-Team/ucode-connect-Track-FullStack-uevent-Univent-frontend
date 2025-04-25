@@ -82,6 +82,8 @@ export interface EventsResponse {
     total: number;
 }
 
+
+
 export interface EventFormat {
     id: number;
     title: string;

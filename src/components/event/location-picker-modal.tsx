@@ -41,6 +41,24 @@ const parseCoordinates = (coords: string): google.maps.LatLngLiteral | null => {
     return isNaN(lat) || isNaN(lng) ? null : { lat, lng };
 };
 
+export const getCityAndCountryFromComponents = (placeDetails: google.maps.places.PlaceResult | google.maps.GeocoderResult): { city: string; country: string } => {
+    let city = "";
+    let country = "";
+
+    if (placeDetails.address_components) {
+        for (const component of placeDetails.address_components) {
+            if (component.types.includes("locality")) {
+                city = component.long_name;
+            }
+            if (component.types.includes("country")) {
+                country = component.long_name;
+            }
+        }
+    }
+
+    return { city, country };
+};
+
 const createPlaceDetails = (
     placeDetails: google.maps.places.PlaceResult,
     fallbackCoordinates: string,
@@ -127,6 +145,7 @@ export default function LocationPickerModal({
                 fields: [
                     "name",
                     "formatted_address",
+                    "address_components",
                     "geometry",
                     "rating",
                     "user_ratings_total",
@@ -142,7 +161,11 @@ export default function LocationPickerModal({
                     setVenue(newPlace.name);
                     setCoordinates(newPlace.coordinates);
                     setSelectedPlace(newPlace);
-                    setSearchQuery(newPlace.name);
+
+                    const { city, country } = getCityAndCountryFromComponents(placeDetails);
+                    const formattedQuery = city && country ? `${country}, ${city}, ${newPlace.name}` : newPlace.name;
+                    setSearchQuery(formattedQuery);
+
                     setShowSuggestions(false);
                     if (newPlace.location) centerMapWithOffset(newPlace.location);
                 }
@@ -237,6 +260,7 @@ export default function LocationPickerModal({
                                 fields: [
                                     "name",
                                     "formatted_address",
+                                    "address_components",
                                     "geometry",
                                     "rating",
                                     "user_ratings_total",
@@ -255,7 +279,11 @@ export default function LocationPickerModal({
                                 setVenue(updatedPlace.name);
                                 setCoordinates(updatedPlace.coordinates);
                                 setSelectedPlace(updatedPlace);
-                                setSearchQuery(updatedPlace.name);
+
+                                const { city, country } = getCityAndCountryFromComponents(placeDetails || place);
+                                const formattedQuery = city && country ? `${updatedPlace.name}, ${city}, ${country}` : updatedPlace.name;
+                                setSearchQuery(formattedQuery);
+
                                 setShowSuggestions(false);
                                 centerMapWithOffset(clickedLocation);
                             }
@@ -264,7 +292,13 @@ export default function LocationPickerModal({
                         setVenue(newPlace.name);
                         setCoordinates(newPlace.coordinates);
                         setSelectedPlace(newPlace);
-                        setSearchQuery(newPlace.name);
+
+                        const { city, country } = place.address_components
+                            ? getCityAndCountryFromComponents(place)
+                            : { city: "", country: "" };
+                        const formattedQuery = city && country ? `${country}, ${city}, ${newPlace.name}` : newPlace.name;
+                        setSearchQuery(formattedQuery);
+
                         setShowSuggestions(false);
                         centerMapWithOffset(clickedLocation);
                     }
@@ -278,7 +312,7 @@ export default function LocationPickerModal({
             showErrorToasts(["Please select a place"]);
             return;
         }
-        onSelect(venue, coordinates);
+        onSelect(searchQuery, coordinates);
     };
 
     const handleClose = () => {
@@ -346,8 +380,8 @@ export default function LocationPickerModal({
                                         <div className="-mt-2 border-b flex items-center">
                                             <Star className="w-5 h-5 mr-2 text-yellow-500" />
                                             <span className="text-sm text-gray-600">
-                        {selectedPlace.rating} ({selectedPlace.reviews} отзывов)
-                      </span>
+                                                {selectedPlace.rating} ({selectedPlace.reviews} отзывов)
+                                            </span>
                                         </div>
                                     )}
                                     <div className="flex items-start">

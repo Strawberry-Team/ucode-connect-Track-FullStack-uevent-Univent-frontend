@@ -5,6 +5,7 @@ import { generateMapEmbedUrl } from "@/utils/generateMapEmbedUrl";
 import { CalendarDays, MapPinned, MapPin, Tag, Building } from "lucide-react";
 import TicketActions from "@/components/card/TicketActions";
 import AttendeesAndNewsBlock from "@/components/attendees-and-news/attendees-and-news-block";
+import CompanyEventsCarousel from "@/components/event/CompanyEventsCarousel";
 
 interface NewsNotification {
     type: "news";
@@ -140,7 +141,7 @@ export default async function PageCard({ params }: { params: Promise<{ product: 
                         </div>
 
                         <div className="flex items-center gap-2">
-                            <MapPin strokeWidth={2.5} className="w-5 h-5 text-gray-500" />
+                            <MapPin strokeWidth={2.5} className="w-5 h-5 text-gray-500 " />
                             <span className="text-lg font-medium">{event.venue}</span>
                         </div>
 
@@ -187,8 +188,13 @@ export default async function PageCard({ params }: { params: Promise<{ product: 
                         ></iframe>
                         <p className="mt-5 text-gray-600 text-lg leading-relaxed">{event.description}</p>
                     </div>
+                    {/* Очищаем поток после float */}
+                    <div className="clear-both"></div>
                 </div>
             </div>
+
+            {/* Добавляем карусель событий компании */}
+            <CompanyEventsCarousel companyId={event.company.id} />
         </div>
     );
 }

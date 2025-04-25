@@ -1,209 +1,741 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp, CalendarIcon } from "lucide-react";
+import {
+    ChevronDown,
+    ChevronUp,
+    CalendarIcon,
+    X,
+    FunnelPlus,
+    FunnelX,
+    SlidersHorizontal,
+    Ellipsis,
+    ChevronLeft, ChevronRight
+} from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
+import { getEventFormats } from "@/lib/format";
+import { getThemes } from "@/lib/theme";
+import { EventFormat, Theme } from "@/types";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function EventFilters() {
     const [isFiltersOpen, setIsFiltersOpen] = useState(false);
-    const [selectedFormats, setSelectedFormats] = useState<string[]>([]);
-    const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
+    const [isFormatsExpanded, setIsFormatsExpanded] = useState(false);
+    const [isThemesExpanded, setIsThemesExpanded] = useState(false);
+    const [formats, setFormats] = useState<EventFormat[]>([]);
+    const [themes, setThemes] = useState<Theme[]>([]);
+    const [selectedFormats, setSelectedFormats] = useState<number[]>([]);
+    const [selectedThemes, setSelectedThemes] = useState<number[]>([]);
+    const [pendingThemes, setPendingThemes] = useState<number[]>([]); // Временное состояние для тем
     const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+    const [pendingDateFrom, setPendingDateFrom] = useState<Date | undefined>(undefined); // Временное состояние для даты "с"
     const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+    const [pendingDateTo, setPendingDateTo] = useState<Date | undefined>(undefined); // Временное состояние для даты "по"
     const [priceRange, setPriceRange] = useState([0, 100]);
+    const [pendingPriceRange, setPendingPriceRange] = useState([0, 100]); // Временное состояние для цен
     const [contentHeight, setContentHeight] = useState(0);
     const contentRef = useRef<HTMLDivElement>(null);
 
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
+    const INITIAL_VISIBLE_FORMATS = 5;
+    const INITIAL_VISIBLE_THEMES = 5;
+
+    // Загружаем форматы и темы
+    useEffect(() => {
+        const fetchFilters = async () => {
+            const formatsResponse = await getEventFormats();
+            if (formatsResponse.success && formatsResponse.data) {
+                setFormats(formatsResponse.data);
+            } else {
+                console.error("Failed to load formats:", formatsResponse.errors);
+                setFormats([]);
+            }
+
+            const themesResponse = await getThemes();
+            if (themesResponse.success && themesResponse.data) {
+                setThemes(themesResponse.data);
+            } else {
+                console.error("Failed to load themes:", themesResponse.errors);
+                setThemes([]);
+            }
+        };
+        fetchFilters();
+    }, []);
+
+    // Инициализация выбранных фильтров из query-параметров при загрузке
+    useEffect(() => {
+        const formatId = searchParams.get("formatId");
+        const themesParam = searchParams.get("themes");
+        const dateFromParam = searchParams.get("dateFrom");
+        const dateToParam = searchParams.get("dateTo");
+        const priceMinParam = searchParams.get("priceMin");
+        const priceMaxParam = searchParams.get("priceMax");
+
+        if (formatId) {
+            setSelectedFormats([Number(formatId)]);
+        } else {
+            setSelectedFormats([]);
+        }
+
+        if (themesParam) {
+            const themeIds = themesParam.split(",").map(Number).filter((id) => !isNaN(id));
+            setSelectedThemes(themeIds);
+            setPendingThemes(themeIds); // Синхронизируем временное состояние
+        } else {
+            setSelectedThemes([]);
+            setPendingThemes([]);
+        }
+
+        if (dateFromParam) {
+            const date = new Date(dateFromParam);
+            setDateFrom(date);
+            setPendingDateFrom(date);
+        } else {
+            setDateFrom(undefined);
+            setPendingDateFrom(undefined);
+        }
+
+        if (dateToParam) {
+            const date = new Date(dateToParam);
+            setDateTo(date);
+            setPendingDateTo(date);
+        } else {
+            setDateTo(undefined);
+            setPendingDateTo(undefined);
+        }
+
+        if (priceMinParam !== null && priceMaxParam !== null) {
+            const priceRangeValue = [Number(priceMinParam), Number(priceMaxParam)];
+            setPriceRange(priceRangeValue);
+            setPendingPriceRange(priceRangeValue);
+        } else {
+            setPriceRange([0, 100]);
+            setPendingPriceRange([0, 100]);
+        }
+    }, [searchParams]);
+
     const toggleFilters = () => setIsFiltersOpen((prev) => !prev);
+    const toggleFormatsExpanded = () => setIsFormatsExpanded((prev) => !prev);
+    const toggleThemesExpanded = () => setIsThemesExpanded((prev) => !prev);
 
-    const handleFormatToggle = (format: string) => {
-        setSelectedFormats((prev) =>
-            prev.includes(format) ? prev.filter((f) => f !== format) : [...prev, format]
+    const handleFormatToggle = (formatId: number) => {
+        const newSelectedFormats = selectedFormats.includes(formatId)
+            ? selectedFormats.filter((id) => id !== formatId)
+            : [formatId];
+
+        setSelectedFormats(newSelectedFormats);
+
+        const params = new URLSearchParams(searchParams.toString());
+        if (newSelectedFormats.length > 0) {
+            params.set("formatId", newSelectedFormats[0].toString());
+        } else {
+            params.delete("formatId");
+        }
+        params.set("page", "1");
+        router.push(`?${params.toString()}`);
+    };
+
+    const handleThemeToggle = (themeId: number) => {
+        setPendingThemes((prev) =>
+            prev.includes(themeId) ? prev.filter((id) => id !== themeId) : [...prev, themeId]
         );
     };
 
-    const handleThemeToggle = (theme: string) => {
-        setSelectedThemes((prev) =>
-            prev.includes(theme) ? prev.filter((t) => t !== theme) : [...prev, theme]
-        );
-    };
-
-    // Функция сброса фильтров
     const resetFilters = () => {
         setSelectedFormats([]);
         setSelectedThemes([]);
+        setPendingThemes([]);
         setDateFrom(undefined);
+        setPendingDateFrom(undefined);
         setDateTo(undefined);
+        setPendingDateTo(undefined);
         setPriceRange([0, 100]);
+        setPendingPriceRange([0, 100]);
+        setIsFiltersOpen(false);
+        setIsFormatsExpanded(false);
+        setIsThemesExpanded(false);
+
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("formatId");
+        params.delete("themes");
+        params.delete("dateFrom");
+        params.delete("dateTo");
+        params.delete("priceMin");
+        params.delete("priceMax");
+        params.set("page", "1");
+        router.push(`?${params.toString()}`);
+    };
+
+    const applyFilters = () => {
+        // Переносим временное состояние в основное
+        setSelectedThemes(pendingThemes);
+        setDateFrom(pendingDateFrom);
+        setDateTo(pendingDateTo);
+        setPriceRange(pendingPriceRange);
+
+        const params = new URLSearchParams(searchParams.toString());
+
+        if (pendingThemes.length > 0) {
+            params.set("themes", pendingThemes.join(","));
+        } else {
+            params.delete("themes");
+        }
+
+        if (pendingDateFrom) {
+            params.set("dateFrom", pendingDateFrom.toISOString());
+        } else {
+            params.delete("dateFrom");
+        }
+
+        if (pendingDateTo) {
+            params.set("dateTo", pendingDateTo.toISOString());
+        } else {
+            params.delete("dateTo");
+        }
+
+        if (pendingPriceRange[0] !== 0 || pendingPriceRange[1] !== 100) {
+            params.set("priceMin", pendingPriceRange[0].toString());
+            params.set("priceMax", pendingPriceRange[1].toString());
+        } else {
+            params.delete("priceMin");
+            params.delete("priceMax");
+        }
+
+        params.set("page", "1");
+        router.push(`?${params.toString()}`);
         setIsFiltersOpen(false);
     };
 
+    // Проверяем, применены ли фильтры
+    const areFiltersApplied = () => {
+        return (
+            selectedFormats.length > 0 ||
+            selectedThemes.length > 0 ||
+            dateFrom !== undefined ||
+            dateTo !== undefined ||
+            (priceRange[0] !== 0 || priceRange[1] !== 100)
+        );
+    };
+
+    // Функции для удаления индивидуальных фильтров
+    const removeFormatFilter = () => {
+        setSelectedFormats([]);
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("formatId");
+        params.set("page", "1");
+        router.push(`?${params.toString()}`);
+    };
+
+    const removeThemeFilter = (themeId: number) => {
+        const newSelectedThemes = selectedThemes.filter((id) => id !== themeId);
+        setSelectedThemes(newSelectedThemes);
+        setPendingThemes(newSelectedThemes); // Синхронизируем временное состояние
+        const params = new URLSearchParams(searchParams.toString());
+        if (newSelectedThemes.length > 0) {
+            params.set("themes", newSelectedThemes.join(","));
+        } else {
+            params.delete("themes");
+        }
+        params.set("page", "1");
+        router.push(`?${params.toString()}`);
+    };
+
+    const removeDateFromFilter = () => {
+        setDateFrom(undefined);
+        setPendingDateFrom(undefined);
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("dateFrom");
+        params.set("page", "1");
+        router.push(`?${params.toString()}`);
+    };
+
+    const removeDateToFilter = () => {
+        setDateTo(undefined);
+        setPendingDateTo(undefined);
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("dateTo");
+        params.set("page", "1");
+        router.push(`?${params.toString()}`);
+    };
+
+    const removePriceFilter = () => {
+        setPriceRange([0, 100]);
+        setPendingPriceRange([0, 100]);
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("priceMin");
+        params.delete("priceMax");
+        params.set("page", "1");
+        router.push(`?${params.toString()}`);
+    };
+
     useEffect(() => {
-        const updateHeight = () => {
-            if (contentRef.current) {
-                const height = contentRef.current.scrollHeight;
-                const extraHeight = 20;
-                setContentHeight(height + extraHeight);
-            }
+        let timeoutId: NodeJS.Timeout;
+
+        const debounceUpdateHeight = () => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                if (contentRef.current) {
+                    const height = contentRef.current.scrollHeight;
+                    const extraHeight = 20;
+                    setContentHeight(height + extraHeight);
+                } else {
+                    setContentHeight(0);
+                }
+            }, 100);
         };
 
-        updateHeight();
+        const observer = new ResizeObserver(debounceUpdateHeight);
 
-        window.addEventListener("resize", updateHeight);
+        if (contentRef.current) {
+            observer.observe(contentRef.current);
+        }
 
-        return () => window.removeEventListener("resize", updateHeight);
-    }, [isFiltersOpen]);
+        window.addEventListener("resize", debounceUpdateHeight);
+
+        return () => {
+            clearTimeout(timeoutId);
+            if (contentRef.current) {
+                observer.unobserve(contentRef.current);
+            }
+            window.removeEventListener("resize", debounceUpdateHeight);
+        };
+    }, [isFiltersOpen, isFormatsExpanded, isThemesExpanded]);
+
+    const hasMoreFormats = formats.length > INITIAL_VISIBLE_FORMATS;
+    const hasMoreThemes = themes.length > INITIAL_VISIBLE_THEMES;
+
+    const formatButtonVariants = {
+        hidden: {
+            opacity: 0,
+            width: 0,
+            x: -10,
+            transition: { duration: 0.3, ease: "easeOut" },
+        },
+        visible: (index: number) => ({
+            opacity: 1,
+            width: "auto",
+            x: 0,
+            transition: {
+                duration: 0.3,
+                ease: "easeOut",
+                delay: index >= INITIAL_VISIBLE_FORMATS ? (index - INITIAL_VISIBLE_FORMATS) * 0.07 : 0,
+            },
+        }),
+        exit: {
+            opacity: 0,
+            width: 0,
+            x: -10,
+            transition: {
+                duration: 0.5,
+                ease: "easeOut",
+            },
+        },
+    };
+
+    const themeButtonVariants = {
+        hidden: {
+            opacity: 0,
+            width: 0,
+            x: -10,
+            transition: { duration: 0.3, ease: "easeOut" },
+        },
+        visible: (index: number) => ({
+            opacity: 1,
+            width: "auto",
+            x: 0,
+            transition: {
+                duration: 0.3,
+                ease: "easeOut",
+                delay: index >= INITIAL_VISIBLE_THEMES ? (index - INITIAL_VISIBLE_THEMES) * 0.07 : 0,
+            },
+        }),
+        exit: (index: number) => ({
+            opacity: 0,
+            width: 0,
+            x: -10,
+            transition: {
+                duration: 0.3,
+                ease: "easeOut",
+                delay: (themes.length - 1 - index) * 0.05,
+            },
+        }),
+    };
 
     return (
         <div className="px-custom px-4 py-4 border-b sticky top-[68px] bg-background/95 backdrop-blur-md z-20 max-w-full">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-                <div className="flex flex-wrap gap-2">
-                    {["Concert", "Workshop", "Festival", "Exhibition"].map((format) => (
-                        <Button
-                            key={format}
-                            variant={selectedFormats.includes(format) ? "default" : "outline"}
-                            className="cursor-pointer rounded-full"
-                            onClick={() => handleFormatToggle(format)}
-                        >
-                            {format}
-                        </Button>
-                    ))}
-                </div>
-                <Button
-                    variant="ghost"
-                    className="cursor-pointer flex items-center gap-2"
-                    onClick={toggleFilters}
-                >
-                    More Filters
-                    {isFiltersOpen ? (
-                        <ChevronUp className="w-4 h-4" />
+            <div className="flex items-center justify-between gap-4 flex-nowrap">
+                <div className="flex flex-wrap gap-2 items-center min-w-0">
+                    {/* Условный рендеринг: показываем форматы или выбранные фильтры */}
+                    {!areFiltersApplied() ? (
+                        // Если фильтры не применены, показываем форматы
+                        <>
+                            <AnimatePresence initial={false}>
+                                {formats.map((format, index) => {
+                                    const isExtra = index >= INITIAL_VISIBLE_FORMATS;
+                                    const isVisible = !isExtra || isFormatsExpanded;
+
+                                    return (
+                                        isVisible && (
+                                            <motion.div
+                                                key={format.id}
+                                                custom={index}
+                                                variants={formatButtonVariants}
+                                                initial="hidden"
+                                                animate="visible"
+                                                exit="exit"
+                                                className="format-button-wrapper inline-block"
+                                            >
+                                                <Button
+                                                    variant={selectedFormats.includes(format.id) ? "default" : "outline"}
+                                                    className="cursor-pointer whitespace-nowrap rounded-full px-5 py-1"
+                                                    onClick={() => handleFormatToggle(format.id)}
+                                                >
+                                                    {format.title}
+                                                </Button>
+                                            </motion.div>
+                                        )
+                                    );
+                                })}
+                            </AnimatePresence>
+                            {hasMoreFormats && (
+                                <motion.div
+                                    className="format-button-wrapper inline-block"
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0, transition: { duration: 0.3, ease: "easeOut" } }}
+                                >
+                                    <Button
+                                        variant="ghost"
+                                        className="cursor-pointer flex items-center gap-1 rounded-full px-5 py-1"
+                                        onClick={toggleFormatsExpanded}
+                                    >
+                                        {/*<span className="font-semibold ">• • •</span>*/}
+                                        {isFormatsExpanded ? (
+                                            <ChevronLeft strokeWidth={2.5} />
+                                        ) : (
+                                            <ChevronRight strokeWidth={2.5} />
+                                        )}
+                                    </Button>
+                                </motion.div>
+                            )}
+                        </>
                     ) : (
-                        <ChevronDown className="w-4 h-4" />
+                        // Если фильтры применены, показываем выбранные фильтры с крестиками
+                        <div className="flex flex-wrap gap-2 items-center">
+                            {/* Формат */}
+                            {selectedFormats.length > 0 && (
+                                <div className="inline-flex items-center gap-1 border rounded-full px-3 py-1">
+                                    <span className="text-sm">
+                                        {formats.find((f) => f.id === selectedFormats[0])?.title}
+                                    </span>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="p-0 h-6 w-6"
+                                        onClick={removeFormatFilter}
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            )}
+
+                            {/* Темы */}
+                            {selectedThemes.map((themeId) => {
+                                const theme = themes.find((t) => t.id === themeId);
+                                return theme ? (
+                                    <div
+                                        key={themeId}
+                                        className="inline-flex items-center gap-1 border rounded-full px-3 py-1"
+                                    >
+                                        <span className="text-sm">{theme.title}</span>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="p-0 h-6 w-6"
+                                            onClick={() => removeThemeFilter(themeId)}
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </Button>
+                                    </div>
+                                ) : null;
+                            })}
+
+                            {/* Дата "с" */}
+                            {dateFrom && (
+                                <div className="inline-flex items-center gap-1 border rounded-full px-3 py-1">
+                                    <span className="text-sm">From: {format(dateFrom, "PPP")}</span>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="p-0 h-6 w-6"
+                                        onClick={removeDateFromFilter}
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            )}
+
+                            {/* Дата "по" */}
+                            {dateTo && (
+                                <div className="inline-flex items-center gap-1 border rounded-full px-3 py-1">
+                                    <span className="text-sm">To: {format(dateTo, "PPP")}</span>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="p-0 h-6 w-6"
+                                        onClick={removeDateToFilter}
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            )}
+
+                            {/* Цена */}
+                            {(priceRange[0] !== 0 || priceRange[1] !== 100) && (
+                                <div className="inline-flex items-center gap-1 border rounded-full px-3 py-1">
+                                    <span className="text-sm">Price: ${priceRange[0]} - ${priceRange[1]}</span>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="p-0 h-6 w-6"
+                                        onClick={removePriceFilter}
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            )}
+
+                            {/* Кнопка сброса всех фильтров */}
+                            <Button
+                                variant="ghost"
+                                className="cursor-pointer flex items-center gap-1 rounded-full px-5 py-1"
+                                onClick={resetFilters}
+                            >
+                                Reset
+                            </Button>
+                        </div>
                     )}
-                </Button>
+                </div>
+
+                <div className="flex-shrink-0">
+                    <Button
+                        variant="ghost"
+                        className="cursor-pointer flex items-center gap-2 rounded-full px-18 py-1"
+                        onClick={toggleFilters}
+                    >
+                        <SlidersHorizontal strokeWidth={2} className="!w-5.5 !h-5.5"/>
+                    </Button>
+                </div>
             </div>
 
             <div
                 className="overflow-hidden transition-all duration-500 ease-in-out"
                 style={{
-                    height: isFiltersOpen ? `${contentHeight}px` : "0px",
+                    maxHeight: isFiltersOpen ? `${contentHeight}px` : "0px",
                     opacity: isFiltersOpen ? 1 : 0,
+                    visibility: isFiltersOpen ? "visible" : "hidden",
                 }}
             >
-                <div ref={contentRef}>
-                    <hr className="mt-4 border-t border-gray-300" />
-                    <div className="mt-4 flex flex-wrap gap-6 lg:gap-8">
+                <div ref={contentRef} className="pt-4">
+                    <hr className="mt-4 border-t" />
+                    <div className="mt-4 flex flex-col gap-6">
+                        {/* Форматы (первая строка в "More Filters", если фильтры применены) */}
+                        {areFiltersApplied() && (
+                            <div className="w-full">
+
+                                <div className="flex flex-wrap items-center gap-2 max-w-full">
+                                    <span className="font-semibold">Formats</span>
+                                    <AnimatePresence initial={false}>
+                                        {formats.map((format, index) => {
+                                            const isExtra = index >= INITIAL_VISIBLE_FORMATS;
+                                            const isVisible = !isExtra || isFormatsExpanded;
+
+                                            return (
+                                                isVisible && (
+                                                    <motion.div
+                                                        key={format.id}
+                                                        custom={index}
+                                                        variants={formatButtonVariants}
+                                                        initial="hidden"
+                                                        animate="visible"
+                                                        exit="exit"
+                                                        className="format-button-wrapper inline-block"
+                                                    >
+                                                        <Button
+                                                            variant={selectedFormats.includes(format.id) ? "default" : "outline"}
+                                                            className="cursor-pointer rounded-full whitespace-nowrap"
+                                                            onClick={() => handleFormatToggle(format.id)}
+                                                        >
+                                                            {format.title}
+                                                        </Button>
+                                                    </motion.div>
+                                                )
+                                            );
+                                        })}
+                                    </AnimatePresence>
+                                    {hasMoreFormats && (
+                                        <motion.div
+                                            className="format-button-wrapper inline-block"
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0, transition: { duration: 0.3, ease: "easeOut" } }}
+                                        >
+                                            <Button
+                                                variant="ghost"
+                                                className="cursor-pointer flex items-center gap-1 rounded-full px-5 py-1"
+                                                onClick={toggleFormatsExpanded}
+                                            >
+                                                {isFormatsExpanded ? (
+                                                    <ChevronLeft strokeWidth={2.5} />
+                                                ) : (
+                                                    <ChevronRight strokeWidth={2.5} />
+                                                )}
+                                            </Button>
+                                        </motion.div>
+                                    )}
+                                </div>
+                            </div>
+
+                        )}
                         {/* Темы */}
-                        <div className="flex-shrink-0">
-                            <div className="flex gap-2">
-                                {["Art", "Science", "Music", "Tech"].map((theme) => (
-                                    <Button
-                                        key={theme}
-                                        variant={selectedThemes.includes(theme) ? "default" : "outline"}
-                                        className="cursor-pointer rounded-full"
-                                        onClick={() => handleThemeToggle(theme)}
+                        <div className="w-full">
+                            <div className="flex flex-wrap items-center gap-2 max-w-full">
+                                {areFiltersApplied() && (
+                                <span className="font-semibold">Themes</span>
+                                    )}
+                                <AnimatePresence initial={false}>
+                                    {themes.map((theme, index) => {
+                                        const isExtra = index >= INITIAL_VISIBLE_THEMES;
+                                        const isVisible = !isExtra || isThemesExpanded;
+
+                                        return (
+                                            isVisible && (
+                                                <motion.div
+                                                    key={theme.id}
+                                                    custom={index}
+                                                    variants={themeButtonVariants}
+                                                    initial="hidden"
+                                                    animate="visible"
+                                                    exit="exit"
+                                                    className="theme-button-wrapper inline-block"
+                                                >
+                                                    <Button
+                                                        variant={pendingThemes.includes(theme.id) ? "default" : "outline"}
+                                                        className="cursor-pointer rounded-full whitespace-nowrap"
+                                                        onClick={() => handleThemeToggle(theme.id)}
+                                                    >
+                                                        {theme.title}
+                                                    </Button>
+                                                </motion.div>
+                                            )
+                                        );
+                                    })}
+                                </AnimatePresence>
+                                {hasMoreThemes && (
+                                    <motion.div
+                                        className="theme-button-wrapper inline-block"
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0, transition: { duration: 0.3, ease: "easeOut" } }}
                                     >
-                                        {theme}
-                                    </Button>
-                                ))}
+                                        <Button
+                                            variant="ghost"
+                                            className="cursor-pointer flex items-center gap-1 rounded-full px-5 py-1"
+                                            onClick={toggleThemesExpanded}
+                                        >
+                                            {isFormatsExpanded ? (
+                                                <ChevronLeft strokeWidth={2.5} />
+                                            ) : (
+                                                <ChevronRight strokeWidth={2.5} />
+                                            )}
+                                        </Button>
+                                    </motion.div>
+                                )}
                             </div>
                         </div>
 
-                        {/* Фильтр по дате */}
-                        <div className="flex-shrink-0 w-full md:w-auto">
-                            <div className="flex items-center gap-2">
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            variant="outline"
-                                            className="cursor-pointer w-[180px] font-semibold flex items-center gap-2"
-                                        >
-                                            <CalendarIcon
-                                                strokeWidth={2.5}
-                                                className="h-4 w-4"
-                                                style={{ color: "#727272" }}
+                        {/* Дата и Цена */}
+                        <div className="flex flex-wrap gap-6 lg:gap-8 w-full">
+                            <div className="flex-shrink-0 w-full md:w-auto">
+                                <div className="flex items-center gap-2">
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                className="cursor-pointer w-[180px] font-semibold flex items-center gap-2 justify-start text-left"
+                                            >
+                                                <CalendarIcon
+                                                    strokeWidth={2.5}
+                                                    className="h-4 w-4 mr-1 flex-shrink-0"
+                                                    style={{ color: "#727272" }}
+                                                />
+                                                <span className="truncate">
+                                                    {pendingDateFrom ? format(pendingDateFrom, "PPP") : "Start Date"}
+                                                </span>
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent align="start" className="w-auto p-0">
+                                            <Calendar
+                                                mode="single"
+                                                selected={pendingDateFrom}
+                                                onSelect={setPendingDateFrom}
+                                                initialFocus
                                             />
-                                            {dateFrom ? format(dateFrom, "PPP") : "Start date"}
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent align="start">
-                                        <Calendar
-                                            mode="single"
-                                            selected={dateFrom}
-                                            onSelect={(date) => setDateFrom(date)}
-                                        />
-                                    </PopoverContent>
-                                </Popover>
-                                <Label className="text-sm text-gray-700">to</Label>
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            variant="outline"
-                                            className="cursor-pointer w-[180px] font-semibold flex items-center gap-2"
-                                        >
-                                            <CalendarIcon
-                                                strokeWidth={2.5}
-                                                className="h-4 w-4"
-                                                style={{ color: "#727272" }}
+                                        </PopoverContent>
+                                    </Popover>
+                                    <Label className="text-sm text-gray-700">to</Label>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                className="cursor-pointer w-[180px] font-semibold flex items-center gap-2 justify-start text-left"
+                                            >
+                                                <CalendarIcon
+                                                    strokeWidth={2.5}
+                                                    className="h-4 w-4 mr-1 flex-shrink-0"
+                                                    style={{ color: "#727272" }}
+                                                />
+                                                <span className="truncate">
+                                                    {pendingDateTo ? format(pendingDateTo, "PPP") : "End Date"}
+                                                </span>
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent align="start" className="w-auto p-0">
+                                            <Calendar
+                                                mode="single"
+                                                selected={pendingDateTo}
+                                                onSelect={setPendingDateTo}
+                                                initialFocus
                                             />
-                                            {dateTo ? format(dateTo, "PPP") : "End date"}
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent align="start">
-                                        <Calendar
-                                            mode="single"
-                                            selected={dateTo}
-                                            onSelect={(date) => setDateTo(date)}
-                                        />
-                                    </PopoverContent>
-                                </Popover>
+                                        </PopoverContent>
+                                    </Popover>
+                                </div>
                             </div>
-                        </div>
 
-                        {/* Ценовая полоска */}
-                        <div className="mt-4 flex-grow w-full md:w-auto flex flex-col gap-2">
-                            <div className="flex items-center">
+                            <div className="mt-4 flex-grow w-full md:w-auto flex flex-col gap-2 min-w-[300px] max-w-[300px]">
                                 <Slider
-                                    value={priceRange}
-                                    onValueChange={setPriceRange}
+                                    value={pendingPriceRange}
+                                    onValueChange={setPendingPriceRange}
                                     min={0}
                                     max={100}
                                     step={1}
-                                    className="cursor-pointer min-w-[300px] max-w-[300px]"
+                                    className="cursor-pointer w-full"
                                 />
+                                <span className="text-sm font-medium text-gray-700 text-center w-full">
+                                    ${pendingPriceRange[0]} - ${pendingPriceRange[1]}
+                                </span>
                             </div>
-                            <span className="text-sm font-medium -mt-1.5 text-gray-700 text-center min-w-[300px] max-w-[300px]">
-                Price: {priceRange[0]} - {priceRange[1]} $
-              </span>
                         </div>
                     </div>
 
-                    <div className="mt-4 flex justify-end gap-2">
-                        <Button
-                            variant="outline"
-                            className="cursor-pointer"
-                            onClick={resetFilters}
-                        >
-                            Reset Filters
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                console.log({
-                                    formats: selectedFormats,
-                                    themes: selectedThemes,
-                                    dateRange: { from: dateFrom, to: dateTo },
-                                    priceRange,
-                                });
-                                setIsFiltersOpen(false);
-                            }}
-                            className="cursor-pointer"
-                        >
-                            Apply Filters
+                    <div className="mt-6 flex justify-end gap-2">
+                        <Button onClick={applyFilters} className="cursor-pointer rounded-full px-5 py-1">
+                            Apply
                         </Button>
                     </div>
                 </div>

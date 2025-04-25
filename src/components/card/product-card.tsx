@@ -1,3 +1,4 @@
+// ProductCard.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -8,12 +9,15 @@ import { format } from "date-fns";
 
 interface ProductCardProps {
     event: Event;
+    className?: string;
+    hasMoved?: boolean; // Новый проп для отслеживания перетаскивания
 }
 
-const ProductCard = ({ event }: ProductCardProps) => {
+const ProductCard = ({ event, className, hasMoved = false }: ProductCardProps) => {
     const router = useRouter();
 
     const handleClick = () => {
+        if (hasMoved) return; // Блокируем переход, если было перетаскивание
         router.push(`/products/${event.id}`);
     };
 
@@ -31,7 +35,7 @@ const ProductCard = ({ event }: ProductCardProps) => {
 
     return (
         <Card
-            className="pt-0 cursor-pointer w-full bg-white flex flex-col overflow-hidden transition duration-300 hover:-translate-y-1 hover:-translate-x-1 hover:shadow-2xl"
+            className={`pt-0 cursor-pointer w-full bg-white flex flex-col overflow-hidden transition duration-300 hover:-translate-y-1 hover:-translate-x-1 hover:shadow-2xl ${className || ""}`}
             onClick={handleClick}
         >
             <img
@@ -41,33 +45,30 @@ const ProductCard = ({ event }: ProductCardProps) => {
                         : "https://via.placeholder.com/300x192"
                 }
                 alt={event.title}
-                className="h-65 w-full object-cover "
+                className="w-full object-cover h-65"
             />
-            {/* Контент карточки */}
             <CardContent className="-mt-3 flex-1 flex flex-col justify-between">
                 <div>
-                    <h3 className="text-xl font-bold text-gray-900">{event.title}</h3>
+                    <h3 className="font-bold text-gray-900 truncate text-xl">{event.title}</h3>
                     <div className="flex flex-col gap-1 text-gray-700">
-                        <p className="text-sm font-medium flex items-center gap-1 truncate max-w-full">
-                            <Tag strokeWidth={2.5} className="w-4 h-4 flex-shrink-0" />
+                        <p className="font-medium flex items-center gap-1 truncate max-w-full text-sm">
+                            <Tag strokeWidth={2.5} className="flex-shrink-0 w-4 h-4" />
                             <span className="truncate">
-                                {event.format.title} • {event.themes.map((theme) => theme.title).join(", ")}
-                            </span>
+                {event.format.title} • {event.themes.map((theme) => theme.title).join(", ")}
+              </span>
                         </p>
-                        <p className="text-sm font-medium flex items-center gap-1">
-                            <CalendarDays strokeWidth={2.5} className="w-4 h-4" />
+                        <p className="font-medium flex items-center gap-1 text-sm">
+                            <CalendarDays strokeWidth={2.5} className="flex-shrink-0 w-4 h-4" />
                             {format(new Date(event.startedAt), "MMMM d, yyyy HH:mm")}
                         </p>
-                        <p className="text-sm font-medium flex items-center gap-1 truncate max-w-full">
-                            <MapPinned strokeWidth={2.5} className="w-4 h-4 flex-shrink-0" />
+                        <p className="font-medium flex items-center gap-1 truncate max-w-full text-sm">
+                            <MapPinned strokeWidth={2.5} className="flex-shrink-0 w-4 h-4" />
                             <span className="truncate">{event.venue}</span>
                         </p>
                     </div>
                 </div>
                 <div className="mt-2">
-                    <span className="text-xl font-bold text-gray-900">
-                        {getPriceRange()}
-                    </span>
+                    <span className="font-bold text-gray-900 text-xl">{getPriceRange()}</span>
                 </div>
             </CardContent>
         </Card>

@@ -163,4 +163,15 @@
   padding-right: clamp(1rem, calc(1rem + 0.23 * (100vw - 950px)), 25rem);
 }
 
+.format-button-wrapper {
+  display: inline-block; /* Для корректного отображения в flex-контейнере */
+  vertical-align: middle; /* Выравнивание по вертикали */
+  overflow: hidden; /* Предотвращаем переполнение во время анимации */
+  will-change: opacity, width, transform; /* Оптимизация анимации */
+}
 
+.formats-container {
+  flex: 1; /* Растягиваем контейнер, но учитываем кнопку "Больше фильтров" */
+  min-width: 0; /* Предотвращаем переполнение */
+  max-width: calc(100% - 180px); /* Ограничиваем ширину, учитывая кнопку "Больше фильтров" */
+}

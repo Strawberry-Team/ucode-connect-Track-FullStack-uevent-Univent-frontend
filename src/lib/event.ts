@@ -10,8 +10,25 @@ import {
     TicketsResponse, TicketTypesResponse
 } from "@/types";
 
-export async function getEvents(): Promise<ApiResponse<EventsResponse>> {
-    return executeApiRequest<EventsResponse>(() => api.get("/events"), "Failed to fetch events");
+export async function getEvents(
+    skip: number = 0,
+    take: number = 12,
+    formatId?: number,
+    themes?: string
+): Promise<ApiResponse<EventsResponse>> {
+    // Формируем URL с учётом фильтров
+    let url = `/events?skip=${skip}&take=${take}`;
+    if (formatId) {
+        url += `&formatId=${formatId}`;
+    }
+    if (themes) {
+        url += `&themes=${themes}`;
+    }
+
+    return executeApiRequest<EventsResponse>(
+        () => api.get(url),
+        "Failed to fetch events"
+    );
 }
 
 export async function createEvent(

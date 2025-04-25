@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation"; // Добавляем useSearchParams
 import { getEvents } from "@/lib/event";
 import { Event } from "@/types";
 import { format } from "date-fns";
@@ -20,6 +20,24 @@ const PopularCardsCarousel = () => {
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(true);
+
+    // Добавляем useSearchParams для чтения параметров URL
+    const searchParams = useSearchParams();
+
+    // Проверяем, нужно ли показывать карусель
+    const shouldShowCarousel = () => {
+        const formatId = searchParams.get("formatId");
+        const themes = searchParams.get("themes");
+        const page = searchParams.get("page");
+
+        // Показываем карусель только если:
+        // 1. Нет фильтров (formatId и themes отсутствуют)
+        // 2. Страница — первая (page отсутствует или равно 1)
+        const noFilters = !formatId && !themes;
+        const isFirstPage = !page || page === "1";
+
+        return noFilters && isFirstPage;
+    };
 
     useEffect(() => {
         const fetchEvents = async () => {
@@ -47,7 +65,6 @@ const PopularCardsCarousel = () => {
 
     const totalSlides: number = popularEvents.length || 1;
 
-    // Функция для получения диапазона цен
     const getPriceRange = (event: Event): string => {
         if (!event.tickets || event.tickets.length === 0) {
             return "No tickets";
@@ -60,7 +77,6 @@ const PopularCardsCarousel = () => {
         return `${minPrice} - ${maxPrice} $`;
     };
 
-    // Автоматическое переключение каждые 5 секунд
     useEffect(() => {
         if (intervalRef.current) {
             clearInterval(intervalRef.current);
@@ -79,12 +95,10 @@ const PopularCardsCarousel = () => {
         };
     }, [isPaused, isLoading]);
 
-    // Плавный переход для бесконечной карусели
     const getTranslateX = (): string => {
         return `translateX(-${currentIndex * 100}%)`;
     };
 
-    // Обработчики для кнопок с защитой от множественных кликов
     const handlePrev = (): void => {
         if (isProcessingRef.current || isLoading) return;
         isProcessingRef.current = true;
@@ -99,7 +113,6 @@ const PopularCardsCarousel = () => {
         setTimeout(() => (isProcessingRef.current = false), 500);
     };
 
-    // Обработчики наведения и ухода мыши
     const handleMouseEnter = (): void => {
         setIsPaused(true);
     };
@@ -108,14 +121,12 @@ const PopularCardsCarousel = () => {
         setIsPaused(false);
     };
 
-    // Обработчик клика по карточке
     const handleCardClick = (eventId: number) => {
         if (!isLoading) {
             router.push(`/products/${eventId}`);
         }
     };
 
-    // Сброс позиции для бесконечного цикла
     useEffect(() => {
         if (currentIndex === totalSlides + 1) {
             setIsTransitioning(true);
@@ -136,12 +147,16 @@ const PopularCardsCarousel = () => {
         }
     }, [currentIndex, totalSlides]);
 
-    // Нормализация индекса для индикаторов
     const getIndicatorIndex = (): number => {
         if (currentIndex === 0) return totalSlides - 1;
         if (currentIndex === totalSlides + 1) return 0;
         return currentIndex - 1;
     };
+
+    // Если карусель не должна отображаться, возвращаем null
+    if (!shouldShowCarousel()) {
+        return null;
+    }
 
     if (isLoading) {
         return (
