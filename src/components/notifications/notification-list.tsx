@@ -15,10 +15,11 @@ import {
 import { markNotificationAsRead, markNotificationAsHidden } from "@/lib/notifications";
 import { useAuth } from "@/context/auth-context";
 import { showSuccessToast, showErrorToasts } from "@/lib/toast";
+import Link from "next/link";
 
 const formatDate = (dateString: string): string => {
     const date = parseISO(dateString);
-    return isValid(date) ? format(date, "MMM d, yyyy") : "Unknown notification date";
+    return isValid(date) ? format(date, "MMMM d, yyyy") : "Unknown notification date";
 };
 
 const formatTime = (dateString: string): string => {
@@ -162,7 +163,7 @@ export function NotificationList({ notifications: initialNotifications, onUpdate
                     )}
                 </div>
             </div>
-            <div className="flex flex-col gap-1 max-h-[500px] overflow-y-auto border-t">
+            <div className="flex flex-col gap-1 max-h-[440px] border-t px-2 py-2 overflow-y-auto custom-scroll">
                 {notifications.map((notification) => (
                     <div
                         key={notification.id}
@@ -246,7 +247,43 @@ export function NotificationList({ notifications: initialNotifications, onUpdate
                                     </div>
                                 </div>
                                 <p className="text-sm text-muted-foreground mt-1">
-                                    {notification.content}
+                                    {notification.event ? (
+                                        <>
+                                            {notification.content.split(notification.event.title).map((part, index, array) => {
+                                                if (index === array.length - 1) return <span key={`${notification.id}-event-${index}`}>{part}</span>;
+                                                return (
+                                                    <span key={`${notification.id}-event-${index}`}>
+                                                        {part}
+                                                        <Link 
+                                                            href={`/events/${notification.event?.id}`}
+                                                            className="font-medium hover:underline text-foreground"
+                                                        >
+                                                            {notification.event?.title}
+                                                        </Link>
+                                                    </span>
+                                                );
+                                            })}
+                                        </>
+                                    ) : notification.company ? (
+                                        <>
+                                            {notification.content.split(notification.company.title).map((part, index, array) => {
+                                                if (index === array.length - 1) return <span key={`${notification.id}-company-${index}`}>{part}</span>;
+                                                return (
+                                                    <span key={`${notification.id}-company-${index}`}>
+                                                        {part}
+                                                        <Link 
+                                                            href={`/companies/${notification.company?.id}`}
+                                                            className="font-medium hover:underline text-foreground"
+                                                        >
+                                                            {notification.company?.title}
+                                                        </Link>
+                                                    </span>
+                                                );
+                                            })}
+                                        </>
+                                    ) : (
+                                        notification.content
+                                    )}
                                 </p>
                                 <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
                                     {/* <CalendarDays strokeWidth={2.5} className="h-3 w-3"/> */}
