@@ -42,7 +42,7 @@ import {eventCreateZodSchema, validateEventDates} from "@/zod/shemas";
 import {ScrollArea} from "@/components/ui/scroll-area";
 
 const CalendarComponent = dynamic(() => import("@/components/ui/calendar").then(mod => mod.Calendar), {ssr: false});
-const LocationPickerModal = dynamic(() => import("./location-picker-modal"), {ssr: false});
+const LocationPickerModal = dynamic(() => import("../google-map/google-map-location-picker-modal"), {ssr: false});
 const GOOGLE_MAPS_LIBRARIES: ("places")[] = ["places"];
 
 type EventInfoCardProps = {

@@ -21,7 +21,7 @@ import { eventCreateZodSchema, validateEventDates } from "@/zod/shemas"
 import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { getCityAndCountryFromComponents } from "./location-picker-modal";
+import { getCityAndCountryFromComponents } from "../google-map/google-map-location-picker-modal";
 
 function useDebounce<T>(value: T, delay: number): T {
     const [debouncedValue, setDebouncedValue] = useState<T>(value)
@@ -39,7 +39,7 @@ function useDebounce<T>(value: T, delay: number): T {
     return debouncedValue
 }
 
-const LocationPickerModal = dynamic(() => import("./location-picker-modal"), { ssr: false })
+const LocationPickerModal = dynamic(() => import("../google-map/google-map-location-picker-modal"), { ssr: false })
 
 interface CreateEventModalProps {
     companyId: number

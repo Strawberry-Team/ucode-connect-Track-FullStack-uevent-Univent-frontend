@@ -85,7 +85,7 @@ const createPlaceDetails = (
     };
 };
 
-export default function LocationPickerModal({
+export default function GoogleMapLocationPickerModal({
                                                 isOpen,
                                                 onClose,
                                                 onSelect,

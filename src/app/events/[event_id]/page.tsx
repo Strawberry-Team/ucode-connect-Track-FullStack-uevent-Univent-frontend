@@ -1,11 +1,11 @@
 import { format } from "date-fns";
 import Link from "next/link";
 import { getEventById, getEventByIdNews, getEventTicketTypes } from "@/lib/event";
-import { generateMapEmbedUrl } from "@/utils/generateMapEmbedUrl";
-import { CalendarDays, MapPinned, MapPin, Tag, Building } from "lucide-react";
+import { CalendarDays, MapPin, Tag, Building } from "lucide-react";
 import TicketActions from "@/components/ticket/TicketActions";
 import AttendeesAndNewsBlock from "@/components/attendees-and-news/attendees-and-news-block";
 import EventsCompanyCarousel from "@/components/event/events-company-carousel";
+import GoogleMapIframe from "@/components/google-map/google-map-iframe";
 
 interface NewsNotification {
     type: "news";
@@ -107,8 +107,6 @@ export default async function PageCard({ params }: { params: Promise<{ event_id:
         ? `http://localhost:8080/uploads/event-posters/${event.posterName}`
         : "https://via.placeholder.com/384x384";
 
-    const mapEmbedUrl = generateMapEmbedUrl(event.locationCoordinates);
-
     return (
         <div className="px-custom py-4 w-full">
             <div className="flex flex-col md:flex-row gap-6 items-start">
@@ -141,7 +139,7 @@ export default async function PageCard({ params }: { params: Promise<{ event_id:
                         </div>
 
                         <div className="flex items-center gap-2">
-                            <MapPin strokeWidth={2.5} className="w-5 h-5 text-gray-500 " />
+                            <MapPin strokeWidth={2.5} className="w-5 h-5 text-gray-500" />
                             <span className="text-lg font-medium">{event.venue}</span>
                         </div>
 
@@ -177,23 +175,13 @@ export default async function PageCard({ params }: { params: Promise<{ event_id:
             <div className="mt-8 border-t">
                 <div className="my-6">
                     <div className="block">
-                        <iframe
-                            src={mapEmbedUrl}
-                            width="100%"
-                            height="300"
-                            allowFullScreen
-                            loading="lazy"
-                            referrerPolicy="no-referrer-when-downgrade"
-                            className="md:w-[500px] rounded-lg md:float-right md:ml-6"
-                        ></iframe>
+                        <GoogleMapIframe coordinates={event.locationCoordinates} />
                         <p className="mt-5 text-gray-600 text-lg leading-relaxed">{event.description}</p>
                     </div>
-                    {/* Очищаем поток после float */}
                     <div className="clear-both"></div>
                 </div>
             </div>
 
-            {/* Добавляем карусель событий компании */}
             <EventsCompanyCarousel companyId={event.company.id} />
         </div>
     );
