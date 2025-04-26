@@ -11,7 +11,7 @@ import { Event } from "@/types";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const PopularCardsCarousel = () => {
+const EventsPopularCardCarousel = () => {
     const [events, setEvents] = useState<Event[]>([]);
     const [currentIndex, setCurrentIndex] = useState<number>(1);
     const [isPaused, setIsPaused] = useState<boolean>(false);
@@ -21,19 +21,17 @@ const PopularCardsCarousel = () => {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(true);
 
-    // Добавляем useSearchParams для чтения параметров URL
     const searchParams = useSearchParams();
 
-    // Проверяем, нужно ли показывать карусель
     const shouldShowCarousel = () => {
         const formatId = searchParams.get("formatId");
         const themes = searchParams.get("themes");
         const page = searchParams.get("page");
+        const startedAt = searchParams.get("startedAt");
+        const endAt = searchParams.get("endAt");
+        const title = searchParams.get("title");
 
-        // Показываем карусель только если:
-        // 1. Нет фильтров (formatId и themes отсутствуют)
-        // 2. Страница — первая (page отсутствует или равно 1)
-        const noFilters = !formatId && !themes;
+        const noFilters = !formatId && !themes && !startedAt && !endAt && !title;
         const isFirstPage = !page || page === "1";
 
         return noFilters && isFirstPage;
@@ -67,7 +65,7 @@ const PopularCardsCarousel = () => {
 
     const getPriceRange = (event: Event): string => {
         if (!event.tickets || event.tickets.length === 0) {
-            return "No tickets";
+            return "No ticket";
         }
 
         const prices = event.tickets.map((ticket) => ticket.price);
@@ -123,7 +121,7 @@ const PopularCardsCarousel = () => {
 
     const handleCardClick = (eventId: number) => {
         if (!isLoading) {
-            router.push(`/products/${eventId}`);
+            router.push(`/events/${eventId}`);
         }
     };
 
@@ -351,4 +349,4 @@ const PopularCardsCarousel = () => {
     );
 };
 
-export default PopularCardsCarousel;
+export default EventsPopularCardCarousel;

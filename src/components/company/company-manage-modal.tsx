@@ -1,4 +1,4 @@
-// components/company/manage-company-modal.tsx
+// components/company/company-manage-modal.tsx
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -20,7 +20,7 @@ interface ManageCompanyModalProps {
     editingCompany: Company | null;
 }
 
-export default function ManageCompanyModal({
+export default function CompanyManageModal({
                                                isOpen,
                                                onClose,
                                                editingCompany,

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import EventsCard from "@/components/event/events-card";
-import OrdersCard from "@/components/profile/orders-card";
+import OrdersCard from "@/components/order/orders-card";
 import CompanyInfoCard from "@/components/company/company-info-card";
 import NewsCard from "@/components/news/news-card";
 

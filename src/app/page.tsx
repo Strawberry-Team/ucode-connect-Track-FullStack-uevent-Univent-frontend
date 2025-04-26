@@ -1,6 +1,6 @@
 "use client";
-import ProductCardList from "@/components/card/product-card-list";
-import PopularCardsCarousel from "@/components/card/popular-cards-carousel";
+import EventsCardList from "@/components/event/events-card-list";
+import EventsPopularCardCarousel from "@/components/event/events-popular-card-carousel";
 import ProductFilters from "@/components/filter/product-filters";
 
 
@@ -26,8 +26,8 @@ export default function Home() {
               onClose={() => setIsAuthModalOpen(false)}
           />
         <ProductFilters/>
-        <PopularCardsCarousel />
-        <ProductCardList />
+        <EventsPopularCardCarousel />
+        <EventsCardList />
       </main>
   );
 }

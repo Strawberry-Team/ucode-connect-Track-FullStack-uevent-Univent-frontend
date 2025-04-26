@@ -1,4 +1,4 @@
-// components/tickets/TicketCreateModal.tsx
+// components/ticket/TicketCreateModal.tsx
 "use client";
 
 import { useState, useEffect } from "react";

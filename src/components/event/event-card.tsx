@@ -1,4 +1,4 @@
-// ProductCard.tsx
+// EventCard.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -13,17 +13,17 @@ interface ProductCardProps {
     hasMoved?: boolean; // Новый проп для отслеживания перетаскивания
 }
 
-const ProductCard = ({ event, className, hasMoved = false }: ProductCardProps) => {
+const EventCard = ({ event, className, hasMoved = false }: ProductCardProps) => {
     const router = useRouter();
 
     const handleClick = () => {
         if (hasMoved) return; // Блокируем переход, если было перетаскивание
-        router.push(`/products/${event.id}`);
+        router.push(`/events/${event.id}`);
     };
 
     const getPriceRange = () => {
         if (!event.tickets || event.tickets.length === 0) {
-            return "No tickets";
+            return "No ticket";
         }
 
         const prices = event.tickets.map((ticket) => ticket.price);
@@ -75,4 +75,4 @@ const ProductCard = ({ event, className, hasMoved = false }: ProductCardProps) =
     );
 };
 
-export default ProductCard;
+export default EventCard;

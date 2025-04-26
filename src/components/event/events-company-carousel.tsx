@@ -4,13 +4,13 @@ import { useState, useEffect, useRef } from "react";
 import { getCompanyEvents } from "@/lib/company";
 import { Event } from "@/types";
 import { Skeleton } from "@/components/ui/skeleton";
-import ProductCard from "@/components/card/product-card";
+import EventCard from "@/components/event/event-card";
 
 interface CompanyEventsCarouselProps {
     companyId: number;
 }
 
-const CompanyEventsCarousel = ({ companyId }: CompanyEventsCarouselProps) => {
+const EventsCompanyCarousel = ({ companyId }: CompanyEventsCarouselProps) => {
     const [events, setEvents] = useState<Event[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -210,7 +210,7 @@ const CompanyEventsCarousel = ({ companyId }: CompanyEventsCarouselProps) => {
                             style={{ transform: "scale(0.9)", transformOrigin: "left" }}
                             onClick={handleCardClick}
                         >
-                            <ProductCard event={event} hasMoved={hasMoved} />
+                            <EventCard event={event} hasMoved={hasMoved} />
                         </div>
                     ))}
                 </div>
@@ -219,4 +219,4 @@ const CompanyEventsCarousel = ({ companyId }: CompanyEventsCarouselProps) => {
     );
 };
 
-export default CompanyEventsCarousel;
+export default EventsCompanyCarousel;

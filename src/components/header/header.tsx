@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,15 +11,20 @@ import { useAuth } from "@/context/auth-context";
 import { showErrorToasts } from "@/lib/toast";
 import { NavUser } from "@/components/user/nav-user";
 import { NotificationButton } from "@/components/notifications/notification-button";
-import { Notification, NotificationsResponse } from "@/types";
+import { Notification } from "@/types";
 import { getUserNotifications } from "@/lib/notifications";
+import { Search, X } from "lucide-react";
 
 export default function Header() {
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const { isAuthenticated, user } = useAuth();
     const pathname = usePathname();
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [unreadNotifications, setUnreadNotifications] = useState(0);
+    const [searchQuery, setSearchQuery] = useState("");
+    const prevPathnameRef = useRef(pathname);
 
     const showBorder = pathname !== "/";
 
@@ -27,7 +32,6 @@ export default function Header() {
         if (isAuthenticated && user) {
             try {
                 const response = await getUserNotifications(user.id);
-                
                 if (response.success && Array.isArray(response.data)) {
                     const notificationsList = response.data as Notification[];
                     setNotifications(notificationsList);
@@ -37,8 +41,8 @@ export default function Header() {
                     setUnreadNotifications(unreadCount);
                 }
             } catch (error) {
-                console.error('Failed to fetch notifications:', error);
-                showErrorToasts('Failed to fetch notifications');
+                console.error("Failed to fetch notifications:", error);
+                showErrorToasts("Failed to fetch notifications");
             }
         }
     };
@@ -49,8 +53,46 @@ export default function Header() {
         }
     }, [isAuthenticated, user]);
 
+    useEffect(() => {
+        const prevPathname = prevPathnameRef.current;
+
+        if (prevPathname === "/" && pathname !== "/") {
+            setSearchQuery("");
+        }
+
+        // Обновляем предыдущий pathname
+        prevPathnameRef.current = pathname;
+    }, [pathname]);
+
     const handleNotificationClick = () => {
         fetchNotifications();
+    };
+
+    const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            handleSearch();
+        }
+    };
+
+    const handleSearch = () => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (searchQuery.trim()) {
+            params.set("title", searchQuery.trim());
+        } else {
+            params.delete("title");
+        }
+        params.set("page", "1");
+        router.push(`/?${params.toString()}`);
+    };
+
+    const clearSearch = () => {
+        setSearchQuery("");
+        const params = new URLSearchParams(searchParams.toString());
+        if (params.has("title")) {
+            params.delete("title");
+            params.set("page", "1");
+            router.push(`/?${params.toString()}`);
+        }
     };
 
     return (
@@ -67,12 +109,31 @@ export default function Header() {
                     <span className="text-[20px] font-medium">Calendula</span>
                 </Link>
 
-                <div className="flex-1 flex justify-center max-w-2xl">
+                <div className="flex-1 flex justify-center max-w-2xl relative">
                     <Input
                         type="text"
                         placeholder="Find events..."
-                        className="h-10 text-[14px] px-4 font-medium w-full rounded-full border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary"
+                        className="h-10 text-[14px] px-4 pr-20 font-medium w-full rounded-full border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={handleSearchKeyDown}
                     />
+                    {searchQuery && (
+                        <Button
+                            variant="ghost"
+                            className="absolute right-12 top-1/2 transform -translate-y-1/2 p-1"
+                            onClick={clearSearch}
+                        >
+                            <X className="h-5 w-5 text-gray-500" />
+                        </Button>
+                    )}
+                    <Button
+                        variant="ghost"
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1"
+                        onClick={handleSearch}
+                    >
+                        <Search className="h-5 w-5 text-gray-500" />
+                    </Button>
                 </div>
 
                 <div className="flex items-center gap-4">

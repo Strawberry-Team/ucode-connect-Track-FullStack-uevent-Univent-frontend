@@ -12,7 +12,8 @@ import {
     FunnelX,
     SlidersHorizontal,
     Ellipsis,
-    ChevronLeft, ChevronRight
+    ChevronLeft,
+    ChevronRight,
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
@@ -32,13 +33,13 @@ export default function EventFilters() {
     const [themes, setThemes] = useState<Theme[]>([]);
     const [selectedFormats, setSelectedFormats] = useState<number[]>([]);
     const [selectedThemes, setSelectedThemes] = useState<number[]>([]);
-    const [pendingThemes, setPendingThemes] = useState<number[]>([]); // Временное состояние для тем
-    const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
-    const [pendingDateFrom, setPendingDateFrom] = useState<Date | undefined>(undefined); // Временное состояние для даты "с"
-    const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
-    const [pendingDateTo, setPendingDateTo] = useState<Date | undefined>(undefined); // Временное состояние для даты "по"
+    const [pendingThemes, setPendingThemes] = useState<number[]>([]);
+    const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+    const [pendingStartDate, setPendingStartDate] = useState<Date | undefined>(undefined);
+    const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+    const [pendingEndDate, setPendingEndDate] = useState<Date | undefined>(undefined);
     const [priceRange, setPriceRange] = useState([0, 100]);
-    const [pendingPriceRange, setPendingPriceRange] = useState([0, 100]); // Временное состояние для цен
+    const [pendingPriceRange, setPendingPriceRange] = useState([0, 100]);
     const [contentHeight, setContentHeight] = useState(0);
     const contentRef = useRef<HTMLDivElement>(null);
 
@@ -48,7 +49,6 @@ export default function EventFilters() {
     const INITIAL_VISIBLE_FORMATS = 5;
     const INITIAL_VISIBLE_THEMES = 5;
 
-    // Загружаем форматы и темы
     useEffect(() => {
         const fetchFilters = async () => {
             const formatsResponse = await getEventFormats();
@@ -70,12 +70,11 @@ export default function EventFilters() {
         fetchFilters();
     }, []);
 
-    // Инициализация выбранных фильтров из query-параметров при загрузке
     useEffect(() => {
         const formatId = searchParams.get("formatId");
         const themesParam = searchParams.get("themes");
-        const dateFromParam = searchParams.get("dateFrom");
-        const dateToParam = searchParams.get("dateTo");
+        const startDateParam = searchParams.get("startedAt");
+        const endDateParam = searchParams.get("endAt");
         const priceMinParam = searchParams.get("priceMin");
         const priceMaxParam = searchParams.get("priceMax");
 
@@ -88,28 +87,28 @@ export default function EventFilters() {
         if (themesParam) {
             const themeIds = themesParam.split(",").map(Number).filter((id) => !isNaN(id));
             setSelectedThemes(themeIds);
-            setPendingThemes(themeIds); // Синхронизируем временное состояние
+            setPendingThemes(themeIds);
         } else {
             setSelectedThemes([]);
             setPendingThemes([]);
         }
 
-        if (dateFromParam) {
-            const date = new Date(dateFromParam);
-            setDateFrom(date);
-            setPendingDateFrom(date);
+        if (startDateParam) {
+            const date = new Date(startDateParam);
+            setStartDate(date);
+            setPendingStartDate(date);
         } else {
-            setDateFrom(undefined);
-            setPendingDateFrom(undefined);
+            setStartDate(undefined);
+            setPendingStartDate(undefined);
         }
 
-        if (dateToParam) {
-            const date = new Date(dateToParam);
-            setDateTo(date);
-            setPendingDateTo(date);
+        if (endDateParam) {
+            const date = new Date(endDateParam);
+            setEndDate(date);
+            setPendingEndDate(date);
         } else {
-            setDateTo(undefined);
-            setPendingDateTo(undefined);
+            setEndDate(undefined);
+            setPendingEndDate(undefined);
         }
 
         if (priceMinParam !== null && priceMaxParam !== null) {
@@ -153,10 +152,10 @@ export default function EventFilters() {
         setSelectedFormats([]);
         setSelectedThemes([]);
         setPendingThemes([]);
-        setDateFrom(undefined);
-        setPendingDateFrom(undefined);
-        setDateTo(undefined);
-        setPendingDateTo(undefined);
+        setStartDate(undefined);
+        setPendingStartDate(undefined);
+        setEndDate(undefined);
+        setPendingEndDate(undefined);
         setPriceRange([0, 100]);
         setPendingPriceRange([0, 100]);
         setIsFiltersOpen(false);
@@ -166,8 +165,8 @@ export default function EventFilters() {
         const params = new URLSearchParams(searchParams.toString());
         params.delete("formatId");
         params.delete("themes");
-        params.delete("dateFrom");
-        params.delete("dateTo");
+        params.delete("startedAt");
+        params.delete("endAt");
         params.delete("priceMin");
         params.delete("priceMax");
         params.set("page", "1");
@@ -175,10 +174,9 @@ export default function EventFilters() {
     };
 
     const applyFilters = () => {
-        // Переносим временное состояние в основное
         setSelectedThemes(pendingThemes);
-        setDateFrom(pendingDateFrom);
-        setDateTo(pendingDateTo);
+        setStartDate(pendingStartDate);
+        setEndDate(pendingEndDate);
         setPriceRange(pendingPriceRange);
 
         const params = new URLSearchParams(searchParams.toString());
@@ -189,16 +187,16 @@ export default function EventFilters() {
             params.delete("themes");
         }
 
-        if (pendingDateFrom) {
-            params.set("dateFrom", pendingDateFrom.toISOString());
+        if (pendingStartDate) {
+            params.set("startedAt", format(pendingStartDate, "yyyy-MM-dd"));
         } else {
-            params.delete("dateFrom");
+            params.delete("startedAt");
         }
 
-        if (pendingDateTo) {
-            params.set("dateTo", pendingDateTo.toISOString());
+        if (pendingEndDate) {
+            params.set("endAt", format(pendingEndDate, "yyyy-MM-dd"));
         } else {
-            params.delete("dateTo");
+            params.delete("endAt");
         }
 
         if (pendingPriceRange[0] !== 0 || pendingPriceRange[1] !== 100) {
@@ -214,18 +212,16 @@ export default function EventFilters() {
         setIsFiltersOpen(false);
     };
 
-    // Проверяем, применены ли фильтры
     const areFiltersApplied = () => {
         return (
             selectedFormats.length > 0 ||
             selectedThemes.length > 0 ||
-            dateFrom !== undefined ||
-            dateTo !== undefined ||
+            startDate !== undefined ||
+            endDate !== undefined ||
             (priceRange[0] !== 0 || priceRange[1] !== 100)
         );
     };
 
-    // Функции для удаления индивидуальных фильтров
     const removeFormatFilter = () => {
         setSelectedFormats([]);
         const params = new URLSearchParams(searchParams.toString());
@@ -237,7 +233,7 @@ export default function EventFilters() {
     const removeThemeFilter = (themeId: number) => {
         const newSelectedThemes = selectedThemes.filter((id) => id !== themeId);
         setSelectedThemes(newSelectedThemes);
-        setPendingThemes(newSelectedThemes); // Синхронизируем временное состояние
+        setPendingThemes(newSelectedThemes);
         const params = new URLSearchParams(searchParams.toString());
         if (newSelectedThemes.length > 0) {
             params.set("themes", newSelectedThemes.join(","));
@@ -248,20 +244,20 @@ export default function EventFilters() {
         router.push(`?${params.toString()}`);
     };
 
-    const removeDateFromFilter = () => {
-        setDateFrom(undefined);
-        setPendingDateFrom(undefined);
+    const removeStartDateFilter = () => {
+        setStartDate(undefined);
+        setPendingStartDate(undefined);
         const params = new URLSearchParams(searchParams.toString());
-        params.delete("dateFrom");
+        params.delete("startedAt"); // Меняем dateFrom на startedAt
         params.set("page", "1");
         router.push(`?${params.toString()}`);
     };
 
-    const removeDateToFilter = () => {
-        setDateTo(undefined);
-        setPendingDateTo(undefined);
+    const removeEndDateFilter = () => {
+        setEndDate(undefined);
+        setPendingEndDate(undefined);
         const params = new URLSearchParams(searchParams.toString());
-        params.delete("dateTo");
+        params.delete("endAt");
         params.set("page", "1");
         router.push(`?${params.toString()}`);
     };
@@ -373,9 +369,7 @@ export default function EventFilters() {
         <div className="px-custom px-4 py-4 border-b sticky top-[68px] bg-background/95 backdrop-blur-md z-20 max-w-full">
             <div className="flex items-center justify-between gap-4 flex-nowrap">
                 <div className="flex flex-wrap gap-2 items-center min-w-0">
-                    {/* Условный рендеринг: показываем форматы или выбранные фильтры */}
                     {!areFiltersApplied() ? (
-                        // Если фильтры не применены, показываем форматы
                         <>
                             <AnimatePresence initial={false}>
                                 {formats.map((format, index) => {
@@ -416,7 +410,6 @@ export default function EventFilters() {
                                         className="cursor-pointer flex items-center gap-1 rounded-full px-5 py-1"
                                         onClick={toggleFormatsExpanded}
                                     >
-                                        {/*<span className="font-semibold ">• • •</span>*/}
                                         {isFormatsExpanded ? (
                                             <ChevronLeft strokeWidth={2.5} />
                                         ) : (
@@ -427,9 +420,7 @@ export default function EventFilters() {
                             )}
                         </>
                     ) : (
-                        // Если фильтры применены, показываем выбранные фильтры с крестиками
                         <div className="flex flex-wrap gap-2 items-center">
-                            {/* Формат */}
                             {selectedFormats.length > 0 && (
                                 <div className="inline-flex items-center gap-1 border rounded-full px-3 py-1">
                                     <span className="text-sm">
@@ -446,7 +437,6 @@ export default function EventFilters() {
                                 </div>
                             )}
 
-                            {/* Темы */}
                             {selectedThemes.map((themeId) => {
                                 const theme = themes.find((t) => t.id === themeId);
                                 return theme ? (
@@ -467,37 +457,34 @@ export default function EventFilters() {
                                 ) : null;
                             })}
 
-                            {/* Дата "с" */}
-                            {dateFrom && (
+                            {startDate && (
                                 <div className="inline-flex items-center gap-1 border rounded-full px-3 py-1">
-                                    <span className="text-sm">From: {format(dateFrom, "PPP")}</span>
+                                    <span className="text-sm">From: {format(startDate, "PPP")}</span>
                                     <Button
                                         variant="ghost"
                                         size="sm"
                                         className="p-0 h-6 w-6"
-                                        onClick={removeDateFromFilter}
+                                        onClick={removeStartDateFilter}
                                     >
                                         <X className="w-4 h-4" />
                                     </Button>
                                 </div>
                             )}
 
-                            {/* Дата "по" */}
-                            {dateTo && (
+                            {endDate && (
                                 <div className="inline-flex items-center gap-1 border rounded-full px-3 py-1">
-                                    <span className="text-sm">To: {format(dateTo, "PPP")}</span>
+                                    <span className="text-sm">To: {format(endDate, "PPP")}</span>
                                     <Button
                                         variant="ghost"
                                         size="sm"
                                         className="p-0 h-6 w-6"
-                                        onClick={removeDateToFilter}
+                                        onClick={removeEndDateFilter}
                                     >
                                         <X className="w-4 h-4" />
                                     </Button>
                                 </div>
                             )}
 
-                            {/* Цена */}
                             {(priceRange[0] !== 0 || priceRange[1] !== 100) && (
                                 <div className="inline-flex items-center gap-1 border rounded-full px-3 py-1">
                                     <span className="text-sm">Price: ${priceRange[0]} - ${priceRange[1]}</span>
@@ -512,7 +499,6 @@ export default function EventFilters() {
                                 </div>
                             )}
 
-                            {/* Кнопка сброса всех фильтров */}
                             <Button
                                 variant="ghost"
                                 className="cursor-pointer flex items-center gap-1 rounded-full px-5 py-1"
@@ -530,7 +516,7 @@ export default function EventFilters() {
                         className="cursor-pointer flex items-center gap-2 rounded-full px-18 py-1"
                         onClick={toggleFilters}
                     >
-                        <SlidersHorizontal strokeWidth={2} className="!w-5.5 !h-5.5"/>
+                        <SlidersHorizontal strokeWidth={2} className="!w-5.5 !h-5.5" />
                     </Button>
                 </div>
             </div>
@@ -546,10 +532,8 @@ export default function EventFilters() {
                 <div ref={contentRef} className="pt-4">
                     <hr className="mt-4 border-t" />
                     <div className="mt-4 flex flex-col gap-6">
-                        {/* Форматы (первая строка в "More Filters", если фильтры применены) */}
                         {areFiltersApplied() && (
                             <div className="w-full">
-
                                 <div className="flex flex-wrap items-center gap-2 max-w-full">
                                     <span className="font-semibold">Formats</span>
                                     <AnimatePresence initial={false}>
@@ -601,14 +585,10 @@ export default function EventFilters() {
                                     )}
                                 </div>
                             </div>
-
                         )}
-                        {/* Темы */}
                         <div className="w-full">
                             <div className="flex flex-wrap items-center gap-2 max-w-full">
-                                {areFiltersApplied() && (
-                                <span className="font-semibold">Themes</span>
-                                    )}
+                                {areFiltersApplied() && <span className="font-semibold">Themes</span>}
                                 <AnimatePresence initial={false}>
                                     {themes.map((theme, index) => {
                                         const isExtra = index >= INITIAL_VISIBLE_THEMES;
@@ -659,7 +639,6 @@ export default function EventFilters() {
                             </div>
                         </div>
 
-                        {/* Дата и Цена */}
                         <div className="flex flex-wrap gap-6 lg:gap-8 w-full">
                             <div className="flex-shrink-0 w-full md:w-auto">
                                 <div className="flex items-center gap-2">
@@ -675,15 +654,15 @@ export default function EventFilters() {
                                                     style={{ color: "#727272" }}
                                                 />
                                                 <span className="truncate">
-                                                    {pendingDateFrom ? format(pendingDateFrom, "PPP") : "Start Date"}
+                                                    {pendingStartDate ? format(pendingStartDate, "PPP") : "Start Date"}
                                                 </span>
                                             </Button>
                                         </PopoverTrigger>
                                         <PopoverContent align="start" className="w-auto p-0">
                                             <Calendar
                                                 mode="single"
-                                                selected={pendingDateFrom}
-                                                onSelect={setPendingDateFrom}
+                                                selected={pendingStartDate}
+                                                onSelect={setPendingStartDate}
                                                 initialFocus
                                             />
                                         </PopoverContent>
@@ -701,15 +680,15 @@ export default function EventFilters() {
                                                     style={{ color: "#727272" }}
                                                 />
                                                 <span className="truncate">
-                                                    {pendingDateTo ? format(pendingDateTo, "PPP") : "End Date"}
+                                                    {pendingEndDate ? format(pendingEndDate, "PPP") : "End Date"}
                                                 </span>
                                             </Button>
                                         </PopoverTrigger>
                                         <PopoverContent align="start" className="w-auto p-0">
                                             <Calendar
                                                 mode="single"
-                                                selected={pendingDateTo}
-                                                onSelect={setPendingDateTo}
+                                                selected={pendingEndDate}
+                                                onSelect={setPendingEndDate}
                                                 initialFocus
                                             />
                                         </PopoverContent>

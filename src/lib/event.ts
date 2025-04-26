@@ -14,7 +14,10 @@ export async function getEvents(
     skip: number = 0,
     take: number = 12,
     formatId?: number,
-    themes?: string
+    themes?: string,
+    startedAt?: string,
+    endAt?: string,
+    title?: string // Добавляем параметр для поиска по заголовку
 ): Promise<ApiResponse<EventsResponse>> {
     // Формируем URL с учётом фильтров
     let url = `/events?skip=${skip}&take=${take}`;
@@ -23,6 +26,15 @@ export async function getEvents(
     }
     if (themes) {
         url += `&themes=${themes}`;
+    }
+    if (startedAt) {
+        url += `&startedAt=${startedAt}`;
+    }
+    if (endAt) {
+        url += `&endAt=${endAt}`;
+    }
+    if (title) {
+        url += `&title=${encodeURIComponent(title)}`; // Кодируем строку для URL
     }
 
     return executeApiRequest<EventsResponse>(

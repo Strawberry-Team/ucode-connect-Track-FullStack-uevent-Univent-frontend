@@ -106,7 +106,7 @@ export default function EventsCard({ companyId }: EventsCardProps) {
                             {events.map((event, index) => (
                                 <div key={event.id} className="flex flex-col">
                                     <div className="flex items-center justify-between rounded-lg px-2 transition-all duration-500 hover:shadow-[0_0_15px_rgba(0,0,0,0.15)] cursor-pointer">
-                                        <Link href={`/products/${event.id}`} className="flex-1">
+                                        <Link href={`/events/${event.id}`} className="flex-1">
                                             <div className="flex items-center gap-4 rounded-lg py-1 transition-all">
                                                 <img
                                                     src={
@@ -138,7 +138,7 @@ export default function EventsCard({ companyId }: EventsCardProps) {
                                                 </div>
                                             </div>
                                         </Link>
-                                        <Link href={`/products/${event.id}/edit`}>
+                                        <Link href={`/events/${event.id}/edit`}>
                                             <Button
                                                 variant="ghost"
                                                 size="sm"

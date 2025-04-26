@@ -192,9 +192,6 @@ export default function PromoCodeCreateModal({
                             className="!text-[15px] w-full mt-3 rounded-md"
                             disabled={isSubmitting}
                         />
-                        {errors.title && (
-                            <p className="text-sm text-red-500">{errors.title}</p>
-                        )}
                     </div>
 
                     {/* Code (только для создания) */}
@@ -226,9 +223,6 @@ export default function PromoCodeCreateModal({
                             className="!text-[15px] w-full rounded-md"
                             disabled={isSubmitting || !!promoCodeToEdit}
                         />
-                        {errors.discountPercent && (
-                            <p className="text-sm text-red-500">{errors.discountPercent}</p>
-                        )}
                     </div>
 
                     {/* Active Switch */}

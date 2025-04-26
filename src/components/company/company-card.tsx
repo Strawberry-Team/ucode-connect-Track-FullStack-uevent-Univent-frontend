@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import AnimatedButton from "@/components/ui/animated-button";
-import ManageCompanyModal from "@/components/company/manage-company-modal";
+import CompanyManageModal from "@/components/company/company-manage-modal";
 import { Building, CalendarDays } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 import { useCompanyStore } from "@/store/company-store";
@@ -78,7 +78,7 @@ export default function CompanyCard() {
                         ) : companies.length > 0 ? (
                             <div className="flex w-full flex-col gap-4 rounded-lg px-2 transition-all duration-500 hover:shadow-[0_0_15px_rgba(0,0,0,0.15)] cursor-pointer">
                                 {companies.map((company, index) => (
-                                    <Link key={index} href={`/company/${company.id}/edit`}>
+                                    <Link key={index} href={`/companies/${company.id}/edit`}>
                                         <div className="flex cursor-pointer items-center gap-4 rounded-lg py-1 transition-all">
                                             <img
                                                 src={

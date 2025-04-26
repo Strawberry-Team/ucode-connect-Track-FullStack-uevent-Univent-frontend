@@ -3,7 +3,7 @@
 import { useState } from "react";
 import ProfileInfoCard from "@/components/profile/profile-info-card";
 import CompanyCard from "@/components/company/company-card";
-import OrdersCard from "@/components/profile/orders-card";
+import OrdersCard from "@/components/order/orders-card";
 
 export default function ProfileForm() {
     const [editMode, setEditMode] = useState(false);

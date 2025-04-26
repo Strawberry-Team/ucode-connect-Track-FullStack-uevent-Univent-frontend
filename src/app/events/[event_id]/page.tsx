@@ -3,9 +3,9 @@ import Link from "next/link";
 import { getEventById, getEventByIdNews, getEventTicketTypes } from "@/lib/event";
 import { generateMapEmbedUrl } from "@/utils/generateMapEmbedUrl";
 import { CalendarDays, MapPinned, MapPin, Tag, Building } from "lucide-react";
-import TicketActions from "@/components/card/TicketActions";
+import TicketActions from "@/components/ticket/TicketActions";
 import AttendeesAndNewsBlock from "@/components/attendees-and-news/attendees-and-news-block";
-import CompanyEventsCarousel from "@/components/event/company-events-carousel";
+import EventsCompanyCarousel from "@/components/event/events-company-carousel";
 
 interface NewsNotification {
     type: "news";
@@ -22,9 +22,9 @@ interface UserNotification {
     avatarUrl: string;
 }
 
-export default async function PageCard({ params }: { params: Promise<{ product: string }> }) {
+export default async function PageCard({ params }: { params: Promise<{ event_id: string }> }) {
     const resolvedParams = await params;
-    const id = parseInt(resolvedParams.product, 10);
+    const id = parseInt(resolvedParams.event_id, 10);
 
     if (isNaN(id) || id < 1) {
         return <div className="px-custom py-4">Ticket not found</div>;
@@ -91,7 +91,7 @@ export default async function PageCard({ params }: { params: Promise<{ product: 
 
     const getPriceRange = (): string => {
         if (!ticketTypes || ticketTypes.length === 0) {
-            return "No tickets";
+            return "No ticket";
         }
 
         const prices = ticketTypes.map((ticket) => ticket.price);
@@ -147,7 +147,7 @@ export default async function PageCard({ params }: { params: Promise<{ product: 
 
                         <div className="flex items-center gap-2">
                             <Building strokeWidth={2.5} className="w-5 h-5 text-gray-500" />
-                            <Link href={`/company/${event.company.id}`}>
+                            <Link href={`/companies/${event.company.id}`}>
                                 <span className="text-lg font-medium underline">
                                     {event.company.title}
                                 </span>
@@ -194,7 +194,7 @@ export default async function PageCard({ params }: { params: Promise<{ product: 
             </div>
 
             {/* Добавляем карусель событий компании */}
-            <CompanyEventsCarousel companyId={event.company.id} />
+            <EventsCompanyCarousel companyId={event.company.id} />
         </div>
     );
 }

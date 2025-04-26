@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import AnimatedButton from "@/components/ui/animated-button";
-import TicketCreateModal from "@/components/tickets/tickets-create-modal";
+import TicketCreateModal from "@/components/ticket/ticket-create-modal";
 import { Ticket as TicketIcon, Plus } from "lucide-react";
 import { getEventTickets, getEventTicketTypes } from "@/lib/event";
 import { showErrorToasts } from "@/lib/toast";
@@ -96,7 +96,7 @@ export default function TicketsCard({ eventId }: TicketsInfoCardProps) {
                 setTicketsData(null);
                 setTicketTypes([]);
                 setGroupedTickets([]);
-                showErrorToasts(ticketsResult.errors || ticketTypesResult.errors || ["Failed to fetch tickets"]);
+                showErrorToasts(ticketsResult.errors || ticketTypesResult.errors || ["Failed to fetch ticket"]);
             }
 
             const elapsed = Date.now() - start;
