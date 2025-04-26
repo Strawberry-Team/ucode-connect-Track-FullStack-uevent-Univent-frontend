@@ -5,17 +5,7 @@ import ProfileInfoCard from "@/components/profile/profile-info-card";
 import CompanyCard from "@/components/company/company-card";
 import OrdersCard from "@/components/profile/orders-card";
 
-type Ticket = {
-    id: number;
-    name: string;
-    status: string;
-};
-
-type ProfileFormProps = {
-    initialTickets: Ticket[];
-};
-
-export default function ProfileForm({ initialTickets }: ProfileFormProps) {
+export default function ProfileForm() {
     const [editMode, setEditMode] = useState(false);
 
     return (
@@ -27,10 +17,10 @@ export default function ProfileForm({ initialTickets }: ProfileFormProps) {
                 {/* Правая колонка с карточками */}
                 <div className="flex flex-col gap-6 w-full md:w-1/2">
                     {/* Карточка компании */}
-                    <CompanyCard  />
+                    <CompanyCard />
 
-                    {/* Карточка тикетов */}
-                    <OrdersCard initialTickets={initialTickets} />
+                    {/* Карточка ордеров */}
+                    <OrdersCard />
                 </div>
             </div>
         </div>

@@ -207,3 +207,31 @@ export interface NotificationButtonProps {
 export interface UpdateAllNotificationsResponse {
     updatedCount: number;
 }
+
+export type OrderItem = {
+    id: number;
+    finalPrice: number;
+    ticket: {
+        id: number;
+        title: string;
+        price: number;
+        number: string;
+        event: {
+            id: number;
+            title: string;
+            startedAt: string;
+            endedAt: string;
+            posterName: string;
+        };
+    };
+};
+
+export type Order = {
+    id: number;
+    totalAmount: number;
+    paymentStatus: string;
+    paymentMethod: string;
+    createdAt: string;
+    promoCode: PromoCode;
+    orderItems: OrderItem[];
+};

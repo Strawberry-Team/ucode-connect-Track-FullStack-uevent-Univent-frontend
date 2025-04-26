@@ -164,14 +164,35 @@
 }
 
 .format-button-wrapper {
-  display: inline-block; /* Для корректного отображения в flex-контейнере */
-  vertical-align: middle; /* Выравнивание по вертикали */
-  overflow: hidden; /* Предотвращаем переполнение во время анимации */
-  will-change: opacity, width, transform; /* Оптимизация анимации */
+  display: inline-block;
+  vertical-align: middle;
+  overflow: hidden;
+  will-change: opacity, width, transform;
 }
 
 .formats-container {
-  flex: 1; /* Растягиваем контейнер, но учитываем кнопку "Больше фильтров" */
-  min-width: 0; /* Предотвращаем переполнение */
-  max-width: calc(100% - 180px); /* Ограничиваем ширину, учитывая кнопку "Больше фильтров" */
+  flex: 1;
+  min-width: 0;
+  max-width: calc(100% - 180px);
 }
+
+.photos-container {
+  transition: all 0.3s ease;
+}
+
+.photos-container.expanded {
+  @apply -space-x-4;
+}
+
+.photos-container img {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.photos-container img:hover {
+  transform: scale(1.15) translateY(-2px);
+  z-index: 50 !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+

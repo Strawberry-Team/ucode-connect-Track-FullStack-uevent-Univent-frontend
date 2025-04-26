@@ -1,6 +1,6 @@
 import api from "@/lib/api";
 import { executeApiRequest } from "@/utils/api-request";
-import { ApiResponse, User, Company } from "@/types";
+import {ApiResponse, User, Company, Order} from "@/types";
 
 export async function getUserMe(accessToken?: string): Promise<ApiResponse<User>> {
     if (!accessToken) return { success: false, errors: ["Access token not found"] };
@@ -27,4 +27,8 @@ export async function uploadAvatar(userId: number, file: File): Promise<ApiRespo
 
 export async function getUserCompany(userId: number): Promise<ApiResponse<Company[] | null>> {
     return executeApiRequest<Company[] | null>(() => api.get(`/users/${userId}/companies`), "Failed to fetch company data");
+}
+
+export async function getUserOrders(userId: number): Promise<ApiResponse<Order[]>> {
+    return executeApiRequest<Order[]>(() => api.get(`/users/${userId}/orders`), "Failed to fetch user orders");
 }

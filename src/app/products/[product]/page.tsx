@@ -5,7 +5,7 @@ import { generateMapEmbedUrl } from "@/utils/generateMapEmbedUrl";
 import { CalendarDays, MapPinned, MapPin, Tag, Building } from "lucide-react";
 import TicketActions from "@/components/card/TicketActions";
 import AttendeesAndNewsBlock from "@/components/attendees-and-news/attendees-and-news-block";
-import CompanyEventsCarousel from "@/components/event/CompanyEventsCarousel";
+import CompanyEventsCarousel from "@/components/event/company-events-carousel";
 
 interface NewsNotification {
     type: "news";
