@@ -1,3 +1,4 @@
+// EventsPopularCardCarousel.tsx
 "use client";
 
 import { CalendarDays, MapPinned, Tag } from "lucide-react";
@@ -5,57 +6,41 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation"; // Добавляем useSearchParams
-import { getEvents } from "@/lib/event";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Event } from "@/types";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const EventsPopularCardCarousel = () => {
-    const [events, setEvents] = useState<Event[]>([]);
+interface EventsPopularCardCarouselProps {
+    events: Event[];
+    isLoading: boolean;
+}
+
+const EventsPopularCardCarousel = ({ events, isLoading }: EventsPopularCardCarouselProps) => {
     const [currentIndex, setCurrentIndex] = useState<number>(1);
     const [isPaused, setIsPaused] = useState<boolean>(false);
     const [isTransitioning, setIsTransitioning] = useState<boolean>(true);
     const isProcessingRef = useRef<boolean>(false);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const router = useRouter();
-    const [isLoading, setIsLoading] = useState(true);
 
     const searchParams = useSearchParams();
 
     const shouldShowCarousel = () => {
-        const formatId = searchParams.get("formatId");
+        const formats = searchParams.get("formats");
         const themes = searchParams.get("themes");
         const page = searchParams.get("page");
         const startedAt = searchParams.get("startedAt");
         const endedAt = searchParams.get("endedAt");
         const title = searchParams.get("title");
+        const minPrice = searchParams.get("minPrice");
+        const maxPrice = searchParams.get("maxPrice");
 
-        const noFilters = !formatId && !themes && !startedAt && !endedAt && !title;
+        const noFilters = !formats && !themes && !startedAt && !endedAt && !title && !minPrice && !maxPrice;
         const isFirstPage = !page || page === "1";
 
         return noFilters && isFirstPage;
     };
-
-    useEffect(() => {
-        const fetchEvents = async () => {
-            const start = Date.now();
-            const response = await getEvents();
-            const elapsed = Date.now() - start;
-            const remaining = 300 - elapsed;
-            if (remaining > 0) {
-                await new Promise((resolve) => setTimeout(resolve, remaining));
-            }
-            if (response.success && response.data?.items) {
-                setEvents(response.data.items);
-            } else {
-                console.error("Failed to fetch events or items are missing:", response);
-                setEvents([]);
-            }
-            setIsLoading(false);
-        };
-        fetchEvents();
-    }, []);
 
     const popularEvents: Event[] = [...events]
         .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
@@ -72,7 +57,7 @@ const EventsPopularCardCarousel = () => {
         const minPrice = Math.min(...prices);
         const maxPrice = Math.max(...prices);
 
-        return `${minPrice} - ${maxPrice} $`;
+        return `$${minPrice} - $${maxPrice}`;
     };
 
     useEffect(() => {
@@ -151,7 +136,6 @@ const EventsPopularCardCarousel = () => {
         return currentIndex - 1;
     };
 
-    // Если карусель не должна отображаться, возвращаем null
     if (!shouldShowCarousel()) {
         return null;
     }

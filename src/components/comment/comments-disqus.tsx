@@ -8,7 +8,7 @@ interface DisqusCommentsProps {
     url: string;
 }
 
-export default function DisqusComments({ id, title, url }: DisqusCommentsProps) {
+export default function CommentsDisqus({ id, title, url }: DisqusCommentsProps) {
     return (
         <div className="mt-8 border-t pt-8">
             <div className="bg-white p-4 rounded-lg">

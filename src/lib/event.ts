@@ -13,16 +13,17 @@ import {
 export async function getEvents(
     skip: number = 0,
     take: number = 12,
-    formatId?: number,
+    formats?: string,
     themes?: string,
     startedAt?: string,
     endedAt?: string,
-    title?: string // Добавляем параметр для поиска по заголовку
+    title?: string,
+    minPrice?: number,
+    maxPrice?: number
 ): Promise<ApiResponse<EventsResponse>> {
-    // Формируем URL с учётом фильтров
     let url = `/events?skip=${skip}&take=${take}`;
-    if (formatId) {
-        url += `&formatId=${formatId}`;
+    if (formats) {
+        url += `&formats=${formats}`;
     }
     if (themes) {
         url += `&themes=${themes}`;
@@ -34,7 +35,13 @@ export async function getEvents(
         url += `&endedAt=${endedAt}`;
     }
     if (title) {
-        url += `&title=${encodeURIComponent(title)}`; // Кодируем строку для URL
+        url += `&title=${encodeURIComponent(title)}`;
+    }
+    if (minPrice !== undefined) {
+        url += `&minPrice=${minPrice}`;
+    }
+    if (maxPrice !== undefined) {
+        url += `&maxPrice=${maxPrice}`;
     }
 
     return executeApiRequest<EventsResponse>(

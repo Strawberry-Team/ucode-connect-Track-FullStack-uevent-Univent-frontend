@@ -30,7 +30,7 @@ const EventCard = ({ event, className, hasMoved = false }: ProductCardProps) => 
         const minPrice = Math.min(...prices);
         const maxPrice = Math.max(...prices);
 
-        return `${minPrice} - ${maxPrice} $`;
+        return `$${minPrice} - $${maxPrice}`;
     };
 
     return (

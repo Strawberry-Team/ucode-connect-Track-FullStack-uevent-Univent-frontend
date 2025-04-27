@@ -113,7 +113,7 @@ export default function Header() {
                     <Input
                         type="text"
                         placeholder="Find events..."
-                        className="h-10 text-[14px] px-4 pr-20 font-medium w-full rounded-full border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary"
+                        className="h-10 text-[14px] px-4 pr-20 font-medium w-full rounded-full"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyDown={handleSearchKeyDown}

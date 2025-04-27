@@ -1,14 +1,8 @@
 "use client";
-import EventsCardList from "@/components/event/events-card-list";
-import EventsPopularCardCarousel from "@/components/event/events-popular-card-carousel";
-import ProductFilters from "@/components/filter/product-filters";
-
-
 import { useState, useEffect } from "react";
-
-
 import { useSearchParams } from "next/navigation";
 import AuthModal from "@/components/auth/auth-modal";
+import MainPage from "@/components/main-page/main-page";
 export default function Home() {
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const searchParams = useSearchParams();
@@ -25,9 +19,7 @@ export default function Home() {
               isOpen={isAuthModalOpen}
               onClose={() => setIsAuthModalOpen(false)}
           />
-        <ProductFilters/>
-        <EventsPopularCardCarousel />
-        <EventsCardList />
+          <MainPage />;
       </main>
   );
 }

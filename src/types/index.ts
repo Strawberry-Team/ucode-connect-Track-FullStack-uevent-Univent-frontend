@@ -80,6 +80,8 @@ export interface EventsResponse {
     items: Event[];
     count: number;
     total: number;
+    minPrice: number;
+    maxPrice: number;
 }
 
 

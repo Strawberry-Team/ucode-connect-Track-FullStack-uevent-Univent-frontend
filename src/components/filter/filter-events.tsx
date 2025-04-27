@@ -1,3 +1,4 @@
+// filter-events.tsx
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -20,26 +21,29 @@ import { Label } from "@/components/ui/label";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
-import { getEventFormats } from "@/lib/format";
-import { getThemes } from "@/lib/theme";
 import { EventFormat, Theme } from "@/types";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function EventFilters() {
+interface EventFiltersProps {
+    formats: EventFormat[];
+    themes: Theme[];
+    minPrice: number; // Добавляем minPrice
+    maxPrice: number; // Добавляем maxPrice
+}
+
+export default function FilterEvents({ formats, themes, minPrice, maxPrice }: EventFiltersProps) {
     const [isFiltersOpen, setIsFiltersOpen] = useState(false);
     const [isFormatsExpanded, setIsFormatsExpanded] = useState(false);
     const [isThemesExpanded, setIsThemesExpanded] = useState(false);
-    const [formats, setFormats] = useState<EventFormat[]>([]);
-    const [themes, setThemes] = useState<Theme[]>([]);
-    const [selectedFormats, setSelectedFormats] = useState<number[]>([]);
+    const [pendingFormats, setPendingFormats] = useState<number[]>([]);
     const [selectedThemes, setSelectedThemes] = useState<number[]>([]);
     const [pendingThemes, setPendingThemes] = useState<number[]>([]);
     const [startDate, setStartDate] = useState<Date | undefined>(undefined);
     const [pendingStartDate, setPendingStartDate] = useState<Date | undefined>(undefined);
     const [endDate, setEndDate] = useState<Date | undefined>(undefined);
     const [pendingEndDate, setPendingEndDate] = useState<Date | undefined>(undefined);
-    const [priceRange, setPriceRange] = useState([0, 100]);
-    const [pendingPriceRange, setPendingPriceRange] = useState([0, 100]);
+    const [priceRange, setPriceRange] = useState([minPrice, maxPrice]); // Используем minPrice и maxPrice
+    const [pendingPriceRange, setPendingPriceRange] = useState([minPrice, maxPrice]); // Используем minPrice и maxPrice
     const [contentHeight, setContentHeight] = useState(0);
     const contentRef = useRef<HTMLDivElement>(null);
 
@@ -50,38 +54,18 @@ export default function EventFilters() {
     const INITIAL_VISIBLE_THEMES = 5;
 
     useEffect(() => {
-        const fetchFilters = async () => {
-            const formatsResponse = await getEventFormats();
-            if (formatsResponse.success && formatsResponse.data) {
-                setFormats(formatsResponse.data);
-            } else {
-                console.error("Failed to load formats:", formatsResponse.errors);
-                setFormats([]);
-            }
-
-            const themesResponse = await getThemes();
-            if (themesResponse.success && themesResponse.data) {
-                setThemes(themesResponse.data);
-            } else {
-                console.error("Failed to load themes:", themesResponse.errors);
-                setThemes([]);
-            }
-        };
-        fetchFilters();
-    }, []);
-
-    useEffect(() => {
-        const formatId = searchParams.get("formatId");
+        const formatsParam = searchParams.get("formats");
         const themesParam = searchParams.get("themes");
         const startDateParam = searchParams.get("startedAt");
         const endDateParam = searchParams.get("endedAt");
-        const priceMinParam = searchParams.get("priceMin");
-        const priceMaxParam = searchParams.get("priceMax");
+        const priceMinParam = searchParams.get("minPrice"); // Обновляем на minPrice
+        const priceMaxParam = searchParams.get("maxPrice"); // Обновляем на maxPrice
 
-        if (formatId) {
-            setSelectedFormats([Number(formatId)]);
+        if (formatsParam) {
+            const formatIdArray = formatsParam.split(",").map(Number).filter((id) => !isNaN(id));
+            setPendingFormats(formatIdArray);
         } else {
-            setSelectedFormats([]);
+            setPendingFormats([]);
         }
 
         if (themesParam) {
@@ -116,27 +100,27 @@ export default function EventFilters() {
             setPriceRange(priceRangeValue);
             setPendingPriceRange(priceRangeValue);
         } else {
-            setPriceRange([0, 100]);
-            setPendingPriceRange([0, 100]);
+            setPriceRange([minPrice, maxPrice]); // Используем значения из пропсов
+            setPendingPriceRange([minPrice, maxPrice]);
         }
-    }, [searchParams]);
+    }, [searchParams, minPrice, maxPrice]);
 
     const toggleFilters = () => setIsFiltersOpen((prev) => !prev);
     const toggleFormatsExpanded = () => setIsFormatsExpanded((prev) => !prev);
     const toggleThemesExpanded = () => setIsThemesExpanded((prev) => !prev);
 
     const handleFormatToggle = (formatId: number) => {
-        const newSelectedFormats = selectedFormats.includes(formatId)
-            ? selectedFormats.filter((id) => id !== formatId)
-            : [formatId];
+        const newPendingFormats = pendingFormats.includes(formatId)
+            ? pendingFormats.filter((id) => id !== formatId)
+            : [...pendingFormats, formatId];
 
-        setSelectedFormats(newSelectedFormats);
+        setPendingFormats(newPendingFormats);
 
         const params = new URLSearchParams(searchParams.toString());
-        if (newSelectedFormats.length > 0) {
-            params.set("formatId", newSelectedFormats[0].toString());
+        if (newPendingFormats.length > 0) {
+            params.set("formats", newPendingFormats.join(","));
         } else {
-            params.delete("formatId");
+            params.delete("formats");
         }
         params.set("page", "1");
         router.push(`?${params.toString()}`);
@@ -149,26 +133,26 @@ export default function EventFilters() {
     };
 
     const resetFilters = () => {
-        setSelectedFormats([]);
+        setPendingFormats([]);
         setSelectedThemes([]);
         setPendingThemes([]);
         setStartDate(undefined);
         setPendingStartDate(undefined);
         setEndDate(undefined);
         setPendingEndDate(undefined);
-        setPriceRange([0, 100]);
-        setPendingPriceRange([0, 100]);
+        setPriceRange([minPrice, maxPrice]); // Сбрасываем до значений из пропсов
+        setPendingPriceRange([minPrice, maxPrice]);
         setIsFiltersOpen(false);
         setIsFormatsExpanded(false);
         setIsThemesExpanded(false);
 
         const params = new URLSearchParams(searchParams.toString());
-        params.delete("formatId");
+        params.delete("formats");
         params.delete("themes");
         params.delete("startedAt");
         params.delete("endedAt");
-        params.delete("priceMin");
-        params.delete("priceMax");
+        params.delete("minPrice"); // Обновляем на minPrice
+        params.delete("maxPrice"); // Обновляем на maxPrice
         params.set("page", "1");
         router.push(`?${params.toString()}`);
     };
@@ -199,12 +183,12 @@ export default function EventFilters() {
             params.delete("endedAt");
         }
 
-        if (pendingPriceRange[0] !== 0 || pendingPriceRange[1] !== 100) {
-            params.set("priceMin", pendingPriceRange[0].toString());
-            params.set("priceMax", pendingPriceRange[1].toString());
+        if (pendingPriceRange[0] !== minPrice || pendingPriceRange[1] !== maxPrice) { // Сравниваем с пропсами
+            params.set("minPrice", pendingPriceRange[0].toString()); // Обновляем на minPrice
+            params.set("maxPrice", pendingPriceRange[1].toString()); // Обновляем на maxPrice
         } else {
-            params.delete("priceMin");
-            params.delete("priceMax");
+            params.delete("minPrice");
+            params.delete("maxPrice");
         }
 
         params.set("page", "1");
@@ -214,18 +198,23 @@ export default function EventFilters() {
 
     const areFiltersApplied = () => {
         return (
-            selectedFormats.length > 0 ||
+            pendingFormats.length > 0 ||
             selectedThemes.length > 0 ||
             startDate !== undefined ||
             endDate !== undefined ||
-            (priceRange[0] !== 0 || priceRange[1] !== 100)
+            (priceRange[0] !== minPrice || priceRange[1] !== maxPrice) // Обновляем проверку
         );
     };
 
-    const removeFormatFilter = () => {
-        setSelectedFormats([]);
+    const removeFormatFilter = (formatId: number) => {
+        const newPendingFormats = pendingFormats.filter((id) => id !== formatId);
+        setPendingFormats(newPendingFormats);
         const params = new URLSearchParams(searchParams.toString());
-        params.delete("formatId");
+        if (newPendingFormats.length > 0) {
+            params.set("formats", newPendingFormats.join(","));
+        } else {
+            params.delete("formats");
+        }
         params.set("page", "1");
         router.push(`?${params.toString()}`);
     };
@@ -248,7 +237,7 @@ export default function EventFilters() {
         setStartDate(undefined);
         setPendingStartDate(undefined);
         const params = new URLSearchParams(searchParams.toString());
-        params.delete("startedAt"); // Меняем dateFrom на startedAt
+        params.delete("startedAt");
         params.set("page", "1");
         router.push(`?${params.toString()}`);
     };
@@ -263,11 +252,11 @@ export default function EventFilters() {
     };
 
     const removePriceFilter = () => {
-        setPriceRange([0, 100]);
-        setPendingPriceRange([0, 100]);
+        setPriceRange([minPrice, maxPrice]); // Сбрасываем до значений из пропсов
+        setPendingPriceRange([minPrice, maxPrice]);
         const params = new URLSearchParams(searchParams.toString());
-        params.delete("priceMin");
-        params.delete("priceMax");
+        params.delete("minPrice"); // Обновляем на minPrice
+        params.delete("maxPrice"); // Обновляем на maxPrice
         params.set("page", "1");
         router.push(`?${params.toString()}`);
     };
@@ -372,32 +361,40 @@ export default function EventFilters() {
                     {!areFiltersApplied() ? (
                         <>
                             <AnimatePresence initial={false}>
-                                {formats.map((format, index) => {
-                                    const isExtra = index >= INITIAL_VISIBLE_FORMATS;
-                                    const isVisible = !isExtra || isFormatsExpanded;
+                                {[...formats]
+                                    .sort((a, b) => {
+                                        const aIsSelected = pendingFormats.includes(a.id);
+                                        const bIsSelected = pendingFormats.includes(b.id);
+                                        if (aIsSelected && !bIsSelected) return -1;
+                                        if (!aIsSelected && bIsSelected) return 1;
+                                        return formats.indexOf(a) - formats.indexOf(b);
+                                    })
+                                    .map((format, index) => {
+                                        const isExtra = index >= INITIAL_VISIBLE_FORMATS;
+                                        const isVisible = !isExtra || isFormatsExpanded;
 
-                                    return (
-                                        isVisible && (
-                                            <motion.div
-                                                key={format.id}
-                                                custom={index}
-                                                variants={formatButtonVariants}
-                                                initial="hidden"
-                                                animate="visible"
-                                                exit="exit"
-                                                className="format-button-wrapper inline-block"
-                                            >
-                                                <Button
-                                                    variant={selectedFormats.includes(format.id) ? "default" : "outline"}
-                                                    className="cursor-pointer whitespace-nowrap rounded-full px-5 py-1"
-                                                    onClick={() => handleFormatToggle(format.id)}
+                                        return (
+                                            isVisible && (
+                                                <motion.div
+                                                    key={format.id}
+                                                    custom={index}
+                                                    variants={formatButtonVariants}
+                                                    initial="hidden"
+                                                    animate="visible"
+                                                    exit="exit"
+                                                    className="format-button-wrapper inline-block"
                                                 >
-                                                    {format.title}
-                                                </Button>
-                                            </motion.div>
-                                        )
-                                    );
-                                })}
+                                                    <Button
+                                                        variant={pendingFormats.includes(format.id) ? "default" : "outline"}
+                                                        className="cursor-pointer whitespace-nowrap rounded-full px-5 py-1"
+                                                        onClick={() => handleFormatToggle(format.id)}
+                                                    >
+                                                        {format.title}
+                                                    </Button>
+                                                </motion.div>
+                                            )
+                                        );
+                                    })}
                             </AnimatePresence>
                             {hasMoreFormats && (
                                 <motion.div
@@ -421,21 +418,22 @@ export default function EventFilters() {
                         </>
                     ) : (
                         <div className="flex flex-wrap gap-2 items-center">
-                            {selectedFormats.length > 0 && (
-                                <div className="inline-flex items-center gap-1 border rounded-full px-3 py-1">
-                                    <span className="text-sm">
-                                        {formats.find((f) => f.id === selectedFormats[0])?.title}
-                                    </span>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="p-0 h-6 w-6"
-                                        onClick={removeFormatFilter}
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </Button>
-                                </div>
-                            )}
+                            {pendingFormats.map((formatId) => {
+                                const format = formats.find((f) => f.id === formatId);
+                                return format ? (
+                                    <div key={formatId} className="inline-flex items-center gap-1 border rounded-full px-3 py-1">
+                                        <span className="text-sm">{format.title}</span>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="p-0 h-6 w-6"
+                                            onClick={() => removeFormatFilter(formatId)}
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </Button>
+                                    </div>
+                                ) : null;
+                            })}
 
                             {selectedThemes.map((themeId) => {
                                 const theme = themes.find((t) => t.id === themeId);
@@ -485,9 +483,9 @@ export default function EventFilters() {
                                 </div>
                             )}
 
-                            {(priceRange[0] !== 0 || priceRange[1] !== 100) && (
+                            {(priceRange[0] !== minPrice || priceRange[1] !== maxPrice) && (
                                 <div className="inline-flex items-center gap-1 border rounded-full px-3 py-1">
-                                    <span className="text-sm">Price: ${priceRange[0]} - ${priceRange[1]}</span>
+                                    <span className="text-sm">${priceRange[0]} - ${priceRange[1]}</span>
                                     <Button
                                         variant="ghost"
                                         size="sm"
@@ -537,32 +535,40 @@ export default function EventFilters() {
                                 <div className="flex flex-wrap items-center gap-2 max-w-full">
                                     <span className="font-semibold">Formats</span>
                                     <AnimatePresence initial={false}>
-                                        {formats.map((format, index) => {
-                                            const isExtra = index >= INITIAL_VISIBLE_FORMATS;
-                                            const isVisible = !isExtra || isFormatsExpanded;
+                                        {[...formats]
+                                            .sort((a, b) => {
+                                                const aIsSelected = pendingFormats.includes(a.id);
+                                                const bIsSelected = pendingFormats.includes(b.id);
+                                                if (aIsSelected && !bIsSelected) return -1;
+                                                if (!aIsSelected && bIsSelected) return 1;
+                                                return formats.indexOf(a) - formats.indexOf(b);
+                                            })
+                                            .map((format, index) => {
+                                                const isExtra = index >= INITIAL_VISIBLE_FORMATS;
+                                                const isVisible = !isExtra || isFormatsExpanded;
 
-                                            return (
-                                                isVisible && (
-                                                    <motion.div
-                                                        key={format.id}
-                                                        custom={index}
-                                                        variants={formatButtonVariants}
-                                                        initial="hidden"
-                                                        animate="visible"
-                                                        exit="exit"
-                                                        className="format-button-wrapper inline-block"
-                                                    >
-                                                        <Button
-                                                            variant={selectedFormats.includes(format.id) ? "default" : "outline"}
-                                                            className="cursor-pointer rounded-full whitespace-nowrap"
-                                                            onClick={() => handleFormatToggle(format.id)}
+                                                return (
+                                                    isVisible && (
+                                                        <motion.div
+                                                            key={format.id}
+                                                            custom={index}
+                                                            variants={formatButtonVariants}
+                                                            initial="hidden"
+                                                            animate="visible"
+                                                            exit="exit"
+                                                            className="format-button-wrapper inline-block"
                                                         >
-                                                            {format.title}
-                                                        </Button>
-                                                    </motion.div>
-                                                )
-                                            );
-                                        })}
+                                                            <Button
+                                                                variant={pendingFormats.includes(format.id) ? "default" : "outline"}
+                                                                className="cursor-pointer rounded-full whitespace-nowrap"
+                                                                onClick={() => handleFormatToggle(format.id)}
+                                                            >
+                                                                {format.title}
+                                                            </Button>
+                                                        </motion.div>
+                                                    )
+                                                );
+                                            })}
                                     </AnimatePresence>
                                     {hasMoreFormats && (
                                         <motion.div
@@ -590,32 +596,40 @@ export default function EventFilters() {
                             <div className="flex flex-wrap items-center gap-2 max-w-full">
                                 {areFiltersApplied() && <span className="font-semibold">Themes</span>}
                                 <AnimatePresence initial={false}>
-                                    {themes.map((theme, index) => {
-                                        const isExtra = index >= INITIAL_VISIBLE_THEMES;
-                                        const isVisible = !isExtra || isThemesExpanded;
+                                    {[...themes]
+                                        .sort((a, b) => {
+                                            const aIsSelected = pendingThemes.includes(a.id);
+                                            const bIsSelected = pendingThemes.includes(b.id);
+                                            if (aIsSelected && !bIsSelected) return -1;
+                                            if (!aIsSelected && bIsSelected) return 1;
+                                            return themes.indexOf(a) - themes.indexOf(b);
+                                        })
+                                        .map((theme, index) => {
+                                            const isExtra = index >= INITIAL_VISIBLE_THEMES;
+                                            const isVisible = !isExtra || isThemesExpanded;
 
-                                        return (
-                                            isVisible && (
-                                                <motion.div
-                                                    key={theme.id}
-                                                    custom={index}
-                                                    variants={themeButtonVariants}
-                                                    initial="hidden"
-                                                    animate="visible"
-                                                    exit="exit"
-                                                    className="theme-button-wrapper inline-block"
-                                                >
-                                                    <Button
-                                                        variant={pendingThemes.includes(theme.id) ? "default" : "outline"}
-                                                        className="cursor-pointer rounded-full whitespace-nowrap"
-                                                        onClick={() => handleThemeToggle(theme.id)}
+                                            return (
+                                                isVisible && (
+                                                    <motion.div
+                                                        key={theme.id}
+                                                        custom={index}
+                                                        variants={themeButtonVariants}
+                                                        initial="hidden"
+                                                        animate="visible"
+                                                        exit="exit"
+                                                        className="theme-button-wrapper inline-block"
                                                     >
-                                                        {theme.title}
-                                                    </Button>
-                                                </motion.div>
-                                            )
-                                        );
-                                    })}
+                                                        <Button
+                                                            variant={pendingThemes.includes(theme.id) ? "default" : "outline"}
+                                                            className="cursor-pointer rounded-full whitespace-nowrap"
+                                                            onClick={() => handleThemeToggle(theme.id)}
+                                                        >
+                                                            {theme.title}
+                                                        </Button>
+                                                    </motion.div>
+                                                )
+                                            );
+                                        })}
                                 </AnimatePresence>
                                 {hasMoreThemes && (
                                     <motion.div
@@ -700,8 +714,8 @@ export default function EventFilters() {
                                 <Slider
                                     value={pendingPriceRange}
                                     onValueChange={setPendingPriceRange}
-                                    min={0}
-                                    max={100}
+                                    min={minPrice}
+                                    max={maxPrice}
                                     step={1}
                                     className="cursor-pointer w-full"
                                 />
