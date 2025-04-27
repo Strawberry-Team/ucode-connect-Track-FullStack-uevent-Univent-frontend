@@ -16,7 +16,7 @@ export async function getEvents(
     formatId?: number,
     themes?: string,
     startedAt?: string,
-    endAt?: string,
+    endedAt?: string,
     title?: string // Добавляем параметр для поиска по заголовку
 ): Promise<ApiResponse<EventsResponse>> {
     // Формируем URL с учётом фильтров
@@ -30,8 +30,8 @@ export async function getEvents(
     if (startedAt) {
         url += `&startedAt=${startedAt}`;
     }
-    if (endAt) {
-        url += `&endAt=${endAt}`;
+    if (endedAt) {
+        url += `&endedAt=${endedAt}`;
     }
     if (title) {
         url += `&title=${encodeURIComponent(title)}`; // Кодируем строку для URL

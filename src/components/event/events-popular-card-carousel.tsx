@@ -28,10 +28,10 @@ const EventsPopularCardCarousel = () => {
         const themes = searchParams.get("themes");
         const page = searchParams.get("page");
         const startedAt = searchParams.get("startedAt");
-        const endAt = searchParams.get("endAt");
+        const endedAt = searchParams.get("endedAt");
         const title = searchParams.get("title");
 
-        const noFilters = !formatId && !themes && !startedAt && !endAt && !title;
+        const noFilters = !formatId && !themes && !startedAt && !endedAt && !title;
         const isFirstPage = !page || page === "1";
 
         return noFilters && isFirstPage;

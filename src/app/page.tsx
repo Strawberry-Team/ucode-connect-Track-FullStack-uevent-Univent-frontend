@@ -16,7 +16,7 @@ export default function Home() {
     useEffect(() => {
         const resetToken = searchParams.get("reset_token");
         if (resetToken) {
-            setIsAuthModalOpen(true); // Открываем модалку, если есть reset_token
+            setIsAuthModalOpen(true);
         }
     }, [searchParams]);
   return (

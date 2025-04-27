@@ -1,6 +1,6 @@
 "use client";
 
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useAuth} from "@/context/auth-context";
 import {updateUser, uploadAvatar} from "@/lib/user";
 import {showSuccessToast, showErrorToasts} from "@/lib/toast";
@@ -11,6 +11,7 @@ import {Save, Camera} from "lucide-react";
 import {cn} from "@/lib/utils";
 import {userZodSchema} from "@/zod/shemas";
 import {format} from "date-fns";
+import {Skeleton} from "@/components/ui/skeleton";
 
 type ProfileCardProps = {
     setEditMode: (editMode: boolean) => void;
@@ -30,6 +31,50 @@ export default function ProfileInfoCard({setEditMode, editMode}: ProfileCardProp
         lastName?: string;
     }>({});
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (user) {
+                setFormData({
+                    firstName: user.firstName,
+                    lastName: user.lastName || "",
+                    profilePicture: null,
+                });
+                setIsLoading(false);
+            }
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [user]);
+
+    if (isLoading) {
+        return (
+            <Card className="shadow-lg transition-all duration-300 hover:shadow-xl h-[640px] flex flex-col w-full md:w-1/2">
+                <CardContent className="space-y-6 flex-1">
+                    <div className="flex flex-col items-center gap-4">
+                        <Skeleton className="h-95 w-95 rounded-md" />
+                    </div>
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <div className="text-center">
+                                <Skeleton className="h-[30px] w-[200px] mx-auto" />
+                                <Skeleton className="h-[20px] w-[150px] mx-auto mt-2" />
+                            </div>
+                            <div className="text-center space-y-2">
+                                <Skeleton className="h-[20px] w-[100px] mx-auto" />
+                                <Skeleton className="h-[20px] w-[100px] mx-auto" />
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+                <CardFooter className="flex flex-col sm:flex-row gap-3">
+                    <Skeleton className="h-9 w-full" />
+                </CardFooter>
+            </Card>
+        );
+    }
 
     const imageUrl = previewUrl ||
         (user.profilePictureName

@@ -199,13 +199,18 @@ export default function TicketsCard({ eventId }: TicketsInfoCardProps) {
                 </CardHeader>
                 <CardContent className="-mt-5 flex-1">
                     {isLoading ? (
-                        <div className="flex flex-col gap-4">
+                        <div className="max-h-[160px] overflow-y-auto px-3 pt-4 custom-scroll">
                             {Array.from({ length: 1 }).map((_, index) => (
-                                <div key={index} className="flex items-center gap-4">
-                                    <Skeleton className="h-10 w-10 rounded-md" />
-                                    <div className="flex flex-col gap-2">
-                                        <Skeleton className="h-[20px] w-[150px]" />
-                                        <Skeleton className="h-[15px] w-[100px]" />
+                                <div key={index} className="flex flex-col">
+                                    <div className="flex items-center justify-between rounded-lg px-2">
+                                        <div className="flex items-center gap-4 rounded-lg py-1">
+                                            <div className="mt-1 flex flex-col">
+                                                <Skeleton className="h-[24px] w-[150px]" />
+                                                <div className="flex items-center gap-1 mt-1">
+                                                    <Skeleton className="h-[16px] w-[100px]" />
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             ))}

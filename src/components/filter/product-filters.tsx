@@ -74,7 +74,7 @@ export default function EventFilters() {
         const formatId = searchParams.get("formatId");
         const themesParam = searchParams.get("themes");
         const startDateParam = searchParams.get("startedAt");
-        const endDateParam = searchParams.get("endAt");
+        const endDateParam = searchParams.get("endedAt");
         const priceMinParam = searchParams.get("priceMin");
         const priceMaxParam = searchParams.get("priceMax");
 
@@ -166,7 +166,7 @@ export default function EventFilters() {
         params.delete("formatId");
         params.delete("themes");
         params.delete("startedAt");
-        params.delete("endAt");
+        params.delete("endedAt");
         params.delete("priceMin");
         params.delete("priceMax");
         params.set("page", "1");
@@ -194,9 +194,9 @@ export default function EventFilters() {
         }
 
         if (pendingEndDate) {
-            params.set("endAt", format(pendingEndDate, "yyyy-MM-dd"));
+            params.set("endedAt", format(pendingEndDate, "yyyy-MM-dd"));
         } else {
-            params.delete("endAt");
+            params.delete("endedAt");
         }
 
         if (pendingPriceRange[0] !== 0 || pendingPriceRange[1] !== 100) {
@@ -257,7 +257,7 @@ export default function EventFilters() {
         setEndDate(undefined);
         setPendingEndDate(undefined);
         const params = new URLSearchParams(searchParams.toString());
-        params.delete("endAt");
+        params.delete("endedAt");
         params.set("page", "1");
         router.push(`?${params.toString()}`);
     };

@@ -6,6 +6,7 @@ import {debounce} from "lodash";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
+import {Skeleton} from "@/components/ui/skeleton";
 import {
     Tooltip,
     TooltipContent,
@@ -1093,7 +1094,58 @@ export default function EventInfoCard({setEditMode, editMode, eventId}: EventInf
     }, [event, previewUrl, setEditMode]);
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return (
+            <Card className="shadow-lg transition-all overflow-hidden duration-300 hover:shadow-xl w-[1200px] h-[600px] flex flex-col relative">
+                <div className="absolute top-0 left-0 w-[33%] min-w-[100px] max-w-[400px] h-[600px] flex-shrink-0">
+                    <Skeleton className="w-full h-full rounded-l-lg" />
+                </div>
+                <div className="flex-1 flex flex-col ml-[33%] ml:min-w-[200px] ml:max-w-[400px] h-[550px]">
+                    <CardContent className="mt-3 flex-1 p-6 overflow-y-auto custom-scroll">
+                        <div className="space-y-6">
+                            <Skeleton className="h-[30px] w-[200px]" />
+                            <div className="mt-7 grid grid-cols-2 gap-x-6 gap-y-4">
+                                <div className="space-y-5">
+                                    <div className="flex items-center gap-2">
+                                        <Skeleton className="h-[20px] w-[150px]" />
+                                    </div>
+                                    <div className="mt-6 flex items-center gap-2">
+                                        <Skeleton className="h-[20px] w-[150px]" />
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Skeleton className="h-[20px] w-[250px]" />
+                                    </div>
+                                    <div className="mt-3 flex items-center gap-2">
+                                        <Skeleton className="h-[20px] w-[150px]" />
+                                    </div>
+                                </div>
+                                <div className="space-y-5">
+                                    <div className="flex items-center gap-2">
+                                        <Skeleton className="h-[20px] w-[100px]" />
+                                    </div>
+                                    <div className="mt-6 flex items-center gap-2">
+                                        <Skeleton className="h-[20px] w-[150px]" />
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Skeleton className="h-[20px] w-[100px]" />
+                                    </div>
+                                    <div className="mt-3 flex items-center gap-2">
+                                        <Skeleton className="h-[20px] w-[150px]" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mt-8 flex items-center gap-2">
+                                <Skeleton className="h-[20px] w-[300px]" />
+                            </div>
+                        </div>
+                    </CardContent>
+                    <CardFooter className="bg-white">
+                        <div className="w-full flex justify-end">
+                            <Skeleton className="h-9 w-[200px]" />
+                        </div>
+                    </CardFooter>
+                </div>
+            </Card>
+        );
     }
 
     if (!event) {

@@ -21,11 +21,13 @@ const EventsCardList = () => {
     const formatId = searchParams.get("formatId") ? Number(searchParams.get("formatId")) : undefined
     const themes = searchParams.get("themes") || undefined
     const startDateRaw = searchParams.get("startedAt") || undefined
-    const endDateRaw = searchParams.get("endAt") || undefined
+    const endDateRaw = searchParams.get("endedAt") || undefined
     const title = searchParams.get("title") || undefined
 
     const startDate = startDateRaw ? new Date(startDateRaw).toISOString() : undefined
-    const endDate = endDateRaw ? new Date(endDateRaw).toISOString() : undefined
+    const endDate = endDateRaw
+        ? (new Date(new Date(endDateRaw).setHours(23, 59, 59, 999))).toISOString()
+        : undefined
 
     useEffect(() => {
         const fetchEvents = async () => {

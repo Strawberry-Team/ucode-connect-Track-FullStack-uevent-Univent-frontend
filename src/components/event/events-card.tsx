@@ -15,12 +15,10 @@ import { showErrorToasts } from "@/lib/toast";
 import { Event } from "@/types";
 import EventCreateModal from "@/components/event/event-create-modal";
 
-// Типы пропсов
 type EventsCardProps = {
     companyId: number;
 };
 
-// Компонент карточки событий
 export default function EventsCard({ companyId }: EventsCardProps) {
     const [events, setEvents] = useState<Event[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,7 +26,6 @@ export default function EventsCard({ companyId }: EventsCardProps) {
     const [isLoading, setIsLoading] = useState(true);
     const [editingEvent, setEditingEvent] = useState<Event | null>(null);
 
-    // Загрузка событий при монтировании компонента или изменении companyId
     useEffect(() => {
         const fetchEvents = async () => {
             setIsLoading(true);
@@ -53,7 +50,6 @@ export default function EventsCard({ companyId }: EventsCardProps) {
         fetchEvents();
     }, [companyId]);
 
-    // Обработчик создания события
     const handleEventCreated = (newEvent: Event) => {
         setEvents((prev) =>
             [...prev, newEvent].sort(
@@ -72,31 +68,37 @@ export default function EventsCard({ companyId }: EventsCardProps) {
                             Events
                         </div>
                         {!isLoading && events.length > 0 && (
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                                setEditingEvent(null);
-                                setIsModalOpen(true);
-                            }}
-                        >
-                            <div className="flex items-center gap-1 text-[15px]">
-                                <Plus strokeWidth={2.5} className="h-5 w-5" />
-                                Add event
-                            </div>
-                        </Button>
-                            )}
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                    setEditingEvent(null);
+                                    setIsModalOpen(true);
+                                }}
+                            >
+                                <div className="flex items-center gap-1 text-[15px]">
+                                    <Plus strokeWidth={2.5} className="h-5 w-5" />
+                                    Add event
+                                </div>
+                            </Button>
+                        )}
                     </div>
                 </CardHeader>
                 <CardContent className="-mt-5 flex-1">
                     {isLoading ? (
-                        <div className="flex flex-col gap-4">
+                        <div className="max-h-[290px] overflow-y-auto px-3 pt-3 custom-scroll">
                             {Array.from({ length: 1 }).map((_, index) => (
-                                <div key={index} className="flex items-center gap-4">
-                                    <Skeleton className="h-26 w-26 rounded-md" />
-                                    <div className="flex flex-col gap-2">
-                                        <Skeleton className="h-[30px] w-[150px]" />
-                                        <Skeleton className="h-[20px] w-[100px]" />
+                                <div key={index} className="flex flex-col">
+                                    <div className="flex items-center justify-between rounded-lg px-2">
+                                        <div className="flex items-center gap-4 rounded-lg py-2">
+                                            <Skeleton className="h-11 w-11 rounded-md" />
+                                            <div className="flex flex-col py-1">
+                                                <Skeleton className="h-[20px] w-[150px]" />
+                                                <div className="flex items-center gap-1 mt-1">
+                                                    <Skeleton className="h-[16px] w-[100px]" />
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -115,7 +117,7 @@ export default function EventsCard({ companyId }: EventsCardProps) {
                                                             : "https://via.placeholder.com/200x200"
                                                     }
                                                     alt="Event poster"
-                                                    className="h-10 w-10 rounded-md object-cover"
+                                                    className="h-11 w-11 rounded-md object-cover"
                                                 />
                                                 <div className="flex flex-col">
                                                     <h4
@@ -132,8 +134,8 @@ export default function EventsCard({ companyId }: EventsCardProps) {
                                                     <div className="flex items-center gap-1 text-gray-500">
                                                         <CalendarDays strokeWidth={2.5} className="h-3 w-3" />
                                                         <span className="text-[12px]">
-                              {format(new Date(event.startedAt), "MMMM d, yyyy")}
-                            </span>
+                                                            {format(new Date(event.startedAt), "MMMM d, yyyy")}
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>
