@@ -1,4 +1,3 @@
-// MainPage.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -32,6 +31,8 @@ export default function MainPage() {
     const title = searchParams.get("title") || undefined;
     const minPriceParam = searchParams.get("minPrice") || undefined;
     const maxPriceParam = searchParams.get("maxPrice") || undefined;
+    const sortByParam = searchParams.get("sortBy") || undefined; // Добавляем sortBy
+    const sortOrderParam = searchParams.get("sortOrder") || undefined; // Добавляем sortOrder
 
     const startDate = startDateRaw ? new Date(startDateRaw).toISOString() : undefined;
     const endDate = endDateRaw
@@ -71,7 +72,9 @@ export default function MainPage() {
                 endDate,
                 title,
                 minPriceParam ? Number(minPriceParam) : undefined,
-                maxPriceParam ? Number(maxPriceParam) : undefined
+                maxPriceParam ? Number(maxPriceParam) : undefined,
+                sortByParam, // Передаём sortBy
+                sortOrderParam // Передаём sortOrder
             );
             const elapsed = Date.now() - start;
             const remaining = 300 - elapsed;
@@ -94,7 +97,7 @@ export default function MainPage() {
         };
 
         fetchData();
-    }, [skip, take, formatsParam, themesParam, startDateRaw, endDateRaw, title, minPriceParam, maxPriceParam]);
+    }, [skip, take, formatsParam, themesParam, startDateRaw, endDateRaw, title, minPriceParam, maxPriceParam, sortByParam, sortOrderParam]); // Добавляем зависимости
 
     return (
         <div>

@@ -1,10 +1,10 @@
-// filter-events.tsx
 "use client";
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
+    Calendar,
     ChevronDown,
     ChevronUp,
     CalendarIcon,
@@ -15,11 +15,22 @@ import {
     Ellipsis,
     ChevronLeft,
     ChevronRight,
+    TrendingUpDown,
+    TrendingDown,
+    TrendingUp,
+    CalendarArrowDown,
+    CalendarArrowUp,
 } from "lucide-react";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
+import { CalendarForm } from "@/components/ui/calendar-form";
 import { format } from "date-fns";
 import { EventFormat, Theme } from "@/types";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -27,8 +38,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 interface EventFiltersProps {
     formats: EventFormat[];
     themes: Theme[];
-    minPrice: number; // Добавляем minPrice
-    maxPrice: number; // Добавляем maxPrice
+    minPrice: number;
+    maxPrice: number;
 }
 
 export default function FilterEvents({ formats, themes, minPrice, maxPrice }: EventFiltersProps) {
@@ -42,9 +53,12 @@ export default function FilterEvents({ formats, themes, minPrice, maxPrice }: Ev
     const [pendingStartDate, setPendingStartDate] = useState<Date | undefined>(undefined);
     const [endDate, setEndDate] = useState<Date | undefined>(undefined);
     const [pendingEndDate, setPendingEndDate] = useState<Date | undefined>(undefined);
-    const [priceRange, setPriceRange] = useState([minPrice, maxPrice]); // Используем minPrice и maxPrice
-    const [pendingPriceRange, setPendingPriceRange] = useState([minPrice, maxPrice]); // Используем minPrice и maxPrice
+    // Изменяем начальное состояние на undefined
+    const [priceRange, setPriceRange] = useState<number[] | undefined>(undefined);
+    const [pendingPriceRange, setPendingPriceRange] = useState<number[] | undefined>(undefined);
     const [contentHeight, setContentHeight] = useState(0);
+    const [priceIconState, setPriceIconState] = useState<"upDown" | "down" | "up">("upDown");
+    const [dateIconState, setDateIconState] = useState<"upDown" | "down" | "up">("upDown");
     const contentRef = useRef<HTMLDivElement>(null);
 
     const router = useRouter();
@@ -58,9 +72,12 @@ export default function FilterEvents({ formats, themes, minPrice, maxPrice }: Ev
         const themesParam = searchParams.get("themes");
         const startDateParam = searchParams.get("startedAt");
         const endDateParam = searchParams.get("endedAt");
-        const priceMinParam = searchParams.get("minPrice"); // Обновляем на minPrice
-        const priceMaxParam = searchParams.get("maxPrice"); // Обновляем на maxPrice
+        const priceMinParam = searchParams.get("minPrice");
+        const priceMaxParam = searchParams.get("maxPrice");
+        const sortByParam = searchParams.get("sortBy");
+        const sortOrderParam = searchParams.get("sortOrder");
 
+        // Форматы
         if (formatsParam) {
             const formatIdArray = formatsParam.split(",").map(Number).filter((id) => !isNaN(id));
             setPendingFormats(formatIdArray);
@@ -100,10 +117,65 @@ export default function FilterEvents({ formats, themes, minPrice, maxPrice }: Ev
             setPriceRange(priceRangeValue);
             setPendingPriceRange(priceRangeValue);
         } else {
-            setPriceRange([minPrice, maxPrice]); // Используем значения из пропсов
-            setPendingPriceRange([minPrice, maxPrice]);
+            setPriceRange(undefined);
+            setPendingPriceRange(undefined);
         }
-    }, [searchParams, minPrice, maxPrice]);
+
+        if (sortByParam === "minPrice" && sortOrderParam === "asc") {
+            setPriceIconState("down");
+            setDateIconState("upDown");
+        } else if (sortByParam === "minPrice" && sortOrderParam === "desc") {
+            setPriceIconState("up");
+            setDateIconState("upDown");
+        } else if (sortByParam === "startedAt" && sortOrderParam === "asc") {
+            setDateIconState("down");
+            setPriceIconState("upDown");
+        } else if (sortByParam === "startedAt" && sortOrderParam === "desc") {
+            setDateIconState("up");
+            setPriceIconState("upDown");
+        } else {
+            setPriceIconState("upDown");
+            setDateIconState("upDown");
+        }
+    }, []);
+
+    useEffect(() => {
+        const params = new URLSearchParams(searchParams.toString());
+        const currentSortBy = params.get("sortBy");
+        const currentSortOrder = params.get("sortOrder");
+
+        let newSortBy: string | null = null;
+        let newSortOrder: string | null = null;
+        let shouldUpdate = false;
+
+        if (dateIconState !== "upDown") {
+            newSortBy = "startedAt";
+            newSortOrder = dateIconState === "down" ? "asc" : "desc";
+        } else if (priceIconState !== "upDown") {
+            newSortBy = "minPrice";
+            newSortOrder = priceIconState === "down" ? "asc" : "desc";
+        }
+
+        if (
+            newSortBy !== currentSortBy ||
+            newSortOrder !== currentSortOrder ||
+            (dateIconState === "upDown" && priceIconState === "upDown" && (currentSortBy !== null || currentSortOrder !== null))
+        ) {
+            shouldUpdate = true;
+            if (newSortBy && newSortOrder) {
+                params.set("sortBy", newSortBy);
+                params.set("sortOrder", newSortOrder);
+            } else {
+                params.delete("sortBy");
+                params.delete("sortOrder");
+            }
+            params.set("page", "1");
+        }
+
+        if (shouldUpdate) {
+            router.push(`?${params.toString()}`, { scroll: false });
+        }
+    }, [priceIconState, dateIconState, router, searchParams]);
 
     const toggleFilters = () => setIsFiltersOpen((prev) => !prev);
     const toggleFormatsExpanded = () => setIsFormatsExpanded((prev) => !prev);
@@ -123,7 +195,7 @@ export default function FilterEvents({ formats, themes, minPrice, maxPrice }: Ev
             params.delete("formats");
         }
         params.set("page", "1");
-        router.push(`?${params.toString()}`);
+        router.push(`?${params.toString()}`, { scroll: false });
     };
 
     const handleThemeToggle = (themeId: number) => {
@@ -140,8 +212,8 @@ export default function FilterEvents({ formats, themes, minPrice, maxPrice }: Ev
         setPendingStartDate(undefined);
         setEndDate(undefined);
         setPendingEndDate(undefined);
-        setPriceRange([minPrice, maxPrice]); // Сбрасываем до значений из пропсов
-        setPendingPriceRange([minPrice, maxPrice]);
+        setPriceRange(undefined);
+        setPendingPriceRange(undefined);
         setIsFiltersOpen(false);
         setIsFormatsExpanded(false);
         setIsThemesExpanded(false);
@@ -151,10 +223,10 @@ export default function FilterEvents({ formats, themes, minPrice, maxPrice }: Ev
         params.delete("themes");
         params.delete("startedAt");
         params.delete("endedAt");
-        params.delete("minPrice"); // Обновляем на minPrice
-        params.delete("maxPrice"); // Обновляем на maxPrice
+        params.delete("minPrice");
+        params.delete("maxPrice");
         params.set("page", "1");
-        router.push(`?${params.toString()}`);
+        router.push(`?${params.toString()}`, { scroll: false });
     };
 
     const applyFilters = () => {
@@ -183,16 +255,16 @@ export default function FilterEvents({ formats, themes, minPrice, maxPrice }: Ev
             params.delete("endedAt");
         }
 
-        if (pendingPriceRange[0] !== minPrice || pendingPriceRange[1] !== maxPrice) { // Сравниваем с пропсами
-            params.set("minPrice", pendingPriceRange[0].toString()); // Обновляем на minPrice
-            params.set("maxPrice", pendingPriceRange[1].toString()); // Обновляем на maxPrice
+        if (pendingPriceRange) {
+            params.set("minPrice", pendingPriceRange[0].toString());
+            params.set("maxPrice", pendingPriceRange[1].toString());
         } else {
             params.delete("minPrice");
             params.delete("maxPrice");
         }
 
         params.set("page", "1");
-        router.push(`?${params.toString()}`);
+        router.push(`?${params.toString()}`, { scroll: false });
         setIsFiltersOpen(false);
     };
 
@@ -202,7 +274,7 @@ export default function FilterEvents({ formats, themes, minPrice, maxPrice }: Ev
             selectedThemes.length > 0 ||
             startDate !== undefined ||
             endDate !== undefined ||
-            (priceRange[0] !== minPrice || priceRange[1] !== maxPrice) // Обновляем проверку
+            (priceRange !== undefined)
         );
     };
 
@@ -216,7 +288,7 @@ export default function FilterEvents({ formats, themes, minPrice, maxPrice }: Ev
             params.delete("formats");
         }
         params.set("page", "1");
-        router.push(`?${params.toString()}`);
+        router.push(`?${params.toString()}`, { scroll: false });
     };
 
     const removeThemeFilter = (themeId: number) => {
@@ -230,7 +302,7 @@ export default function FilterEvents({ formats, themes, minPrice, maxPrice }: Ev
             params.delete("themes");
         }
         params.set("page", "1");
-        router.push(`?${params.toString()}`);
+        router.push(`?${params.toString()}`, { scroll: false });
     };
 
     const removeStartDateFilter = () => {
@@ -239,7 +311,7 @@ export default function FilterEvents({ formats, themes, minPrice, maxPrice }: Ev
         const params = new URLSearchParams(searchParams.toString());
         params.delete("startedAt");
         params.set("page", "1");
-        router.push(`?${params.toString()}`);
+        router.push(`?${params.toString()}`, { scroll: false });
     };
 
     const removeEndDateFilter = () => {
@@ -248,17 +320,17 @@ export default function FilterEvents({ formats, themes, minPrice, maxPrice }: Ev
         const params = new URLSearchParams(searchParams.toString());
         params.delete("endedAt");
         params.set("page", "1");
-        router.push(`?${params.toString()}`);
+        router.push(`?${params.toString()}`, { scroll: false });
     };
 
     const removePriceFilter = () => {
-        setPriceRange([minPrice, maxPrice]); // Сбрасываем до значений из пропсов
-        setPendingPriceRange([minPrice, maxPrice]);
+        setPriceRange(undefined); // Сбрасываем диапазон цен
+        setPendingPriceRange(undefined);
         const params = new URLSearchParams(searchParams.toString());
-        params.delete("minPrice"); // Обновляем на minPrice
-        params.delete("maxPrice"); // Обновляем на maxPrice
+        params.delete("minPrice");
+        params.delete("maxPrice");
         params.set("page", "1");
-        router.push(`?${params.toString()}`);
+        router.push(`?${params.toString()}`, { scroll: false });
     };
 
     useEffect(() => {
@@ -354,171 +426,255 @@ export default function FilterEvents({ formats, themes, minPrice, maxPrice }: Ev
         }),
     };
 
+    const togglePriceIconState = () => {
+        setPriceIconState((prev) => {
+            if (prev === "upDown") return "down";
+            if (prev === "down") return "up";
+            return "upDown";
+        });
+        setDateIconState("upDown");
+    };
+
+    const toggleDateIconState = () => {
+        setDateIconState((prev) => {
+            if (prev === "upDown") return "down";
+            if (prev === "down") return "up";
+            return "upDown";
+        });
+        setPriceIconState("upDown");
+    };
+
     return (
         <div className="px-custom px-4 py-4 border-b sticky top-[68px] bg-background/95 backdrop-blur-md z-20 max-w-full">
-            <div className="flex items-center justify-between gap-4 flex-nowrap">
-                <div className="flex flex-wrap gap-2 items-center min-w-0">
-                    {!areFiltersApplied() ? (
-                        <>
-                            <AnimatePresence initial={false}>
-                                {[...formats]
-                                    .sort((a, b) => {
-                                        const aIsSelected = pendingFormats.includes(a.id);
-                                        const bIsSelected = pendingFormats.includes(b.id);
-                                        if (aIsSelected && !bIsSelected) return -1;
-                                        if (!aIsSelected && bIsSelected) return 1;
-                                        return formats.indexOf(a) - formats.indexOf(b);
-                                    })
-                                    .map((format, index) => {
-                                        const isExtra = index >= INITIAL_VISIBLE_FORMATS;
-                                        const isVisible = !isExtra || isFormatsExpanded;
+            <div className="flex items-start gap-4">
+                <div className="flex-1">
+                    <div className="flex flex-wrap gap-2 items-center min-w-0">
+                        {!areFiltersApplied() ? (
+                            <>
+                                <AnimatePresence initial={false}>
+                                    {[...formats]
+                                        .sort((a, b) => {
+                                            const aIsSelected = pendingFormats.includes(a.id);
+                                            const bIsSelected = pendingFormats.includes(b.id);
+                                            if (aIsSelected && !bIsSelected) return -1;
+                                            if (!aIsSelected && bIsSelected) return 1;
+                                            return formats.indexOf(a) - formats.indexOf(b);
+                                        })
+                                        .map((format, index) => {
+                                            const isExtra = index >= INITIAL_VISIBLE_FORMATS;
+                                            const isVisible = !isExtra || isFormatsExpanded;
 
-                                        return (
-                                            isVisible && (
-                                                <motion.div
-                                                    key={format.id}
-                                                    custom={index}
-                                                    variants={formatButtonVariants}
-                                                    initial="hidden"
-                                                    animate="visible"
-                                                    exit="exit"
-                                                    className="format-button-wrapper inline-block"
-                                                >
-                                                    <Button
-                                                        variant={pendingFormats.includes(format.id) ? "default" : "outline"}
-                                                        className="cursor-pointer whitespace-nowrap rounded-full px-5 py-1"
-                                                        onClick={() => handleFormatToggle(format.id)}
+                                            return (
+                                                isVisible && (
+                                                    <motion.div
+                                                        key={format.id}
+                                                        custom={index}
+                                                        variants={formatButtonVariants}
+                                                        initial="hidden"
+                                                        animate="visible"
+                                                        exit="exit"
+                                                        className="format-button-wrapper inline-block"
                                                     >
-                                                        {format.title}
-                                                    </Button>
-                                                </motion.div>
-                                            )
-                                        );
-                                    })}
-                            </AnimatePresence>
-                            {hasMoreFormats && (
-                                <motion.div
-                                    className="format-button-wrapper inline-block"
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0, transition: { duration: 0.3, ease: "easeOut" } }}
+                                                        <Button
+                                                            variant={pendingFormats.includes(format.id) ? "default" : "outline"}
+                                                            className="cursor-pointer whitespace-nowrap rounded-full px-5 py-1"
+                                                            onClick={() => handleFormatToggle(format.id)}
+                                                        >
+                                                            {format.title}
+                                                        </Button>
+                                                    </motion.div>
+                                                )
+                                            );
+                                        })}
+                                </AnimatePresence>
+                                {hasMoreFormats && (
+                                    <motion.div
+                                        className="format-button-wrapper inline-block"
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0, transition: { duration: 0.3, ease: "easeOut" } }}
+                                    >
+                                        <Button
+                                            variant="ghost"
+                                            className="cursor-pointer flex items-center gap-1 rounded-full px-5 py-1"
+                                            onClick={toggleFormatsExpanded}
+                                        >
+                                            {isFormatsExpanded ? (
+                                                <ChevronLeft strokeWidth={2.5} />
+                                            ) : (
+                                                <ChevronRight strokeWidth={2.5} />
+                                            )}
+                                        </Button>
+                                    </motion.div>
+                                )}
+                            </>
+                        ) : (
+                            <div className="flex flex-wrap gap-2 items-center">
+                                {pendingFormats.map((formatId) => {
+                                    const format = formats.find((f) => f.id === formatId);
+                                    return format ? (
+                                        <div
+                                            key={formatId}
+                                            className="inline-flex items-center gap-1 border rounded-full px-3 py-1"
+                                        >
+                                            <span className="text-sm">{format.title}</span>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="p-0 h-6 w-6"
+                                                onClick={() => removeFormatFilter(formatId)}
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    ) : null;
+                                })}
+
+                                {selectedThemes.map((themeId) => {
+                                    const theme = themes.find((t) => t.id === themeId);
+                                    return theme ? (
+                                        <div
+                                            key={themeId}
+                                            className="inline-flex items-center gap-1 border rounded-full px-3 py-1"
+                                        >
+                                            <span className="text-sm">{theme.title}</span>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="p-0 h-6 w-6"
+                                                onClick={() => removeThemeFilter(themeId)}
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    ) : null;
+                                })}
+
+                                {startDate && (
+                                    <div className="inline-flex items-center gap-1 border rounded-full px-3 py-1">
+                                        <span className="text-sm">From: {format(startDate, "PPP")}</span>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="p-0 h-6 w-6"
+                                            onClick={removeStartDateFilter}
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </Button>
+                                    </div>
+                                )}
+
+                                {endDate && (
+                                    <div className="inline-flex items-center gap-1 border rounded-full px-3 py-1">
+                                        <span className="text-sm">To: {format(endDate, "PPP")}</span>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="p-0 h-6 w-6"
+                                            onClick={removeEndDateFilter}
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </Button>
+                                    </div>
+                                )}
+
+                                {priceRange && (
+                                    <div className="inline-flex items-center gap-1 border rounded-full px-3 py-1">
+                                        <span className="text-sm">${priceRange[0]} - ${priceRange[1]}</span>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="p-0 h-6 w-6"
+                                            onClick={removePriceFilter}
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </Button>
+                                    </div>
+                                )}
+
+                                <Button
+                                    variant="ghost"
+                                    className="cursor-pointer flex items-center gap-1 rounded-full px-5 py-1"
+                                    onClick={resetFilters}
                                 >
+                                    Reset
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+                <div className="flex flex-row gap-1">
+                    <TooltipProvider>
+                        <div className="flex-shrink-0 self-start">
+                            <Tooltip>
+                                <TooltipTrigger asChild>
                                     <Button
                                         variant="ghost"
-                                        className="cursor-pointer flex items-center gap-1 rounded-full px-5 py-1"
-                                        onClick={toggleFormatsExpanded}
+                                        className="cursor-pointer flex items-center justify-start gap-2 rounded-full !px-3 !py-2"
+                                        onClick={toggleDateIconState}
                                     >
-                                        {isFormatsExpanded ? (
-                                            <ChevronLeft strokeWidth={2.5} />
-                                        ) : (
-                                            <ChevronRight strokeWidth={2.5} />
+                                        {dateIconState === "upDown" && (
+                                            <Calendar strokeWidth={2} className="!w-5.5 !h-5.5" />
+                                        )}
+                                        {dateIconState === "down" && (
+                                            <CalendarArrowDown strokeWidth={2} className="!w-5.5 !h-5.5" />
+                                        )}
+                                        {dateIconState === "up" && (
+                                            <CalendarArrowUp strokeWidth={2} className="!w-5.5 !h-5.5" />
                                         )}
                                     </Button>
-                                </motion.div>
-                            )}
-                        </>
-                    ) : (
-                        <div className="flex flex-wrap gap-2 items-center">
-                            {pendingFormats.map((formatId) => {
-                                const format = formats.find((f) => f.id === formatId);
-                                return format ? (
-                                    <div key={formatId} className="inline-flex items-center gap-1 border rounded-full px-3 py-1">
-                                        <span className="text-sm">{format.title}</span>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="p-0 h-6 w-6"
-                                            onClick={() => removeFormatFilter(formatId)}
-                                        >
-                                            <X className="w-4 h-4" />
-                                        </Button>
-                                    </div>
-                                ) : null;
-                            })}
-
-                            {selectedThemes.map((themeId) => {
-                                const theme = themes.find((t) => t.id === themeId);
-                                return theme ? (
-                                    <div
-                                        key={themeId}
-                                        className="inline-flex items-center gap-1 border rounded-full px-3 py-1"
-                                    >
-                                        <span className="text-sm">{theme.title}</span>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="p-0 h-6 w-6"
-                                            onClick={() => removeThemeFilter(themeId)}
-                                        >
-                                            <X className="w-4 h-4" />
-                                        </Button>
-                                    </div>
-                                ) : null;
-                            })}
-
-                            {startDate && (
-                                <div className="inline-flex items-center gap-1 border rounded-full px-3 py-1">
-                                    <span className="text-sm">From: {format(startDate, "PPP")}</span>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="p-0 h-6 w-6"
-                                        onClick={removeStartDateFilter}
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </Button>
-                                </div>
-                            )}
-
-                            {endDate && (
-                                <div className="inline-flex items-center gap-1 border rounded-full px-3 py-1">
-                                    <span className="text-sm">To: {format(endDate, "PPP")}</span>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="p-0 h-6 w-6"
-                                        onClick={removeEndDateFilter}
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </Button>
-                                </div>
-                            )}
-
-                            {(priceRange[0] !== minPrice || priceRange[1] !== maxPrice) && (
-                                <div className="inline-flex items-center gap-1 border rounded-full px-3 py-1">
-                                    <span className="text-sm">${priceRange[0]} - ${priceRange[1]}</span>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="p-0 h-6 w-6"
-                                        onClick={removePriceFilter}
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </Button>
-                                </div>
-                            )}
-
-                            <Button
-                                variant="ghost"
-                                className="cursor-pointer flex items-center gap-1 rounded-full px-5 py-1"
-                                onClick={resetFilters}
-                            >
-                                Reset
-                            </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    {dateIconState === "upDown" && <p>Sort by date</p>}
+                                    {dateIconState === "down" && <p>Sort by date (ascending)</p>}
+                                    {dateIconState === "up" && <p>Sort by date (descending)</p>}
+                                </TooltipContent>
+                            </Tooltip>
                         </div>
-                    )}
-                </div>
-
-                <div className="flex-shrink-0">
-                    <Button
-                        variant="ghost"
-                        className="cursor-pointer flex items-center gap-2 rounded-full px-18 py-1"
-                        onClick={toggleFilters}
-                    >
-                        <SlidersHorizontal strokeWidth={2} className="!w-5.5 !h-5.5" />
-                    </Button>
+                        <div className="flex-shrink-0 self-start">
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        className="cursor-pointer flex items-center justify-start gap-2 rounded-full !px-3 !py-2"
+                                        onClick={togglePriceIconState}
+                                    >
+                                        {priceIconState === "upDown" && (
+                                            <TrendingUpDown strokeWidth={2} className="!w-5.5 !h-5.5" />
+                                        )}
+                                        {priceIconState === "down" && (
+                                            <TrendingDown strokeWidth={2} className="!w-5.5 !h-5.5" />
+                                        )}
+                                        {priceIconState === "up" && (
+                                            <TrendingUp strokeWidth={2} className="!w-5.5 !h-5.5" />
+                                        )}
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    {priceIconState === "upDown" && <p>Sort by price</p>}
+                                    {priceIconState === "down" && <p>Sort by price (ascending)</p>}
+                                    {priceIconState === "up" && <p>Sort by price (descending)</p>}
+                                </TooltipContent>
+                            </Tooltip>
+                        </div>
+                        <div className="flex-shrink-0 self-start">
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        className="cursor-pointer flex items-center justify-start gap-2 rounded-full !px-3 !py-2"
+                                        onClick={toggleFilters}
+                                    >
+                                        <SlidersHorizontal strokeWidth={2} className="!w-5.5 !h-5.5" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>More options</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </div>
+                    </TooltipProvider>
                 </div>
             </div>
-
             <div
                 className="overflow-hidden transition-all duration-500 ease-in-out"
                 style={{
@@ -673,7 +829,7 @@ export default function FilterEvents({ formats, themes, minPrice, maxPrice }: Ev
                                             </Button>
                                         </PopoverTrigger>
                                         <PopoverContent align="start" className="w-auto p-0">
-                                            <Calendar
+                                            <CalendarForm
                                                 mode="single"
                                                 selected={pendingStartDate}
                                                 onSelect={setPendingStartDate}
@@ -699,7 +855,7 @@ export default function FilterEvents({ formats, themes, minPrice, maxPrice }: Ev
                                             </Button>
                                         </PopoverTrigger>
                                         <PopoverContent align="start" className="w-auto p-0">
-                                            <Calendar
+                                            <CalendarForm
                                                 mode="single"
                                                 selected={pendingEndDate}
                                                 onSelect={setPendingEndDate}
@@ -712,15 +868,16 @@ export default function FilterEvents({ formats, themes, minPrice, maxPrice }: Ev
 
                             <div className="mt-4 flex-grow w-full md:w-auto flex flex-col gap-2 min-w-[300px] max-w-[300px]">
                                 <Slider
-                                    value={pendingPriceRange}
-                                    onValueChange={setPendingPriceRange}
+                                    value={pendingPriceRange || [minPrice, maxPrice]}
+                                    onValueChange={(value) => setPendingPriceRange(value)}
                                     min={minPrice}
                                     max={maxPrice}
                                     step={1}
                                     className="cursor-pointer w-full"
                                 />
                                 <span className="text-sm font-medium text-gray-700 text-center w-full">
-                                    ${pendingPriceRange[0]} - ${pendingPriceRange[1]}
+                                    ${pendingPriceRange ? pendingPriceRange[0] : minPrice} - $
+                                    {pendingPriceRange ? pendingPriceRange[1] : maxPrice}
                                 </span>
                             </div>
                         </div>

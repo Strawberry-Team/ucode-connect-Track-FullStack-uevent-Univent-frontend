@@ -10,44 +10,19 @@ import {
     TicketsResponse, TicketTypesResponse
 } from "@/types";
 
-export async function getEvents(
-    skip: number = 0,
-    take: number = 12,
-    formats?: string,
-    themes?: string,
-    startedAt?: string,
-    endedAt?: string,
-    title?: string,
-    minPrice?: number,
-    maxPrice?: number
-): Promise<ApiResponse<EventsResponse>> {
+export async function getEvents(skip: number = 0, take: number = 12, formats?: string, themes?: string, startedAt?: string, endedAt?: string, title?: string, minPrice?: number, maxPrice?: number, sortBy?: string, sortOrder?: string): Promise<ApiResponse<EventsResponse>> {
     let url = `/events?skip=${skip}&take=${take}`;
-    if (formats) {
-        url += `&formats=${formats}`;
-    }
-    if (themes) {
-        url += `&themes=${themes}`;
-    }
-    if (startedAt) {
-        url += `&startedAt=${startedAt}`;
-    }
-    if (endedAt) {
-        url += `&endedAt=${endedAt}`;
-    }
-    if (title) {
-        url += `&title=${encodeURIComponent(title)}`;
-    }
-    if (minPrice !== undefined) {
-        url += `&minPrice=${minPrice}`;
-    }
-    if (maxPrice !== undefined) {
-        url += `&maxPrice=${maxPrice}`;
-    }
+    if (formats) url += `&formats=${formats}`;
+    if (themes) url += `&themes=${themes}`;
+    if (startedAt) url += `&startedAt=${startedAt}`;
+    if (endedAt) url += `&endedAt=${endedAt}`;
+    if (title) url += `&title=${encodeURIComponent(title)}`;
+    if (minPrice !== undefined) url += `&minPrice=${minPrice}`;
+    if (maxPrice !== undefined) url += `&maxPrice=${maxPrice}`;
+    if (sortBy) url += `&sortBy=${sortBy}`;
+    if (sortOrder) url += `&sortOrder=${sortOrder}`;
 
-    return executeApiRequest<EventsResponse>(
-        () => api.get(url),
-        "Failed to fetch events"
-    );
+    return executeApiRequest<EventsResponse>(() => api.get(url), "Failed to fetch events");
 }
 
 export async function createEvent(

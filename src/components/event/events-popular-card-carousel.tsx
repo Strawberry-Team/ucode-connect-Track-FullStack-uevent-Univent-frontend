@@ -35,8 +35,10 @@ const EventsPopularCardCarousel = ({ events, isLoading }: EventsPopularCardCarou
         const title = searchParams.get("title");
         const minPrice = searchParams.get("minPrice");
         const maxPrice = searchParams.get("maxPrice");
+        const sortBy = searchParams.get("sortBy");
+        const sortOrder = searchParams.get("sortOrder");
 
-        const noFilters = !formats && !themes && !startedAt && !endedAt && !title && !minPrice && !maxPrice;
+        const noFilters = !formats && !themes && !startedAt && !endedAt && !title && !minPrice && !maxPrice && !sortBy && !sortOrder;
         const isFirstPage = !page || page === "1";
 
         return noFilters && isFirstPage;

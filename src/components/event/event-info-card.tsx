@@ -41,8 +41,9 @@ import {showSuccessToast, showErrorToasts} from "@/lib/toast";
 import {format} from "date-fns";
 import {eventCreateZodSchema, validateEventDates} from "@/zod/shemas";
 import {ScrollArea} from "@/components/ui/scroll-area";
+import {getCityAndCountryFromComponents} from "@/components/google-map/google-map-location-picker-modal";
 
-const CalendarComponent = dynamic(() => import("@/components/ui/calendar").then(mod => mod.Calendar), {ssr: false});
+const CalendarComponent = dynamic(() => import("@/components/ui/calendar-form").then(mod => mod.CalendarForm), {ssr: false});
 const LocationPickerModal = dynamic(() => import("../google-map/google-map-location-picker-modal"), {ssr: false});
 const GOOGLE_MAPS_LIBRARIES: ("places")[] = ["places"];
 
@@ -871,8 +872,8 @@ export default function EventInfoCard({setEditMode, editMode, eventId}: EventInf
 
     const handleVenueChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const {value} = e.target;
-        setVenue(value); // Обновляем состояние venue сразу
-        filterPlaces(value); // Вызываем filterPlaces сразу
+        setVenue(value);
+        filterPlaces(value);
     }, [filterPlaces]);
 
     const handleVenueFocus = useCallback(() => {
@@ -886,14 +887,21 @@ export default function EventInfoCard({setEditMode, editMode, eventId}: EventInf
 
         const placesService = new google.maps.places.PlacesService(document.createElement("div"));
         placesService.getDetails(
-            {placeId: place.place_id, fields: ["name", "formatted_address", "geometry"]},
+            {
+                placeId: place.place_id,
+                fields: ["name", "formatted_address", "geometry", "address_components"],
+            },
             (placeDetails, status) => {
                 if (status === google.maps.places.PlacesServiceStatus.OK && placeDetails) {
-                    const venue = placeDetails.name || placeDetails.formatted_address || "";
+                    const name = placeDetails.name || placeDetails.formatted_address || "";
                     const coordinates = placeDetails.geometry?.location
                         ? `${placeDetails.geometry.location.lat()},${placeDetails.geometry.location.lng()}`
                         : "";
-                    setVenue(venue);
+
+                    const { city, country } = getCityAndCountryFromComponents(placeDetails);
+                    const formattedVenue = city && country ? `${name}, ${city}, ${country}` : name;
+
+                    setVenue(formattedVenue);
                     setLocationCoordinates(coordinates);
                     setShowSuggestions(false);
                 }

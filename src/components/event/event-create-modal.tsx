@@ -18,7 +18,7 @@ import type { Event, EventFormat, Theme } from "@/types"
 import { getThemes } from "@/lib/theme"
 import { showErrorToasts, showSuccessToast } from "@/lib/toast"
 import { eventCreateZodSchema, validateEventDates } from "@/zod/shemas"
-import { Calendar } from "@/components/ui/calendar"
+import { CalendarForm } from "@/components/ui/calendar-form"
 import { format } from "date-fns"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { getCityAndCountryFromComponents } from "../google-map/google-map-location-picker-modal";
@@ -253,7 +253,7 @@ const DateFields = memo(
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent align="start" className="pointer-events-auto">
-                                <Calendar
+                                <CalendarForm
                                     mode="single"
                                     selected={startDate}
                                     onSelect={(date) => {
@@ -301,7 +301,7 @@ const DateFields = memo(
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent align="start" className="pointer-events-auto">
-                                <Calendar
+                                <CalendarForm
                                     mode="single"
                                     selected={endDate}
                                     onSelect={(date) => {
@@ -351,7 +351,7 @@ const DateFields = memo(
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent align="start" className="pointer-events-auto">
-                                <Calendar
+                                <CalendarForm
                                     mode="single"
                                     selected={publishedDate}
                                     onSelect={(date) => {
@@ -398,7 +398,7 @@ const DateFields = memo(
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent align="start" className="pointer-events-auto">
-                                <Calendar
+                                <CalendarForm
                                     mode="single"
                                     selected={ticketsDate}
                                     onSelect={(date) => {
