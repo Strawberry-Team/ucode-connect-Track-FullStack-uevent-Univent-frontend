@@ -4,6 +4,7 @@ import { getEventById, getEventByIdNews, getEventTicketTypes } from "@/lib/event
 import { CalendarDays, MapPin, Tag, Building } from "lucide-react";
 import TicketActions from "@/components/ticket/TicketActions";
 import AttendeesAndNewsBlock from "@/components/attendees-and-news/attendees-and-news-block";
+import DisqusComments from "@/components/comments/DisqusComments";
 import EventsCompanyCarousel from "@/components/event/events-company-carousel";
 import GoogleMapIframe from "@/components/google-map/google-map-iframe";
 
@@ -183,6 +184,12 @@ export default async function PageCard({ params }: { params: Promise<{ event_id:
             </div>
 
             <EventsCompanyCarousel companyId={event.company.id} />
+
+            <DisqusComments
+                id={event.id}
+                title={event.title}
+                url={`${process.env.NEXT_PUBLIC_SITE_URL}/products/${event.id}`}
+            />
         </div>
     );
 }
