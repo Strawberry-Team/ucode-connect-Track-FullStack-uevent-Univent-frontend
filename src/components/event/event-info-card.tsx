@@ -33,9 +33,9 @@ import {
 } from "lucide-react";
 import {useJsApiLoader} from "@react-google-maps/api";
 import {cn} from "@/lib/utils";
-import {getEventById, updateEvent, uploadEventPoster, assignThemesToEvent} from "@/lib/event";
-import {getEventFormats} from "@/lib/format";
-import {getThemes} from "@/lib/theme";
+import {getEventById, updateEvent, uploadEventPoster, assignThemesToEvent} from "@/lib/events";
+import {getEventFormats} from "@/lib/formats";
+import {getThemes} from "@/lib/themes";
 import {Event, EventFormat, Theme} from "@/types/event";
 import {showSuccessToast, showErrorToasts} from "@/lib/toast";
 import {format} from "date-fns";

@@ -2,7 +2,7 @@
 
 import {useEffect, useState} from "react";
 import {useAuth} from "@/context/auth-context";
-import {updateUser, uploadAvatar} from "@/lib/user";
+import {updateUser, uploadAvatar} from "@/lib/users";
 import {showSuccessToast, showErrorToasts} from "@/lib/toast";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";

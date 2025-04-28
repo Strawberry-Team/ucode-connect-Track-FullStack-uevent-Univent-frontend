@@ -14,7 +14,7 @@ import TicketList from "./ticket-list";
 import { showErrorToasts, showSuccessToast } from "@/lib/toast";
 import { z } from "zod";
 import { TicketUniqueType, TicketModalProps } from "@/types/ticket";
-import { validateEventPromoCode } from "@/lib/event";
+import { validateEventPromoCode } from "@/lib/events";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 

@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import AnimatedButton from "@/components/ui/animated-button";
 import ManageEventModal from "@/components/event/event-create-modal";
 import { Calendar, CalendarDays, Pencil, Plus } from "lucide-react";
-import { getCompanyEvents } from "@/lib/company";
+import { getCompanyEvents } from "@/lib/companies";
 import { showErrorToasts } from "@/lib/toast";
 import { Event, EventsCardProps } from "@/types/event";
 import EventCreateModal from "@/components/event/event-create-modal";

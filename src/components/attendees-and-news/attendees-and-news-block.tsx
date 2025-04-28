@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { CalendarDays, ChevronDown, ChevronUp } from "lucide-react";
-import { updateEventAttendeeVisibility, getEventAttendees } from "@/lib/event";
+import { updateEventAttendeeVisibility, getEventAttendees } from "@/lib/events";
 import { useAuth } from "@/context/auth-context";
 import { showErrorToasts, showSuccessToast } from "@/lib/toast";
 import { NotificationsBlockProps, NotificationItemProps, Notification, UserNotification } from "@/types/attendees-and-news-block";

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { CalendarDays, ShoppingBag, Clock, CheckCircle, XCircle, RefreshCcw } from "lucide-react";
 import { format } from "date-fns";
 import { useAuth } from "@/context/auth-context";
-import { getUserOrders } from "@/lib/user";
+import { getUserOrders } from "@/lib/users";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Order } from "@/types/order";
 

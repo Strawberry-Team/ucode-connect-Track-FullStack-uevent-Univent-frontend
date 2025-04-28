@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { createSubscription, deleteSubscription } from "@/lib/subscriptions";
-import { getUserEventSubscriptions, getUserCompanySubscriptions } from "@/lib/user";
+import { getUserEventSubscriptions, getUserCompanySubscriptions } from "@/lib/users";
 import { showErrorToasts, showSuccessToast } from "@/lib/toast";
 import { CompanySubscription } from "@/types/company";
 import { EventSubscription } from "@/types/event";

@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import FilterEvents from "@/components/filter/filter-events";
-import EventsPopularCardCarousel from "@/components/event/events-popular-card-carousel";
+import EventsPopularCardCarousel from "@/components/event/popular-events-card-carousel";
 import EventsCardList from "@/components/event/events-card-list";
-import { getEvents } from "@/lib/event";
-import { getEventFormats } from "@/lib/format";
-import { getThemes } from "@/lib/theme";
+import { getEvents } from "@/lib/events";
+import { getEventFormats } from "@/lib/formats";
+import { getThemes } from "@/lib/themes";
 import { Event, EventFormat, Theme } from "@/types/event";
 import { useSearchParams } from "next/navigation";
 

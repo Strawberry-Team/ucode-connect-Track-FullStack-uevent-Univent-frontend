@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import AnimatedButton from "@/components/ui/animated-button";
-import PromoCodeCreateModal from "@/components/promo-codes/promo-codes-create-update-modal";
+import PromoCodeCreateModal from "@/components/promo-code/create-and-update-promo-codes-modal";
 import { Percent, Pencil, Plus } from "lucide-react";
-import { getEventPromoCodes } from "@/lib/event";
+import { getEventPromoCodes } from "@/lib/events";
 import { showErrorToasts } from "@/lib/toast";
 import { PromoCode } from "@/types/promo-code";
 

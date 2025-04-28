@@ -1,4 +1,4 @@
-import { getEventById, getEventByIdNews, getEventTicketTypes } from "@/lib/event";
+import { getEventById, getEventByIdNews, getEventTicketTypes } from "@/lib/events";
 import EventPage from "@/components/event/event-page";
 
 interface NewsNotification {

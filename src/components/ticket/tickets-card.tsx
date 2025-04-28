@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import AnimatedButton from "@/components/ui/animated-button";
 import CreateTicketModal from "@/components/ticket/create-ticket-modal";
 import { Ticket as TicketIcon, Plus } from "lucide-react";
-import { getEventTickets, getEventTicketTypes } from "@/lib/event";
+import { getEventTickets, getEventTicketTypes } from "@/lib/events";
 import { showErrorToasts } from "@/lib/toast";
 import { TicketsResponse, Ticket, TicketType, TicketsInfoCardProps, GroupedTicket } from "@/types/ticket";
 

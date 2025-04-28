@@ -3,7 +3,7 @@
 import { useState } from "react";
 import EventInfoCard from "@/components/event/event-info-card";
 import TicketsCard from "@/components/ticket/tickets-card";
-import PromoCodesInfoCard from "@/components/promo-codes/promo-codes-card";
+import PromoCodesInfoCard from "@/components/promo-code/promo-codes-card";
 import NewsCard from "@/components/news/news-card";
 import { EventFormProps } from "@/types/event";
 

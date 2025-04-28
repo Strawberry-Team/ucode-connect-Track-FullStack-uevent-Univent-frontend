@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { showErrorToasts, showSuccessToast } from "@/lib/toast";
-import { createEventTicket } from "@/lib/event";
+import { createEventTicket } from "@/lib/events";
 import { CreateTicketRequest, CreateTicketModalProps } from "@/types/ticket";
 import { z } from "zod";
 

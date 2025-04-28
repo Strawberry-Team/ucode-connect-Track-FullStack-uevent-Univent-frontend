@@ -1,4 +1,4 @@
-import { getCompanyById, getCompanyNewsById } from "@/lib/company";
+import { getCompanyById, getCompanyNewsById } from "@/lib/companies";
 import CompanyPage from "@/components/company/company-page";
 
 interface CompanyNewsNotification {

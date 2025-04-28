@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { getCompanyEvents } from "@/lib/company";
+import { getCompanyEvents } from "@/lib/companies";
 import { Event, CompanyEventsCarouselProps } from "@/types/event";
 import { Skeleton } from "@/components/ui/skeleton";
 import EventCard from "@/components/event/event-card";

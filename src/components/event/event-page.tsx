@@ -3,10 +3,10 @@
 import { format } from "date-fns";
 import Link from "next/link";
 import { CalendarDays, MapPin, Tag, Building } from "lucide-react";
-import SubscriptionActions from "@/components/subscriptions/subscription-actions";
+import SubscriptionActions from "@/components/subscription/subscription-actions";
 import AttendeesAndNewsBlock from "@/components/attendees-and-news/attendees-and-news-block";
-import CommentsDisqus from "@/components/comment/comments-disqus";
-import EventsCompanyCarousel from "@/components/event/events-company-carousel";
+import CommentsDisqus from "@/components/comment/comment";
+import EventsCompanyCarousel from "@/components/event/company-events-carousel";
 import GoogleMapIframe from "@/components/google-map/google-map-iframe";
 import { useAuth } from "@/context/auth-context";
 import { Event, EventPageProps } from "@/types/event";

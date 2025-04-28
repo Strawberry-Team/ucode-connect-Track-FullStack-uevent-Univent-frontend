@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Save, Camera } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getCompanyById, updateCompany, uploadCompanyLogo } from "@/lib/company";
+import { getCompanyById, updateCompany, uploadCompanyLogo } from "@/lib/companies";
 import { Company, CompanyInfoCardProps } from "@/types/company";
 import { showSuccessToast, showErrorToasts } from "@/lib/toast";
 import { format } from "date-fns";

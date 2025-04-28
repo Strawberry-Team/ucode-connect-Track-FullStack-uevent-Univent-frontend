@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { showErrorToasts, showSuccessToast } from "@/lib/toast";
-import { createEventPromoCode } from "@/lib/event";
+import { createEventPromoCode } from "@/lib/events";
 import { updatePromoCode } from "@/lib/promo-codes";
 import { PromoCode, CreatePromoCodeRequest } from "@/types/promo-code";
 import { z } from "zod";

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Mail } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 import AttendeesAndNewsBlock from "@/components/attendees-and-news/attendees-and-news-block";
-import SubscriptionActions from "@/components/subscriptions/subscription-actions";
+import SubscriptionActions from "@/components/subscription/subscription-actions";
 import { Company, CompanyNewsNotification, EventNotification } from "@/types/company";
 
 interface CompanyPageProps {
