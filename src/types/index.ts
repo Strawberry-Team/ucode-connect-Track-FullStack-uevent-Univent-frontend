@@ -237,3 +237,33 @@ export type Order = {
     promoCode: PromoCode;
     orderItems: OrderItem[];
 };
+
+export interface SubscriptionRequest {
+    entityId: number;
+    entityType: "event" | "company"; // Поддержка событий и компаний
+}
+
+// Тип для ответа от API при создании подписки
+export interface SubscriptionResponse {
+    id: number;
+    userId: number;
+    entityId: number; // Унифицируем поле
+    entityType: "event" | "company"; // Поддержка событий и компаний
+    createdAt: string;
+}
+
+// Тип для подписки на событие
+export interface EventSubscription {
+    id: number;
+    eventId: number;
+    createdAt: string;
+    event: Event;
+}
+
+// Тип для подписки на компанию
+export interface CompanySubscription {
+    id: number;
+    companyId: number;
+    createdAt: string;
+    company: Company;
+}

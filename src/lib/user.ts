@@ -1,6 +1,6 @@
 import api from "@/lib/api";
 import { executeApiRequest } from "@/utils/api-request";
-import {ApiResponse, User, Company, Order} from "@/types";
+import {ApiResponse, User, Company, Order, EventSubscription, CompanySubscription} from "@/types";
 
 export async function getUserMe(accessToken?: string): Promise<ApiResponse<User>> {
     if (!accessToken) return { success: false, errors: ["Access token not found"] };
@@ -31,4 +31,18 @@ export async function getUserCompany(userId: number): Promise<ApiResponse<Compan
 
 export async function getUserOrders(userId: number): Promise<ApiResponse<Order[]>> {
     return executeApiRequest<Order[]>(() => api.get(`/users/${userId}/orders`), "Failed to fetch user orders");
+}
+
+export async function getUserEventSubscriptions(userId: number): Promise<ApiResponse<EventSubscription[]>> {
+    return executeApiRequest(
+        () => api.get(`/users/${userId}/subscriptions/events`),
+        `Failed to fetch event subscriptions for user with ID ${userId}`
+    );
+}
+
+export async function getUserCompanySubscriptions(userId: number): Promise<ApiResponse<CompanySubscription[]>> {
+    return executeApiRequest(
+        () => api.get(`/users/${userId}/subscriptions/companies`),
+        "Failed to fetch user company subscriptions"
+    );
 }

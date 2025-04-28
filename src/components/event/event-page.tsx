@@ -1,0 +1,154 @@
+"use client";
+
+import { format } from "date-fns";
+import Link from "next/link";
+import { CalendarDays, MapPin, Tag, Building } from "lucide-react";
+import TicketActions from "@/components/ticket/TicketActions";
+import AttendeesAndNewsBlock from "@/components/attendees-and-news/attendees-and-news-block";
+import CommentsDisqus from "@/components/comment/comments-disqus";
+import EventsCompanyCarousel from "@/components/event/events-company-carousel";
+import GoogleMapIframe from "@/components/google-map/google-map-iframe";
+import { useAuth } from "@/context/auth-context";
+import { Event, TicketType } from "@/types";
+
+interface NewsNotification {
+    type: "news";
+    title: string;
+    description: string;
+    createdAt: string;
+}
+
+interface UserNotification {
+    type: "user";
+    firstName: string;
+    lastName: string;
+    createdAt: string;
+    avatarUrl: string;
+}
+
+interface EventPageProps {
+    data: {
+        event: Event;
+        ticketTypes: TicketType[];
+        newsNotifications: NewsNotification[];
+        userNotifications: UserNotification[];
+    } | { error: string };
+}
+
+export default function EventPage({ data }: EventPageProps) {
+    const { user } = useAuth();
+
+    if ("error" in data) {
+        return <div className="px-custom py-4">{data.error}</div>;
+    }
+
+    if (!user) {
+        return;
+    }
+
+    const { event, ticketTypes, newsNotifications, userNotifications } = data;
+
+    const dateStart = format(new Date(event.startedAt), "MMMM d, yyyy HH:mm");
+    const dateEnd = format(new Date(event.endedAt), "MMMM d, yyyy HH:mm");
+
+    const getPriceRange = (): string => {
+        if (!ticketTypes || ticketTypes.length === 0) {
+            return "No ticket";
+        }
+
+        const prices = ticketTypes.map((ticket) => ticket.price);
+        const minPrice = Math.min(...prices);
+        const maxPrice = Math.max(...prices);
+
+        return `$${minPrice} - $${maxPrice}`;
+    };
+
+    const price = getPriceRange();
+
+    const imageUrl = event.posterName
+        ? `http://localhost:8080/uploads/event-posters/${event.posterName}`
+        : "https://via.placeholder.com/384x384";
+
+    return (
+        <div className="px-custom py-4 w-full">
+            <div className="flex flex-col md:flex-row gap-6 items-start">
+                <div className="shrink-0 w-full md:w-90">
+                    <img
+                        src={imageUrl}
+                        alt={event.title}
+                        width={384}
+                        height={384}
+                        className="md:h-130 object-cover w-full object-contain"
+                    />
+                </div>
+
+                <div className="px-3 flex-1 flex flex-col gap-4">
+                    <h1 className="text-3xl font-bold text-gray-800">{event.title}</h1>
+
+                    <div className="flex flex-col gap-3 text-gray-700">
+                        <div className="flex items-center gap-2">
+                            <Tag strokeWidth={2.5} className="w-5 h-5 text-gray-500" />
+                            <span className="text-lg font-medium">
+                                {event.format.title} • {event.themes.map((theme) => theme.title).join(", ")}
+                            </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <CalendarDays strokeWidth={2.5} className="w-5 h-5 text-gray-500" />
+                            <span className="text-lg font-medium">
+                                {dateStart} - {dateEnd}
+                            </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <MapPin strokeWidth={2.5} className="w-5 h-5 text-gray-500" />
+                            <span className="text-lg font-medium">{event.venue}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <Building strokeWidth={2.5} className="w-5 h-5 text-gray-500" />
+                            <Link href={`/companies/${event.company.id}`}>
+                                <span className="text-lg font-medium underline">{event.company.title}</span>
+                            </Link>
+                        </div>
+                    </div>
+
+                    <div className="mt-2">
+                        <span className="text-2xl font-semibold text-gray-900">{price}</span>
+                    </div>
+
+                    <div>
+                        <TicketActions title={event.title} price={price} entityId={event.id} userId={user?.id} />
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-6 mt-8">
+                <div className="flex-1 md:flex-[2]">
+                    <AttendeesAndNewsBlock notifications={userNotifications} />
+                </div>
+                <div className="flex-1 md:flex-[4]">
+                    <AttendeesAndNewsBlock notifications={newsNotifications} />
+                </div>
+            </div>
+
+            <div className="mt-8 border-t">
+                <div className="my-6">
+                    <div className="block">
+                        <GoogleMapIframe coordinates={event.locationCoordinates} />
+                        <p className="mt-5 text-gray-600 text-lg leading-relaxed">{event.description}</p>
+                    </div>
+                    <div className="clear-both"></div>
+                </div>
+            </div>
+
+            <EventsCompanyCarousel companyId={event.company.id} />
+
+            <CommentsDisqus
+                id={event.id}
+                title={event.title}
+                url={`${process.env.NEXT_PUBLIC_SITE_URL}/products/${event.id}`}
+            />
+        </div>
+    );
+}

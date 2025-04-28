@@ -1,8 +1,5 @@
-import Image from "next/image";
-import { Mail } from "lucide-react";
 import { getCompanyById, getCompanyNewsById } from "@/lib/company";
-import AttendeesAndNewsBlock from "@/components/attendees-and-news/attendees-and-news-block";
-import {Button} from "@/components/ui/button";
+import CompanyPage from "@/components/company/company-page";
 
 interface CompanyNewsNotification {
     type: "companyNews";
@@ -18,17 +15,17 @@ interface EventNotification {
     avatarUrl: string;
 }
 
-export default async function CompanyPage({ params }: { params: Promise<{ company_id: string }> }) {
+export default async function CompanyPageCard({ params }: { params: Promise<{ company_id: string }> }) {
     const resolvedParams = await params;
     const companyId = parseInt(resolvedParams.company_id, 10);
 
     if (isNaN(companyId) || companyId < 1) {
-        return <div className="px-custom py-4">Company not found</div>;
+        return <CompanyPage data={{ error: "Company not found" }} />;
     }
 
     const companyResponse = await getCompanyById(companyId);
     if (!companyResponse.success || !companyResponse.data) {
-        return <div className="px-custom py-4">Company not found: {companyResponse.errors}</div>;
+        return <CompanyPage data={{ error: `Company not found: ${companyResponse.errors}` }} />;
     }
 
     const newsResponse = await getCompanyNewsById(companyId);
@@ -71,58 +68,13 @@ export default async function CompanyPage({ params }: { params: Promise<{ compan
 
     const company = companyResponse.data;
 
-    // Формируем URL изображения компании
-    const imageUrl = company.logoName
-        ? `http://localhost:8080/uploads/company-logos/${company.logoName}` // Предполагаемый путь к логотипу
-        : "https://via.placeholder.com/384x384"; // Запасное изображение
-
     return (
-        <div className="px-custom py-4 w-full">
-            <div className="flex flex-col md:flex-row gap-6 items-start">
-                {/* Изображение */}
-                <div className="shrink-0 w-full md:w-96">
-                    <Image
-                        src={imageUrl}
-                        alt={company.title}
-                        width={384}
-                        height={384}
-                        className="h-96 w-full object-contain"
-                    />
-                </div>
-
-                {/* Информация о компании */}
-                <div className="px-6 flex-1 flex flex-col gap-4">
-                    <h1 className="text-3xl font-bold text-gray-800">{company.title}</h1>
-                    <div className="flex flex-col gap-3 text-gray-700">
-                        {/* Email */}
-                        <div className="flex items-center gap-2">
-                            <Mail strokeWidth={2.5} className="w-5 h-5 text-gray-500" />
-                            <span className="text-lg font-medium">{company.email}</span>
-                        </div>
-                        <Button
-                            variant="outline"
-                            className="text-[16px] py-5 px-7 rounded-full font-medium mt-1 w-[300px]"
-                        >
-                            Subscribe to event notifications
-                        </Button>
-                        <div className="-mt-3 flex flex-wrap gap-2">
-                            <div className="flex-1 min-w-[300px] md:flex-[2]">
-                                <AttendeesAndNewsBlock notifications={eventNotifications} />
-                            </div>
-                            <div className="flex-1 min-w-[300px] md:flex-[4]">
-                                <AttendeesAndNewsBlock notifications={companyNewsNotifications} />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Описание компании */}
-            <div className="mt-8 border-t">
-                <p className="mb-2 my-6 text-gray-600 text-lg leading-relaxed">
-                    {company.description}
-                </p>
-            </div>
-        </div>
+        <CompanyPage
+            data={{
+                company,
+                companyNewsNotifications,
+                eventNotifications,
+            }}
+        />
     );
 }

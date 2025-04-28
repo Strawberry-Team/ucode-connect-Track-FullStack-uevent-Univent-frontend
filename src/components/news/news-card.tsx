@@ -1,4 +1,3 @@
-// components/news/NewsCard.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -17,11 +16,10 @@ import { CompanyNews, NewsItem } from "@/types";
 
 // Типы пропсов
 type NewsCardProps = {
-    companyId?: number; // Опционально для компании
-    eventId?: number;   // Опционально для события
+    companyId?: number;
+    eventId?: number;
 };
 
-// Компонент карточки новостей
 export default function NewsCard({ companyId, eventId }: NewsCardProps) {
     const [news, setNews] = useState<(CompanyNews | NewsItem)[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,7 +27,6 @@ export default function NewsCard({ companyId, eventId }: NewsCardProps) {
     const [isLoading, setIsLoading] = useState(true);
     const [editingNews, setEditingNews] = useState<CompanyNews | NewsItem | null>(null); // Состояние для редактируемой новости
 
-    // Проверяем, что передан либо companyId, либо eventId, но не оба
     if (companyId !== undefined && eventId !== undefined) {
         throw new Error("Cannot provide both companyId and eventId");
     }
@@ -37,7 +34,6 @@ export default function NewsCard({ companyId, eventId }: NewsCardProps) {
         throw new Error("Either companyId or eventId must be provided");
     }
 
-    // Загрузка новостей
     useEffect(() => {
         const fetchNews = async () => {
             setIsLoading(true);
@@ -70,7 +66,6 @@ export default function NewsCard({ companyId, eventId }: NewsCardProps) {
         fetchNews();
     }, [companyId, eventId]);
 
-    // Обработчик создания новости
     const handleNewsCreated = (newNews: CompanyNews | NewsItem) => {
         setNews((prev) =>
             [...prev, newNews].sort(
@@ -79,13 +74,12 @@ export default function NewsCard({ companyId, eventId }: NewsCardProps) {
         );
     };
 
-    // Обработчик обновления новости
     const handleNewsUpdated = (updatedNews: CompanyNews | NewsItem) => {
         setNews((prev) => {
             const updatedNewsList = prev.map((newsItem) =>
                 newsItem.id === updatedNews.id ? updatedNews : newsItem
             );
-            // Сортируем по дате создания (от новых к старым)
+
             return updatedNewsList.sort(
                 (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
             );
@@ -106,7 +100,7 @@ export default function NewsCard({ companyId, eventId }: NewsCardProps) {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => {
-                                    setEditingNews(null); // Сбрасываем редактируемую новость
+                                    setEditingNews(null);
                                     setIsModalOpen(true);
                                 }}
                             >
