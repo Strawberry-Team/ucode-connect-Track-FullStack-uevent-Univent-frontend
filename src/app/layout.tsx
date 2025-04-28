@@ -9,7 +9,7 @@ import { AuthProvider } from "@/context/auth-context";
 import { cookies } from "next/headers";
 import { Toaster } from "@/components/ui/sonner";
 import { getUserMe } from "@/lib/user";
-import { User } from "@/types";
+import { User } from "@/types/user";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",

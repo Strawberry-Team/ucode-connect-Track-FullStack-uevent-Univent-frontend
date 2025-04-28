@@ -4,22 +4,8 @@ import Image from "next/image";
 import { Mail } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 import AttendeesAndNewsBlock from "@/components/attendees-and-news/attendees-and-news-block";
-import TicketActions from "@/components/ticket/ticket-actions";
-import { Company } from "@/types";
-
-interface CompanyNewsNotification {
-    type: "companyNews";
-    title: string;
-    description: string;
-    createdAt: string;
-}
-
-interface EventNotification {
-    type: "event";
-    title: string;
-    createdAt: string;
-    avatarUrl: string;
-}
+import SubscriptionActions from "@/components/subscriptions/subscription-actions";
+import { Company, CompanyNewsNotification, EventNotification } from "@/types/company";
 
 interface CompanyPageProps {
     data:
@@ -68,9 +54,8 @@ export default function CompanyPage({ data }: CompanyPageProps) {
                             <Mail strokeWidth={2.5} className="w-5 h-5 text-gray-500" />
                             <span className="text-lg font-medium">{company.email}</span>
                         </div>
-                        <TicketActions
+                        <SubscriptionActions
                             title={company.title}
-                            price=""
                             entityId={company.id}
                             userId={user?.id}
                             isCompanyPage={true}

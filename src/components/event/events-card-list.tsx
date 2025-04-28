@@ -3,15 +3,9 @@
 
 import { useSearchParams } from "next/navigation";
 import EventCard from "./event-card";
-import { Event } from "@/types";
+import { Event, EventsCardListProps } from "@/types/event";
 import { Skeleton } from "@/components/ui/skeleton";
 import CustomPagination from "@/components/pagination/custom-pagination";
-
-interface EventsCardListProps {
-    events: Event[];
-    totalCount: number;
-    isLoading: boolean;
-}
 
 const EventsCardList = ({ events, totalCount, isLoading }: EventsCardListProps) => {
     const searchParams = useSearchParams();

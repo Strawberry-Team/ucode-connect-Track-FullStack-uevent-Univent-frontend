@@ -12,7 +12,7 @@ import { useAuth } from "@/context/auth-context";
 import { useCompanyStore } from "@/store/company-store";
 import { companyService } from "@/service/company-service";
 import { showErrorToasts } from "@/lib/toast";
-import { Company } from "@/types";
+import { Company } from "@/types/company";
 
 export default function CompanyCard() {
     const { user } = useAuth();

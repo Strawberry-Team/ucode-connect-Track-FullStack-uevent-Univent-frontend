@@ -5,19 +5,14 @@ import { Button } from "@/components/ui/button";
 import { DialogTitle } from "@/components/ui/dialog";
 import { Mail } from "lucide-react";
 
-interface ResetPasswordFormProps {
-    setIsForgotPassword: (value: boolean) => void;
-    setResetEmail: (value: string) => void;
-    handleResetPassword: (e: React.FormEvent) => Promise<void>;
-    resetEmail: string;
-}
+
 
 export default function ResetPasswordForm({
-                                              setIsForgotPassword,
-                                              setResetEmail,
-                                              handleResetPassword,
-                                              resetEmail,
-                                          }: ResetPasswordFormProps) {
+    setIsForgotPassword,
+    setResetEmail,
+    handleResetPassword,
+    resetEmail,
+}: ResetPasswordFormProps) {
     return (
         <form
             onSubmit={handleResetPassword}

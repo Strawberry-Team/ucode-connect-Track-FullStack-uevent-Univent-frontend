@@ -3,28 +3,18 @@
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {Eye, EyeOff, LockKeyhole, Mail} from "lucide-react";
-
-interface LoginFormProps {
-    setIsForgotPassword: (value: boolean) => void;
-    email: string;
-    password: string;
-    setEmail: (value: string) => void;
-    setPassword: (value: string) => void;
-    showPassword: boolean;
-    togglePasswordVisibility: () => void;
-    handleSubmit: (e: React.FormEvent) => Promise<void>;
-}
+import { LoginFormProps } from "@/types/auth";
 
 export default function LoginForm({
-                                      setIsForgotPassword,
-                                      email,
-                                      password,
-                                      setEmail,
-                                      setPassword,
-                                      showPassword,
-                                      togglePasswordVisibility,
-                                      handleSubmit,
-                                  }: LoginFormProps) {
+    setIsForgotPassword,
+    email,
+    password,
+    setEmail,
+    setPassword,
+    showPassword,
+    togglePasswordVisibility,
+    handleSubmit,
+}: LoginFormProps) {
     return (
         <form onSubmit={handleSubmit} className="p-6 w-full flex flex-col gap-4">
             <div className="relative flex items-center gap-2">

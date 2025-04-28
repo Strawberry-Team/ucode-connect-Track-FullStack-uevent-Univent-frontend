@@ -12,13 +12,7 @@ import { companyService } from "@/service/company-service";
 import { showErrorToasts, showSuccessToast } from "@/lib/toast";
 import { Camera } from "lucide-react";
 import { companyCreateZodSchema, companyUpdateZodSchema } from "@/zod/shemas";
-import { Company } from "@/types";
-
-interface ManageCompanyModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    editingCompany: Company | null;
-}
+import { Company, ManageCompanyModalProps } from "@/types/company";
 
 export default function CompanyManageModal({
                                                isOpen,

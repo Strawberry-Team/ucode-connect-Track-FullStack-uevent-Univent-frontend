@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { CalendarDays, Clock, Building2, Calendar, Eye, EyeOff, Check, CheckCheck, X, Trash2 } from "lucide-react";
 import { format, isValid, parseISO } from "date-fns";
-import { Notification, NotificationListProps } from "@/types";
+import { Notification, NotificationListProps } from "@/types/notification";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {

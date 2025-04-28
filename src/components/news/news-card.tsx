@@ -12,13 +12,8 @@ import { Calendar, CalendarDays, Plus, Pencil } from "lucide-react";
 import { getCompanyNewsById } from "@/lib/company";
 import { getEventByIdNews } from "@/lib/event";
 import { showErrorToasts } from "@/lib/toast";
-import { CompanyNews, NewsItem } from "@/types";
-
-// Типы пропсов
-type NewsCardProps = {
-    companyId?: number;
-    eventId?: number;
-};
+import { NewsCardProps, NewsItem } from "@/types/news";
+import { CompanyNews } from "@/types/company";
 
 export default function NewsCard({ companyId, eventId }: NewsCardProps) {
     const [news, setNews] = useState<(CompanyNews | NewsItem)[]>([]);

@@ -1,6 +1,7 @@
 import api from "@/lib/api";
 import { executeApiRequest } from "@/utils/api-request";
-import {ApiResponse, SubscriptionRequest, SubscriptionResponse} from "@/types";
+import { ApiResponse } from "@/types/common";
+import { SubscriptionRequest, SubscriptionResponse } from "@/types/subscription";
 
 export async function createSubscription(data: SubscriptionRequest): Promise<ApiResponse<SubscriptionResponse>> {
     return executeApiRequest(

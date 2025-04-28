@@ -6,36 +6,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import AnimatedButton from "@/components/ui/animated-button";
-import TicketCreateModal from "@/components/ticket/ticket-create-modal";
+import CreateTicketModal from "@/components/ticket/create-ticket-modal";
 import { Ticket as TicketIcon, Plus } from "lucide-react";
 import { getEventTickets, getEventTicketTypes } from "@/lib/event";
 import { showErrorToasts } from "@/lib/toast";
-import { TicketsResponse, Ticket, TicketType } from "@/types";
+import { TicketsResponse, Ticket, TicketType, TicketsInfoCardProps, GroupedTicket } from "@/types/ticket";
 
-// Типы пропсов
-type TicketsInfoCardProps = {
-    eventId: number;
-};
-
-// Тип для сгруппированных тикетов
-type GroupedTicket = {
-    title: string;
-    price: string;
-    totalQuantity: number; // Всего тикетов
-    availableQuantity: number; // Доступно тикетов
-    soldQuantity: number; // Продано тикетов
-    ticketType: TicketType; // Храним оригинальный тип тикета
-};
-
-// Функция для форматирования цены
 const formatPrice = (price: number): string => {
     return price.toLocaleString("en-US", {
-        minimumFractionDigits: 0, // Не показывать дробные части, если их нет
-        maximumFractionDigits: 2, // Показывать до 2 знаков после запятой, если есть
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
     });
 };
 
-// Компонент карточки тикетов
 export default function TicketsCard({ eventId }: TicketsInfoCardProps) {
     const [ticketsData, setTicketsData] = useState<TicketsResponse | null>(null);
     const [ticketTypes, setTicketTypes] = useState<TicketType[]>([]);
@@ -44,22 +27,18 @@ export default function TicketsCard({ eventId }: TicketsInfoCardProps) {
     const [isClicked, setIsClicked] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Загрузка тикетов и типов тикетов
     useEffect(() => {
         const fetchTickets = async () => {
             setIsLoading(true);
             const start = Date.now();
 
-            // Получаем все тикеты для подсчета общего количества и проданных
             const ticketsResult = await getEventTickets(eventId);
-            // Получаем типы тикетов (доступные)
             const ticketTypesResult = await getEventTicketTypes(eventId);
 
             if (ticketsResult.success && ticketsResult.data && ticketTypesResult.success && ticketTypesResult.data) {
                 setTicketsData(ticketsResult.data);
                 setTicketTypes(ticketTypesResult.data.items);
 
-                // Группируем тикеты по title и price для подсчета общего и проданных
                 const ticketCounts = ticketsResult.data.items.reduce(
                     (acc: { [key: string]: { total: number; sold: number } }, ticket) => {
                         const key = `${ticket.title}-${ticket.price}`;
@@ -75,14 +54,13 @@ export default function TicketsCard({ eventId }: TicketsInfoCardProps) {
                     {}
                 );
 
-                // Создаем сгруппированный массив на основе ticketTypes
                 const groupedArray = ticketTypesResult.data.items
                     .map((ticketType) => {
                         const key = `${ticketType.title}-${ticketType.price}`;
                         const ticketCount = ticketCounts[key] || { total: 0, sold: 0 };
                         return {
                             title: ticketType.title,
-                            price: formatPrice(ticketType.price), // Форматируем цену
+                            price: formatPrice(ticketType.price),
                             totalQuantity: ticketCount.total,
                             availableQuantity: ticketType.count,
                             soldQuantity: ticketCount.sold,
@@ -109,9 +87,7 @@ export default function TicketsCard({ eventId }: TicketsInfoCardProps) {
         fetchTickets();
     }, [eventId]);
 
-    // Обработчик создания тикета
     const handleTicketCreated = async (newTickets: Ticket[]) => {
-        // Обновляем общее количество тикетов
         setTicketsData((prev) => {
             if (!prev) {
                 return { items: newTickets, total: newTickets.length };
@@ -122,13 +98,11 @@ export default function TicketsCard({ eventId }: TicketsInfoCardProps) {
             };
         });
 
-        // Выполняем запрос для получения обновленных типов тикетов
         const ticketTypesResult = await getEventTicketTypes(eventId);
 
         if (ticketTypesResult.success && ticketTypesResult.data) {
             setTicketTypes(ticketTypesResult.data.items);
 
-            // Группируем новые тикеты для подсчета общего и проданных
             const ticketCounts = [...(ticketsData?.items || []), ...newTickets].reduce(
                 (acc: { [key: string]: { total: number; sold: number } }, ticket) => {
                     const key = `${ticket.title}-${ticket.price}`;
@@ -144,7 +118,6 @@ export default function TicketsCard({ eventId }: TicketsInfoCardProps) {
                 {}
             );
 
-            // Создаем новый сгруппированный массив на основе ticketTypes
             const updatedGroupedArray = ticketTypesResult.data.items
                 .map((ticketType) => {
                     const key = `${ticketType.title}-${ticketType.price}`;
@@ -166,7 +139,6 @@ export default function TicketsCard({ eventId }: TicketsInfoCardProps) {
         }
     };
 
-    // Подсчитываем общее количество доступных тикетов для заголовка
     const totalAvailableTickets = groupedTickets.reduce(
         (sum, ticket) => sum + ticket.availableQuantity,
         0
@@ -278,7 +250,7 @@ export default function TicketsCard({ eventId }: TicketsInfoCardProps) {
                 </CardContent>
             </Card>
 
-            <TicketCreateModal
+            <CreateTicketModal
                 eventId={eventId}
                 isOpen={isModalOpen}
                 onClose={() => {

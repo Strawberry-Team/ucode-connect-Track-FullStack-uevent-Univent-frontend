@@ -1,14 +1,10 @@
 import api from "@/lib/api";
 import { executeApiRequest } from "@/utils/api-request";
-import {
-    ApiResponse,
-    CreatePromoCodeRequest,
-    CreateTicketRequest,
-    Event, EventAttendee, EventsResponse,
-    NewsItem,
-    PromoCode, Ticket,
-    TicketsResponse, TicketTypesResponse
-} from "@/types";
+import { ApiResponse } from "@/types/common";
+import { Event, EventsResponse, EventAttendee } from "@/types/event";
+import { CreatePromoCodeRequest, PromoCode, InvalidPromoCode, ValidPromoCode } from "@/types/promo-code";
+import { CreateTicketRequest, Ticket, TicketsResponse, TicketTypesResponse } from "@/types/ticket";
+import { NewsItem } from "@/types/news";
 
 export async function getEvents(skip: number = 0, take: number = 12, formats?: string, themes?: string, startedAt?: string, endedAt?: string, title?: string, minPrice?: number, maxPrice?: number, sortBy?: string, sortOrder?: string): Promise<ApiResponse<EventsResponse>> {
     let url = `/events?skip=${skip}&take=${take}`;
@@ -22,6 +18,7 @@ export async function getEvents(skip: number = 0, take: number = 12, formats?: s
     if (sortBy) url += `&sortBy=${sortBy}`;
     if (sortOrder) url += `&sortOrder=${sortOrder}`;
 
+    console.log(url);
     return executeApiRequest<EventsResponse>(() => api.get(url), "Failed to fetch events");
 }
 
@@ -63,6 +60,10 @@ export async function assignThemesToEvent(eventId: number, themeIds: number[]): 
 
 export async function getEventPromoCodes(eventId: number): Promise<ApiResponse<PromoCode[]>> {
     return executeApiRequest<PromoCode[]>(() => api.get(`/events/${eventId}/promo-codes`), `Failed to fetch promo codes for event with ID ${eventId}`);
+}
+
+export async function validateEventPromoCode(data: { eventId: number; code: string }): Promise<ApiResponse<ValidPromoCode>> {
+    return executeApiRequest<ValidPromoCode>(() => api.post(`/promo-codes/validate`, data), `Failed to validate promo code ${data.code} for event ID ${data.eventId}`);
 }
 
 export async function createEventPromoCode(eventId: number, promoCodeData: CreatePromoCodeRequest): Promise<ApiResponse<PromoCode>> {

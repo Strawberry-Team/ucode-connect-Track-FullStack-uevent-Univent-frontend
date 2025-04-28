@@ -1,13 +1,7 @@
 'use client';
 
 import { DiscussionEmbed } from 'disqus-react';
-
-interface DisqusCommentsProps {
-    id: number;
-    title: string;
-    url: string;
-}
-
+import { DisqusCommentsProps } from '@/types/comment';
 export default function CommentsDisqus({ id, title, url }: DisqusCommentsProps) {
     return (
         <div className="mt-8 border-t pt-8">

@@ -3,29 +3,14 @@
 import { format } from "date-fns";
 import Link from "next/link";
 import { CalendarDays, MapPin, Tag, Building } from "lucide-react";
-import TicketActions from "@/components/ticket/ticket-actions";
+import SubscriptionActions from "@/components/subscriptions/subscription-actions";
 import AttendeesAndNewsBlock from "@/components/attendees-and-news/attendees-and-news-block";
 import CommentsDisqus from "@/components/comment/comments-disqus";
 import EventsCompanyCarousel from "@/components/event/events-company-carousel";
 import GoogleMapIframe from "@/components/google-map/google-map-iframe";
 import { useAuth } from "@/context/auth-context";
-import { Event, TicketType } from "@/types";
-
-interface NewsNotification {
-    type: "news";
-    title: string;
-    description: string;
-    createdAt: string;
-}
-
-interface EventPageProps {
-    data: {
-        event: Event;
-        ticketTypes: TicketType[];
-        newsNotifications: NewsNotification[];
-        eventId: number; // Заменяем userNotifications на eventId
-    } | { error: string };
-}
+import { Event, EventPageProps } from "@/types/event";
+import TicketActions from "@/components/ticket/ticket-actions";
 
 export default function EventPage({ data }: EventPageProps) {
     const { user } = useAuth();
@@ -105,8 +90,9 @@ export default function EventPage({ data }: EventPageProps) {
                         <span className="text-2xl font-semibold text-gray-900">{price}</span>
                     </div>
 
-                    <div>
-                        <TicketActions title={event.title} price={price} entityId={event.id} userId={user?.id} />
+                    <div className="flex items-start gap-5 flex-wrap py-5">
+                        <TicketActions eventId={event.id} eventTitle={event.title} eventType={event.format.title} />
+                        <SubscriptionActions title={event.title} entityId={event.id} userId={user?.id} />
                     </div>
                 </div>
             </div>

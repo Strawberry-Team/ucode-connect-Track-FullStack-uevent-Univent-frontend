@@ -1,5 +1,5 @@
 import { handleApiError } from "@/utils/handle-api-error";
-import { ApiResponse } from "@/types";
+import { ApiResponse } from "@/types/common";
 
 export async function executeApiRequest<T>(
     request: () => Promise<any>,

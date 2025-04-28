@@ -14,7 +14,7 @@ import { useJsApiLoader } from "@react-google-maps/api"
 import { useAuth } from "@/context/auth-context"
 import { createEvent, uploadEventPoster, assignThemesToEvent } from "@/lib/event"
 import { getEventFormats } from "@/lib/format"
-import type { Event, EventFormat, Theme } from "@/types"
+import type { Event, EventFormat, Theme } from "@/types/event"
 import { getThemes } from "@/lib/theme"
 import { showErrorToasts, showSuccessToast } from "@/lib/toast"
 import { eventCreateZodSchema, validateEventDates } from "@/zod/shemas"
@@ -40,13 +40,6 @@ function useDebounce<T>(value: T, delay: number): T {
 }
 
 const LocationPickerModal = dynamic(() => import("../google-map/google-map-location-picker-modal"), { ssr: false })
-
-interface CreateEventModalProps {
-    companyId: number
-    isOpen: boolean
-    onClose: () => void
-    onEventCreated: (newEvent: Event) => void
-}
 
 const TitleDescriptionFields = memo(
     ({

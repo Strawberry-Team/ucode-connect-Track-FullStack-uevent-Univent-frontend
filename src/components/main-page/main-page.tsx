@@ -7,7 +7,7 @@ import EventsCardList from "@/components/event/events-card-list";
 import { getEvents } from "@/lib/event";
 import { getEventFormats } from "@/lib/format";
 import { getThemes } from "@/lib/theme";
-import { Event, EventFormat, Theme } from "@/types";
+import { Event, EventFormat, Theme } from "@/types/event";
 import { useSearchParams } from "next/navigation";
 
 export default function MainPage() {

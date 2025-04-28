@@ -32,15 +32,9 @@ import { Label } from "@/components/ui/label";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { CalendarForm } from "@/components/ui/calendar-form";
 import { format } from "date-fns";
-import { EventFormat, Theme } from "@/types";
+import { EventFormat, Theme, EventFiltersProps } from "@/types/event";
 import { useRouter, useSearchParams } from "next/navigation";
 
-interface EventFiltersProps {
-    formats: EventFormat[];
-    themes: Theme[];
-    minPrice: number;
-    maxPrice: number;
-}
 
 export default function FilterEvents({ formats, themes, minPrice, maxPrice }: EventFiltersProps) {
     const [isFiltersOpen, setIsFiltersOpen] = useState(false);
@@ -551,7 +545,7 @@ export default function FilterEvents({ formats, themes, minPrice, maxPrice }: Ev
 
                                 {startDate && (
                                     <div className="inline-flex items-center gap-1 border rounded-full px-3 py-1">
-                                        <span className="text-sm">From: {format(startDate, "PPP")}</span>
+                                        <span className="">From: {format(startDate, "PPP")}</span>
                                         <Button
                                             variant="ghost"
                                             size="sm"

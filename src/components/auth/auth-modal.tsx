@@ -12,12 +12,7 @@ import LoginForm from "./login-form";
 import ResetPasswordForm from "./reset-password-form";
 import RegisterForm from "./register-form";
 import {loginZodSchema, registerZodSchema, resetPasswordZodSchema} from "@/zod/shemas";
-
-interface AuthModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-}
-
+import { AuthModalProps } from "@/types/auth";
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");

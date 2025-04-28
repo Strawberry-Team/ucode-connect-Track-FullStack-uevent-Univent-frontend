@@ -7,42 +7,7 @@ import { format } from "date-fns";
 import { useAuth } from "@/context/auth-context";
 import { getUserOrders } from "@/lib/user";
 import { Skeleton } from "@/components/ui/skeleton";
-
-type Event = {
-    id: number;
-    title: string;
-    startedAt: string;
-    endedAt: string;
-    posterName: string;
-};
-
-type Ticket = {
-    id: number;
-    title: string;
-    price: number;
-    number: string;
-    event: Event;
-};
-
-type OrderItem = {
-    id: number;
-    finalPrice: number;
-    ticket: Ticket;
-};
-
-type PromoCode = {
-    discountPercent: number;
-} | null;
-
-type Order = {
-    id: number;
-    totalAmount: number;
-    paymentStatus: string;
-    paymentMethod: string;
-    createdAt: string;
-    promoCode: PromoCode;
-    orderItems: OrderItem[];
-};
+import { Order } from "@/types/order";
 
 export default function OrdersCard() {
     const { user } = useAuth();

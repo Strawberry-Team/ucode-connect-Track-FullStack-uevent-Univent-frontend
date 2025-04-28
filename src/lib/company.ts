@@ -1,6 +1,8 @@
 import api from "@/lib/api";
 import { executeApiRequest } from "@/utils/api-request";
-import { Company, CompanyNews, Event, ApiResponse } from "@/types";
+import { ApiResponse } from "@/types/common";
+import { Company, CompanyNews } from "@/types/company";
+import { Event } from "@/types/event";
 
 export async function createCompany(data: { email: string; title: string; description: string; ownerId: number }): Promise<ApiResponse<Company>> {
     return executeApiRequest(() => api.post("/companies", data), "Failed to create company");

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { showErrorToasts, showSuccessToast } from "@/lib/toast";
 import { createEventTicket } from "@/lib/event";
-import { Ticket, CreateTicketRequest } from "@/types";
+import { CreateTicketRequest, CreateTicketModalProps } from "@/types/ticket";
 import { z } from "zod";
 
 // Схема валидации для тикета
@@ -27,20 +27,12 @@ const ticketCreateZodSchema = z.object({
         .refine((val) => !isNaN(val) && val > 0, "Quantity must be a positive number"),
 });
 
-// Типы пропсов для модалки
-type TicketCreateModalProps = {
-    eventId: number;
-    isOpen: boolean;
-    onClose: () => void;
-    onTicketCreated: (newTickets: Ticket[]) => void;
-};
-
-export default function TicketCreateModal({
+export default function CreateTicketModal({
                                               eventId,
                                               isOpen,
                                               onClose,
                                               onTicketCreated,
-                                          }: TicketCreateModalProps) {
+                                          }: CreateTicketModalProps) {
     const [formData, setFormData] = useState({
         title: "",
         price: "",
@@ -59,7 +51,7 @@ export default function TicketCreateModal({
     // Синхронизируем displayPrice с formData.price
     useEffect(() => {
         if (formData.price) {
-            setDisplayPrice(`${formData.price}$`);
+            setDisplayPrice(`$${formData.price}`);
         } else {
             setDisplayPrice("");
         }
@@ -169,7 +161,7 @@ export default function TicketCreateModal({
                                 step="0.01"
                                 value={displayPrice} // Используем displayPrice для отображения с $
                                 onChange={handleInputChange}
-                                placeholder="Price (e.g., 99.99$)"
+                                placeholder="Price (e.g., $99.99)"
                                 className="!text-[15px] w-full rounded-md"
                                 disabled={isSubmitting}
                             />

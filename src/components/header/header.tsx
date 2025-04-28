@@ -11,7 +11,7 @@ import { useAuth } from "@/context/auth-context";
 import { showErrorToasts } from "@/lib/toast";
 import { NavUser } from "@/components/user/nav-user";
 import { NotificationButton } from "@/components/notifications/notification-button";
-import { Notification } from "@/types";
+import { Notification } from "@/types/notification";
 import { getUserNotifications } from "@/lib/notifications";
 import { Search, X } from "lucide-react";
 

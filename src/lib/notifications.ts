@@ -1,6 +1,7 @@
 import api from "@/lib/api";
 import { executeApiRequest } from "@/utils/api-request";
-import { ApiResponse, Notification, NotificationsResponse, UpdateAllNotificationsResponse } from "@/types";
+import { ApiResponse } from "@/types/common";
+import { Notification, NotificationsResponse } from "@/types/notification";
 import { showErrorToasts } from "./toast";
 
 export async function getUserNotifications(userId: number): Promise<ApiResponse<NotificationsResponse>> {

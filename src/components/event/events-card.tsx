@@ -12,12 +12,8 @@ import ManageEventModal from "@/components/event/event-create-modal";
 import { Calendar, CalendarDays, Pencil, Plus } from "lucide-react";
 import { getCompanyEvents } from "@/lib/company";
 import { showErrorToasts } from "@/lib/toast";
-import { Event } from "@/types";
+import { Event, EventsCardProps } from "@/types/event";
 import EventCreateModal from "@/components/event/event-create-modal";
-
-type EventsCardProps = {
-    companyId: number;
-};
 
 export default function EventsCard({ companyId }: EventsCardProps) {
     const [events, setEvents] = useState<Event[]>([]);

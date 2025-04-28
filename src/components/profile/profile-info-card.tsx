@@ -12,12 +12,7 @@ import {cn} from "@/lib/utils";
 import {userZodSchema} from "@/zod/shemas";
 import {format} from "date-fns";
 import {Skeleton} from "@/components/ui/skeleton";
-
-type ProfileCardProps = {
-    setEditMode: (editMode: boolean) => void;
-    editMode: boolean;
-};
-
+import {ProfileCardProps} from "@/types/profile";
 export default function ProfileInfoCard({setEditMode, editMode}: ProfileCardProps) {
     const {user, setUser} = useAuth();
     if (!user) return null

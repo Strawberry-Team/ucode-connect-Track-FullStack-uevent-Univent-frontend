@@ -13,7 +13,7 @@ import {
 import { logout } from "@/lib/auth";
 import { showSuccessToast, showErrorToasts } from "@/lib/toast";
 import { useAuth } from "@/context/auth-context";
-import { NavUserProps, User } from "@/types";
+import { NavUserProps, User } from "@/types/user";
 import Link from "next/link";
 
 export function NavUser({ user }: NavUserProps) {

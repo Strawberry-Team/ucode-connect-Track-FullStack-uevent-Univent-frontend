@@ -1,7 +1,8 @@
 import api from "@/lib/api";
 import Cookies from "js-cookie";
 import {executeApiRequest} from "@/utils/api-request";
-import {ApiResponse, AuthResponse} from "@/types";
+import {ApiResponse} from "@/types/common";
+import {AuthResponse} from "@/types/auth";
 
 export async function login(email: string, password: string): Promise<ApiResponse<AuthResponse>> {
     const result = await executeApiRequest<AuthResponse>(() => api.post("/auth/login", {email, password}), "Login failed");

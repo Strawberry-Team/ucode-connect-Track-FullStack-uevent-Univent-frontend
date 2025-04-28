@@ -9,17 +9,13 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Save, Camera } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getCompanyById, updateCompany, uploadCompanyLogo } from "@/lib/company";
-import { Company } from "@/types";
+import { Company, CompanyInfoCardProps } from "@/types/company";
 import { showSuccessToast, showErrorToasts } from "@/lib/toast";
 import { format } from "date-fns";
 import { companyUpdateZodSchema } from "@/zod/shemas";
 import { Skeleton } from "@/components/ui/skeleton";
 
-type CompanyInfoCardProps = {
-    setEditMode: (editMode: boolean) => void;
-    editMode: boolean;
-    companyId: number;
-};
+
 
 export default function CompanyInfoCard({
                                             setEditMode,
@@ -261,7 +257,7 @@ export default function CompanyInfoCard({
                     ) : (
                         <div className="space-y-2">
                             <div className="text-center">
-                                <p className="-mt-5 text-[27px] font-medium">{company.title}</p>
+                                <p className="-mt-5 text-[27px] font-medium mt-1">{company.title}</p>
                                 <p className="text-base text-foreground/80">{company.email}</p>
                             </div>
                             <div className="text-center text-[17px]">

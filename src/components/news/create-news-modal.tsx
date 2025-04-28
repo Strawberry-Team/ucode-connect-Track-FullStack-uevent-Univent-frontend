@@ -12,7 +12,8 @@ import { createEventNews } from "@/lib/event";
 import { updateNews } from "@/lib/news";
 import { useAuth } from "@/context/auth-context";
 import { z } from "zod";
-import { CompanyNews, NewsItem } from "@/types";
+import { NewsItem } from "@/types/news";
+import { CompanyNews } from "@/types/company";
 
 // Схема валидации для новости
 const newsCreateZodSchema = z.object({

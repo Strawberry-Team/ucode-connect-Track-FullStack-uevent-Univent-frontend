@@ -10,7 +10,7 @@ import PromoCodeCreateModal from "@/components/promo-codes/promo-codes-create-up
 import { Percent, Pencil, Plus } from "lucide-react";
 import { getEventPromoCodes } from "@/lib/event";
 import { showErrorToasts } from "@/lib/toast";
-import { PromoCode } from "@/types";
+import { PromoCode } from "@/types/promo-code";
 
 // Типы пропсов
 type PromoCodesCardProps = {

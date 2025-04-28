@@ -1,6 +1,11 @@
 import api from "@/lib/api";
 import { executeApiRequest } from "@/utils/api-request";
-import {ApiResponse, User, Company, Order, EventSubscription, CompanySubscription} from "@/types";
+import { ApiResponse } from "@/types/common";
+import { User } from "@/types/user";
+import { Company } from "@/types/company";
+import { Order } from "@/types/order";
+import { EventSubscription } from "@/types/event";
+import { CompanySubscription } from "@/types/company";
 
 export async function getUserMe(accessToken?: string): Promise<ApiResponse<User>> {
     if (!accessToken) return { success: false, errors: ["Access token not found"] };

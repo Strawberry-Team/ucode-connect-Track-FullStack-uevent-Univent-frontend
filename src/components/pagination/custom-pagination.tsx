@@ -11,14 +11,7 @@ import {
     PaginationPrevious,
     PaginationEllipsis,
 } from "@/components/ui/pagination";
-
-// Типизация пропсов для CustomPagination
-interface CustomPaginationProps {
-    totalCount: number; // Общее количество элементов
-    currentPage: number; // Текущая страница
-    take: number; // Количество элементов на странице
-    maxVisiblePages?: number; // Максимальное количество отображаемых страниц (по умолчанию 5)
-}
+import { CustomPaginationProps } from "@/types/paggination";
 
 const CustomPagination: React.FC<CustomPaginationProps> = ({
                                                                totalCount,

@@ -9,48 +9,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { CalendarDays, ChevronDown, ChevronUp } from "lucide-react";
 import { updateEventAttendeeVisibility, getEventAttendees } from "@/lib/event";
 import { useAuth } from "@/context/auth-context";
-import {showErrorToasts, showSuccessToast} from "@/lib/toast";
-
-interface NewsNotification {
-    type: "news";
-    title: string;
-    description: string;
-    createdAt: string;
-}
-
-interface UserNotification {
-    type: "user";
-    id: number;
-    userId: number;
-    firstName: string;
-    lastName: string;
-    profilePictureName: string;
-    isVisible: boolean;
-}
-
-interface CompanyNewsNotification {
-    type: "companyNews";
-    title: string;
-    description: string;
-    createdAt: string;
-}
-
-interface EventNotification {
-    type: "event";
-    title: string;
-    createdAt: string;
-    avatarUrl: string;
-}
-
-type Notification = NewsNotification | UserNotification | CompanyNewsNotification | EventNotification;
-
-interface NotificationItemProps {
-    notification: Notification;
-    isExpanded: boolean;
-    isCollapsing: boolean;
-    onVisibilityChange: (id: number, isVisible: boolean) => void;
-    currentUserId?: number;
-}
+import { showErrorToasts, showSuccessToast } from "@/lib/toast";
+import { NotificationsBlockProps, NotificationItemProps, Notification, UserNotification } from "@/types/attendees-and-news-block";
 
 function NotificationItem({ notification, isExpanded, isCollapsing, onVisibilityChange, currentUserId }: NotificationItemProps) {
     const descriptionRef = useRef<HTMLDivElement>(null);
@@ -148,11 +108,6 @@ function NotificationItem({ notification, isExpanded, isCollapsing, onVisibility
     );
 }
 
-interface NotificationsBlockProps {
-    notifications?: Notification[];
-    eventId?: number;
-}
-
 export default function AttendeesAndNewsBlock({ notifications, eventId }: NotificationsBlockProps) {
     const { user } = useAuth();
     const currentUserId = user?.id;
@@ -192,10 +147,10 @@ export default function AttendeesAndNewsBlock({ notifications, eventId }: Notifi
                     });
                     setNotificationsState(userNotifications);
                 } else {
-                    setError("Failed to load attendees");
+                    setError("Failed to load attendees 1");
                 }
             } catch (err) {
-                setError("Failed to load attendees");
+                setError("Failed to load attendees 2");
             } finally {
                 setIsLoading(false);
             }

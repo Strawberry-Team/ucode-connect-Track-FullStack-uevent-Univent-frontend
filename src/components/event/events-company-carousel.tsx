@@ -2,13 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import { getCompanyEvents } from "@/lib/company";
-import { Event } from "@/types";
+import { Event, CompanyEventsCarouselProps } from "@/types/event";
 import { Skeleton } from "@/components/ui/skeleton";
 import EventCard from "@/components/event/event-card";
-
-interface CompanyEventsCarouselProps {
-    companyId: number;
-}
 
 const EventsCompanyCarousel = ({ companyId }: CompanyEventsCarouselProps) => {
     const [events, setEvents] = useState<Event[]>([]);

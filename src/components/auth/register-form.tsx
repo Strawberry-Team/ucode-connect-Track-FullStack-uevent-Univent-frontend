@@ -4,34 +4,21 @@ import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {DialogTitle} from "@/components/ui/dialog";
 import {LockKeyhole, Mail, User, Eye, EyeOff} from "lucide-react";
-
-interface RegisterFormProps {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    setFirstName: (value: string) => void;
-    setLastName: (value: string) => void;
-    setEmail: (value: string) => void;
-    setPassword: (value: string) => void;
-    showPassword: boolean;
-    togglePasswordVisibility: () => void;
-    handleRegister: (e: React.FormEvent) => Promise<void>;
-}
+import { RegisterFormProps } from "@/types/auth";
 
 export default function RegisterForm({
-                                         firstName,
-                                         lastName,
-                                         email,
-                                         password,
-                                         setFirstName,
-                                         setLastName,
-                                         setEmail,
-                                         setPassword,
-                                         showPassword,
-                                         togglePasswordVisibility,
-                                         handleRegister,
-                                     }: RegisterFormProps) {
+    firstName,
+    lastName,
+    email,
+    password,
+    setFirstName,
+    setLastName,
+    setEmail,
+    setPassword,
+    showPassword,
+    togglePasswordVisibility,
+    handleRegister,
+}: RegisterFormProps) {
     return (
         <form
             onSubmit={handleRegister}

@@ -1,4 +1,3 @@
-// EventsPopularCardCarousel.tsx
 "use client";
 
 import { CalendarDays, MapPinned, Tag } from "lucide-react";
@@ -7,14 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Event } from "@/types";
+import { Event, EventsPopularCardCarouselProps } from "@/types/event";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
-
-interface EventsPopularCardCarouselProps {
-    events: Event[];
-    isLoading: boolean;
-}
 
 const EventsPopularCardCarousel = ({ events, isLoading }: EventsPopularCardCarouselProps) => {
     const [currentIndex, setCurrentIndex] = useState<number>(1);

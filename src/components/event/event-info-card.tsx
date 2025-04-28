@@ -24,34 +24,29 @@ import {
     X,
     Tag,
     MapPin,
-    Calendar,
-    Eye,
     FileText,
     Building,
     Users,
-    Clock, Ticket, Palette
+    Clock, 
+    Ticket, 
+    Palette
 } from "lucide-react";
 import {useJsApiLoader} from "@react-google-maps/api";
 import {cn} from "@/lib/utils";
 import {getEventById, updateEvent, uploadEventPoster, assignThemesToEvent} from "@/lib/event";
 import {getEventFormats} from "@/lib/format";
 import {getThemes} from "@/lib/theme";
-import {Event, EventFormat, Theme} from "@/types";
+import {Event, EventFormat, Theme} from "@/types/event";
 import {showSuccessToast, showErrorToasts} from "@/lib/toast";
 import {format} from "date-fns";
 import {eventCreateZodSchema, validateEventDates} from "@/zod/shemas";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {getCityAndCountryFromComponents} from "@/components/google-map/google-map-location-picker-modal";
+import { EventInfoCardProps } from "@/types/event";
 
 const CalendarComponent = dynamic(() => import("@/components/ui/calendar-form").then(mod => mod.CalendarForm), {ssr: false});
 const LocationPickerModal = dynamic(() => import("../google-map/google-map-location-picker-modal"), {ssr: false});
 const GOOGLE_MAPS_LIBRARIES: ("places")[] = ["places"];
-
-type EventInfoCardProps = {
-    setEditMode: (editMode: boolean) => void;
-    editMode: boolean;
-    eventId: number;
-};
 
 const TitleDescriptionFields = memo(
     ({

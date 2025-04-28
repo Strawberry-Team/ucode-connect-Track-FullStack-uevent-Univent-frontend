@@ -2,10 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useJsApiLoader } from "@react-google-maps/api";
-
-interface MapEmbedProps {
-    coordinates: string;
-}
+import { MapEmbedProps } from "@/types/map";
 
 const parseCoordinates = (coords: string): { lat: number; lng: number } | null => {
     if (!coords) return null;

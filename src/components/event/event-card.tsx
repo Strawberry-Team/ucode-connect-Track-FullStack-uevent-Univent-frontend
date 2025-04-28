@@ -4,14 +4,8 @@
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { CalendarDays, MapPinned, Tag } from "lucide-react";
-import { Event } from "@/types";
+import { Event, ProductCardProps } from "@/types/event";
 import { format } from "date-fns";
-
-interface ProductCardProps {
-    event: Event;
-    className?: string;
-    hasMoved?: boolean; // Новый проп для отслеживания перетаскивания
-}
 
 const EventCard = ({ event, className, hasMoved = false }: ProductCardProps) => {
     const router = useRouter();

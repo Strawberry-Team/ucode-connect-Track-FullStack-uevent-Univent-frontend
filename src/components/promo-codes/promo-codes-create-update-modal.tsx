@@ -9,8 +9,9 @@ import { Switch } from "@/components/ui/switch";
 import { showErrorToasts, showSuccessToast } from "@/lib/toast";
 import { createEventPromoCode } from "@/lib/event";
 import { updatePromoCode } from "@/lib/promo-codes";
-import { PromoCode, CreatePromoCodeRequest } from "@/types";
+import { PromoCode, CreatePromoCodeRequest } from "@/types/promo-code";
 import { z } from "zod";
+import { PromoCodeCreateModalProps } from "@/types/promo-code";
 
 // Схема валидации для промокода
 const promoCodeZodSchema = z.object({
@@ -24,24 +25,14 @@ const promoCodeZodSchema = z.object({
     isActive: z.boolean(),
 });
 
-// Типы пропсов для модалки
-type PromoCodeCreateModalProps = {
-    eventId: number;
-    isOpen: boolean;
-    onClose: () => void;
-    onPromoCodeCreated: (newPromoCode: PromoCode) => void;
-    onPromoCodeUpdated: (updatedPromoCode: PromoCode) => void;
-    promoCodeToEdit?: PromoCode | null;
-};
-
 export default function PromoCodeCreateModal({
-                                                 eventId,
-                                                 isOpen,
-                                                 onClose,
-                                                 onPromoCodeCreated,
-                                                 onPromoCodeUpdated,
-                                                 promoCodeToEdit,
-                                             }: PromoCodeCreateModalProps) {
+    eventId,
+    isOpen,
+    onClose,
+    onPromoCodeCreated,
+    onPromoCodeUpdated,
+    promoCodeToEdit,
+}: PromoCodeCreateModalProps) {
     const [formData, setFormData] = useState({
         title: promoCodeToEdit?.title || "",
         code: promoCodeToEdit?.code || "",

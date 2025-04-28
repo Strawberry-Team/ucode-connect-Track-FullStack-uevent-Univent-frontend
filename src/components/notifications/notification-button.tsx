@@ -8,7 +8,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { NotificationList } from "./notification-list";
-import { NotificationButtonProps } from "@/types";
+import { NotificationButtonProps } from "@/types/notification";
 
 export function NotificationButton({ 
     unreadCount = 0, 
