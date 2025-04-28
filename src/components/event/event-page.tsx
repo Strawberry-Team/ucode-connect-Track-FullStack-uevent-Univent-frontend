@@ -3,7 +3,7 @@
 import { format } from "date-fns";
 import Link from "next/link";
 import { CalendarDays, MapPin, Tag, Building } from "lucide-react";
-import TicketActions from "@/components/ticket/TicketActions";
+import TicketActions from "@/components/ticket/ticket-actions";
 import AttendeesAndNewsBlock from "@/components/attendees-and-news/attendees-and-news-block";
 import CommentsDisqus from "@/components/comment/comments-disqus";
 import EventsCompanyCarousel from "@/components/event/events-company-carousel";
