@@ -18,20 +18,12 @@ interface NewsNotification {
     createdAt: string;
 }
 
-interface UserNotification {
-    type: "user";
-    firstName: string;
-    lastName: string;
-    createdAt: string;
-    avatarUrl: string;
-}
-
 interface EventPageProps {
     data: {
         event: Event;
         ticketTypes: TicketType[];
         newsNotifications: NewsNotification[];
-        userNotifications: UserNotification[];
+        eventId: number; // Заменяем userNotifications на eventId
     } | { error: string };
 }
 
@@ -42,11 +34,7 @@ export default function EventPage({ data }: EventPageProps) {
         return <div className="px-custom py-4">{data.error}</div>;
     }
 
-    if (!user) {
-        return;
-    }
-
-    const { event, ticketTypes, newsNotifications, userNotifications } = data;
+    const { event, ticketTypes, newsNotifications, eventId } = data;
 
     const dateStart = format(new Date(event.startedAt), "MMMM d, yyyy HH:mm");
     const dateEnd = format(new Date(event.endedAt), "MMMM d, yyyy HH:mm");
@@ -125,7 +113,7 @@ export default function EventPage({ data }: EventPageProps) {
 
             <div className="flex flex-col md:flex-row gap-6 mt-8">
                 <div className="flex-1 md:flex-[2]">
-                    <AttendeesAndNewsBlock notifications={userNotifications} />
+                    <AttendeesAndNewsBlock eventId={eventId} />
                 </div>
                 <div className="flex-1 md:flex-[4]">
                     <AttendeesAndNewsBlock notifications={newsNotifications} />

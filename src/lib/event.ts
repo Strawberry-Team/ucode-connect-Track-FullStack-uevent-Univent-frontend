@@ -4,7 +4,7 @@ import {
     ApiResponse,
     CreatePromoCodeRequest,
     CreateTicketRequest,
-    Event, EventsResponse,
+    Event, EventAttendee, EventsResponse,
     NewsItem,
     PromoCode, Ticket,
     TicketsResponse, TicketTypesResponse
@@ -79,4 +79,15 @@ export async function createEventTicket(eventId: number, ticketData: CreateTicke
 
 export async function getEventTicketTypes(eventId: number): Promise<ApiResponse<TicketTypesResponse>> {
     return executeApiRequest<TicketTypesResponse>(() => api.get(`/events/${eventId}/ticket-types`), `Failed to fetch ticket types for event ${eventId}`);
+}
+
+export async function getEventAttendees(eventId: number): Promise<ApiResponse<EventAttendee[]>> {
+    return executeApiRequest<EventAttendee[]>(() => api.get(`/events/${eventId}/attendees`), `Failed to fetch attendees for event with ID ${eventId}`);
+}
+
+export async function updateEventAttendeeVisibility(attendeeId: number, isVisible: boolean): Promise<ApiResponse<EventAttendee>> {
+    return executeApiRequest<EventAttendee>(
+        () => api.patch(`/event-attendees/${attendeeId}`, { isVisible }),
+        `Failed to update visibility for attendee with ID ${attendeeId}`
+    );
 }

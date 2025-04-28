@@ -267,3 +267,16 @@ export interface CompanySubscription {
     createdAt: string;
     company: Company;
 }
+
+export interface EventAttendee {
+    id: number;
+    eventId: number;
+    userId: number;
+    isVisible: boolean;
+    user: {
+        id: number;
+        firstName: string;
+        lastName: string;
+        profilePictureName: string;
+    };
+}

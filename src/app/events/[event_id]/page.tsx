@@ -8,14 +8,6 @@ interface NewsNotification {
     createdAt: string;
 }
 
-interface UserNotification {
-    type: "user";
-    firstName: string;
-    lastName: string;
-    createdAt: string;
-    avatarUrl: string;
-}
-
 interface PageCardProps {
     params: Promise<{ event_id: string }>;
 }
@@ -50,38 +42,6 @@ export default async function PageCard({ params }: PageCardProps) {
         createdAt: notification.createdAt,
     }));
 
-    const rawUserNotifications = [
-        {
-            id: 1,
-            firstName: "John",
-            lastName: "Doe",
-            createdAt: "2025-04-15T10:07:28.000Z",
-            avatarUrl: `http://localhost:8080/uploads/event-posters/default-poster.png`,
-        },
-        {
-            id: 2,
-            firstName: "Jane",
-            lastName: "Smith",
-            createdAt: "2025-04-15T10:08:00.000Z",
-            avatarUrl: `http://localhost:8080/uploads/event-posters/default-poster.png`,
-        },
-        {
-            id: 1,
-            firstName: "John",
-            lastName: "Doe",
-            createdAt: "2025-04-15T10:07:28.000Z",
-            avatarUrl: `http://localhost:8080/uploads/event-posters/default-poster.png`,
-        },
-    ];
-
-    const userNotifications: UserNotification[] = rawUserNotifications.map((user) => ({
-        type: "user" as const,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        createdAt: user.createdAt,
-        avatarUrl: user.avatarUrl,
-    }));
-
     const event = eventResponse.data;
 
     return (
@@ -90,7 +50,7 @@ export default async function PageCard({ params }: PageCardProps) {
                 event,
                 ticketTypes,
                 newsNotifications,
-                userNotifications,
+                eventId: id,
             }}
         />
     );
