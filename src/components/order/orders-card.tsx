@@ -9,7 +9,7 @@ import { getUserOrders } from "@/lib/users";
 import { getOrderById } from "@/lib/orders";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Order } from "@/types/order";
-import OrderDetailsModal from "./OrderDetailsModal";
+import OrderDetailsModal from "./order-details-modal";
 import { showErrorToasts } from "@/lib/toast";
 
 export default function OrdersCard() {
@@ -140,7 +140,7 @@ export default function OrdersCard() {
                                                     <span className="text-[20px] -mt-1 font-medium text-gray-800 truncate">
                                                         № {order.id}
                                                     </span>
-                                                    <span className="text-[15px] text-gray-500 truncate">
+                                                    <span className="pl-2 text-[15px] text-gray-500 truncate">
                                                         {order.orderItems.length}{" "}
                                                         {order.orderItems.length === 1 ? "ticket" : "tickets"}
                                                     </span>
@@ -203,7 +203,6 @@ export default function OrdersCard() {
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
                 order={selectedOrder}
-                loading={modalLoading}
             />
         </>
     );
