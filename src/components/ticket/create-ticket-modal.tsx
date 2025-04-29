@@ -1,4 +1,3 @@
-// components/ticket/TicketCreateModal.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -10,22 +9,7 @@ import { showErrorToasts, showSuccessToast } from "@/lib/toast";
 import { createEventTicket } from "@/lib/events";
 import { CreateTicketRequest, CreateTicketModalProps } from "@/types/ticket";
 import { z } from "zod";
-
-// Схема валидации для тикета
-const ticketCreateZodSchema = z.object({
-    title: z.string().min(1, "Title is required"),
-    price: z
-        .string()
-        .min(1, "Price is required")
-        .transform((val) => Number(val))
-        .refine((val) => !isNaN(val) && val > 0, "Price must be a positive number"),
-    status: z.enum(["AVAILABLE", "UNAVAILABLE"], { errorMap: () => ({ message: "Status is required" }) }),
-    quantity: z
-        .string()
-        .min(1, "Quantity is required")
-        .transform((val) => Number(val))
-        .refine((val) => !isNaN(val) && val > 0, "Quantity must be a positive number"),
-});
+import {ticketCreateZodSchema} from "@/zod/shemas";
 
 export default function CreateTicketModal({
                                               eventId,
@@ -48,7 +32,6 @@ export default function CreateTicketModal({
     }>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Синхронизируем displayPrice с formData.price
     useEffect(() => {
         if (formData.price) {
             setDisplayPrice(`$${formData.price}`);
@@ -63,7 +46,6 @@ export default function CreateTicketModal({
         const { name, value } = e.target;
 
         if (name === "price") {
-            // Извлекаем только числовую часть, удаляя $ и другие нечисловые символы
             const numericValue = value.replace(/[^0-9.]/g, "");
             setFormData((prev) => ({ ...prev, [name]: numericValue }));
         } else {
@@ -139,7 +121,6 @@ export default function CreateTicketModal({
             <DialogContent className="w-[500px] bg-white rounded-lg shadow-lg">
                 <DialogTitle className="sr-only">Create a New Ticket</DialogTitle>
                 <form onSubmit={handleSubmit} className="space-y-4 px-2">
-                    {/* Title */}
                     <div className="space-y-2">
                         <Input
                             id="title"
@@ -152,14 +133,13 @@ export default function CreateTicketModal({
                         />
                     </div>
 
-                    {/* Price and Quantity in one row */}
                     <div className="flex gap-2 space-y-2">
                         <div className="flex-1 space-y-2">
                             <Input
                                 id="price"
                                 name="price"
                                 step="0.01"
-                                value={displayPrice} // Используем displayPrice для отображения с $
+                                value={displayPrice}
                                 onChange={handleInputChange}
                                 placeholder="Price (e.g., $99.99)"
                                 className="!text-[15px] w-full rounded-md"
@@ -180,7 +160,6 @@ export default function CreateTicketModal({
                         </div>
                     </div>
 
-                    {/* Status */}
                     <div className="space-y-2">
                         <Select
                             value={formData.status}

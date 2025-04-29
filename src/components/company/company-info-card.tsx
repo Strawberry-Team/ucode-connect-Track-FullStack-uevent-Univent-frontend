@@ -1,4 +1,3 @@
-// components/company/company-info-card.tsx
 "use client";
 
 import { useState, useEffect } from "react";

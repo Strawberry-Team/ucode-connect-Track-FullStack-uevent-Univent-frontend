@@ -1,6 +1,6 @@
 "use client";
 
-import {useState, useEffect, useRef, useCallback, useMemo, memo} from "react";
+import React, {useState, useEffect, useRef, useCallback, useMemo, memo} from "react";
 import dynamic from "next/dynamic";
 import {debounce} from "lodash";
 import {Button} from "@/components/ui/button";
@@ -224,6 +224,12 @@ const DateFields = memo(
         };
         startedAt: string;
     }) => {
+        const getMinutesFromTime = (time: string) => {
+            if (!time) return 0;
+            const [hours, minutes] = time.split(":").map(Number);
+            return hours * 60 + minutes;
+        };
+
         return (
             <div className="max-w-[330px] space-y-4">
                 <div className="space-y-2">
@@ -332,11 +338,22 @@ const DateFields = memo(
                             </SelectTrigger>
                             <SelectContent>
                                 <ScrollArea className="h-48">
-                                    {timeOptions.map((time) => (
-                                        <SelectItem className="cursor-pointer" key={time} value={time}>
-                                            {time}
-                                        </SelectItem>
-                                    ))}
+                                    {timeOptions.map((time) => {
+                                        const startMinutes = getMinutesFromTime(startTime);
+                                        const endMinutes = getMinutesFromTime(time);
+                                        const isTimeDisabled =  endMinutes < startMinutes + 60;
+
+                                        return (
+                                            <SelectItem
+                                                className="cursor-pointer"
+                                                key={time}
+                                                value={time}
+                                                disabled={isTimeDisabled}
+                                            >
+                                                {time}
+                                            </SelectItem>
+                                        );
+                                    })}
                                 </ScrollArea>
                             </SelectContent>
                         </Select>
@@ -366,7 +383,9 @@ const DateFields = memo(
                                         handleDateChange("publishedAt", date);
                                         setOpenPublishedCalendar(false);
                                     }}
-                                    disabled={(date) => date > new Date(startedAt)}
+                                    disabled={(date) =>
+                                        startDate ? date > startDate : date > new Date(new Date().setHours(0, 0, 0, 0))
+                                    }
                                 />
                             </PopoverContent>
                         </Popover>
@@ -423,7 +442,9 @@ const DateFields = memo(
                                         handleDateChange("ticketsAvailableFrom", date);
                                         setOpenTicketsCalendar(false);
                                     }}
-                                    disabled={(date) => date > new Date(startedAt)}
+                                    disabled={(date) =>
+                                        startDate ? date > startDate : date > new Date(new Date().setHours(0, 0, 0, 0))
+                                    }
                                 />
                             </PopoverContent>
                         </Popover>
@@ -1005,7 +1026,6 @@ export default function EventInfoCard({setEditMode, editMode, eventId}: EventInf
                 description: errors.description?.[0],
                 venue: errors.venue?.[0],
                 formatId: errors.formatId?.[0],
-                locationCoordinates: errors.locationCoordinates?.[0],
                 startedAt: errors.startedAt?.[0],
                 endedAt: errors.endedAt?.[0],
             });

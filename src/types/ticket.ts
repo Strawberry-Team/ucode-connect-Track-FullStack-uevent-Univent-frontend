@@ -65,6 +65,7 @@ export interface TicketSelectorProps {
     onQuantityChange: (quantity: number) => void;
     discountPercent?: number;
     onReset?: () => void;
+    quantity?: number;
 }
 
 export type TicketsInfoCardProps = {

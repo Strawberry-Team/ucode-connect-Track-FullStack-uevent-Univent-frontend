@@ -1,4 +1,3 @@
-// components/company/company-manage-modal.tsx
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -92,7 +91,6 @@ export default function CompanyManageModal({
             description: formData.description,
         };
 
-        // Валидация
         if (editingCompany) {
             const updateValidation = companyUpdateZodSchema.safeParse({
                 title: formData.title,
@@ -194,98 +192,102 @@ export default function CompanyManageModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-            <DialogContent className="w-[425px] bg-white rounded-lg shadow-lg">
+            <DialogContent className="w-[800px] h-[500px] bg-white rounded-lg border-none shadow-lg p-0">
                 <DialogTitle className="sr-only">
                     {editingCompany ? "Update Company" : "Create a New Company"}
                 </DialogTitle>
-                <form onSubmit={handleSubmit} className="space-y-4 py-4">
-                    <div className="space-y-2 flex justify-center">
-                        <div className="relative group">
-                            <div
-                                className="w-30 h-35 bg-gray-200 rounded-md flex items-center justify-center cursor-pointer relative overflow-hidden group-hover:brightness-75 transition-all duration-200"
-                                onClick={handleFileClick}
-                            >
-                                {logoPreview ? (
-                                    <img
-                                        src={logoPreview}
-                                        alt="Logo preview"
-                                        className="w-full h-full object-cover group-hover:brightness-60 transition-all duration-200"
-                                    />
-                                ) : (
-                                    <Camera strokeWidth={2.5} className="w-8 h-8 text-gray-500" />
+                <form onSubmit={handleSubmit} className="h-full">
+                    <div className="flex flex-row h-full">
+                        <div className="w-[350px] flex-shrink-0">
+                            <div className="relative group h-full">
+                                <div
+                                    className="rounded-l-md w-full h-full bg-gray-200 flex items-center justify-center cursor-pointer relative overflow-hidden group-hover:brightness-75 transition-all duration-200"
+                                    onClick={handleFileClick}
+                                >
+                                    {logoPreview ? (
+                                        <img
+                                            src={logoPreview}
+                                            alt="Logo preview"
+                                            className=" w-full h-full object-cover group-hover:brightness-60 transition-all duration-200"
+                                        />
+                                    ) : (
+                                        <Camera strokeWidth={2.5} className="w-8 h-8 text-gray-500" />
+                                    )}
+                                </div>
+                                {logoPreview && (
+                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                                        <Camera strokeWidth={2.5} className="text-white w-8 h-8" />
+                                    </div>
                                 )}
+                                <input
+                                    id="logo"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleFileChange}
+                                    ref={fileInputRef}
+                                    className="hidden"
+                                />
                             </div>
-                            {logoPreview && (
-                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                                    <Camera strokeWidth={2.5} className="text-white w-8 h-8" />
+                        </div>
+
+                        <div className="w-2/3 flex flex-col justify-center space-y-4 px-4">
+                            <div className="space-y-2">
+                                <Input
+                                    id="title"
+                                    name="title"
+                                    value={formData.title}
+                                    onChange={handleInputChange}
+                                    placeholder="Title"
+                                    className="!text-[15px] w-full rounded-md"
+                                    disabled={isLoading}
+                                />
+                            </div>
+
+                            {!editingCompany && (
+                                <div className="space-y-2">
+                                    <Input
+                                        id="email"
+                                        name="email"
+                                        type="text"
+                                        value={formData.email}
+                                        onChange={handleInputChange}
+                                        placeholder="Company Email"
+                                        className="!text-[15px] w-full rounded-md"
+                                        disabled={isLoading}
+                                    />
                                 </div>
                             )}
-                            <input
-                                id="logo"
-                                type="file"
-                                accept="image/*"
-                                onChange={handleFileChange}
-                                ref={fileInputRef}
-                                className="hidden"
-                            />
+
+                            <div className="space-y-2">
+                                <Textarea
+                                    id="description"
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={handleInputChange}
+                                    placeholder="Enter a brief description of the company..."
+                                    className="!text-[15px] w-full rounded-md min-h-[100px]"
+                                    disabled={isLoading}
+                                />
+                            </div>
+
+                            <Button
+                                type="submit"
+                                disabled={
+                                    isLoading ||
+                                    !formData.title ||
+                                    !formData.description ||
+                                    (!editingCompany && !formData.email)
+                                }
+                                className="w-full"
+                            >
+                                {isLoading
+                                    ? "Loading..."
+                                    : editingCompany
+                                        ? "Update Company"
+                                        : "Create Company"}
+                            </Button>
                         </div>
                     </div>
-
-                    <div className="space-y-2">
-                        <Input
-                            id="title"
-                            name="title"
-                            value={formData.title}
-                            onChange={handleInputChange}
-                            placeholder="Title"
-                            className="!text-[15px] w-full rounded-md"
-                            disabled={isLoading}
-                        />
-                    </div>
-
-                    {!editingCompany && (
-                        <div className="space-y-2">
-                            <Input
-                                id="email"
-                                name="email"
-                                type="text"
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                placeholder="Company Email"
-                                className="!text-[15px] w-full rounded-md"
-                                disabled={isLoading}
-                            />
-                        </div>
-                    )}
-
-                    <div className="space-y-2">
-                        <Textarea
-                            id="description"
-                            name="description"
-                            value={formData.description}
-                            onChange={handleInputChange}
-                            placeholder="Enter a brief description of the company..."
-                            className="!text-[15px] w-full rounded-md min-h-[100px]"
-                            disabled={isLoading}
-                        />
-                    </div>
-
-                    <Button
-                        type="submit"
-                        disabled={
-                            isLoading ||
-                            !formData.title ||
-                            !formData.description ||
-                            (!editingCompany && !formData.email)
-                        }
-                        className="w-full"
-                    >
-                        {isLoading
-                            ? "Loading..."
-                            : editingCompany
-                                ? "Update Company"
-                                : "Create Company"}
-                    </Button>
                 </form>
             </DialogContent>
         </Dialog>

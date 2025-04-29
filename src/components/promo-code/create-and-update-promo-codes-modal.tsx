@@ -9,20 +9,8 @@ import { showErrorToasts, showSuccessToast } from "@/lib/toast";
 import { createEventPromoCode } from "@/lib/events";
 import { updatePromoCode } from "@/lib/promo-codes";
 import { PromoCode, CreatePromoCodeRequest } from "@/types/promo-code";
-import { z } from "zod";
 import { PromoCodeCreateModalProps } from "@/types/promo-code";
-
-// Схема валидации для промокода
-const promoCodeZodSchema = z.object({
-    title: z.string().min(1, "Title is required"),
-    code: z.string().min(1, "Code is required").optional(),
-    discountPercent: z
-        .string()
-        .min(1, "Discount percent is required")
-        .transform((val) => Number(val))
-        .refine((val) => !isNaN(val) && val > 0 && val <= 100, "Discount must be a number between 1 and 100"),
-    isActive: z.boolean(),
-});
+import {promoCodeZodSchema} from "@/zod/shemas";
 
 export default function PromoCodeCreateModal({
                                                  eventId,
@@ -173,7 +161,6 @@ export default function PromoCodeCreateModal({
                     {promoCodeToEdit ? "Edit Promo Code" : "Create Promo Code"}
                 </DialogTitle>
                 <form onSubmit={handleSubmit} className="space-y-4 px-2">
-                    {/* Title */}
                     <div className="space-y-2">
                         <Input
                             id="title"
@@ -186,7 +173,6 @@ export default function PromoCodeCreateModal({
                         />
                     </div>
 
-                    {/* Code (только для создания) */}
                     {!promoCodeToEdit && (
                         <div className="space-y-2">
                             <Input
@@ -201,7 +187,6 @@ export default function PromoCodeCreateModal({
                         </div>
                     )}
 
-                    {/* Discount Percent */}
                     <div className="space-y-2">
                         <Input
                             id="discountPercent"
@@ -214,7 +199,6 @@ export default function PromoCodeCreateModal({
                         />
                     </div>
 
-                    {/* Active Switch */}
                     <div className="flex items-center space-x-2">
                         <span className="text-[15px] text-gray-700">Active</span>
                         <Switch

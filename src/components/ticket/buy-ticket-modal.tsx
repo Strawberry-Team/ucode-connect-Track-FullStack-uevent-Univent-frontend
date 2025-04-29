@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter, useParams } from 'next/navigation';
 import type { MouseEvent } from "react";
 import {
@@ -13,22 +13,13 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart, Trash2, RefreshCw, CircleCheck, CirclePercent, AlertCircle } from "lucide-react";
 import TicketList from "./ticket-list";
 import { showErrorToasts, showSuccessToast } from "@/lib/toast";
-import { z } from "zod";
 import { TicketUniqueType, TicketModalProps } from "@/types/ticket";
 import { validateEventPromoCode } from "@/lib/promo-codes";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ticketPurchaseZodSchema } from "@/zod/shemas";
 import { createOrder, purchaseTickets } from "@/lib/tickets";
 import { OrderCreateRequest } from "@/types/order";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-
-// Validation schema for ticket purchase
-const ticketPurchaseSchema = z.record(
-  z.string(),
-  z.number()
-    .min(0, "Ticket quantity cannot be negative")
-    .max(100, "Maximum 100 tickets per type allowed")
-);
 
 const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: TicketModalProps) => {
   const router = useRouter();
@@ -41,14 +32,17 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
   const [promoError, setPromoError] = useState<string>("");
   const [promoWarning, setPromoWarning] = useState<string>("");
 
-  const handleQuantitiesChange = (newQuantities: { [typeId: string]: number }) => {
+  const handleQuantitiesChange = useCallback((newQuantities: { [typeId: string]: number }) => {
     setQuantities(newQuantities);
-  };
+  }, []);
+
+  const handleTicketsLoad = useCallback((loadedTickets: TicketUniqueType[]) => {
+    setTickets(loadedTickets);
+  }, []);
 
   const handleClearCart = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setQuantities({});
-    setResetCount(prev => prev + 1);
   };
 
   const handleClose = () => {
@@ -58,7 +52,7 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
 
   const handlePurchase = async () => {
     try {
-      const validation = ticketPurchaseSchema.safeParse(quantities);
+      const validation = ticketPurchaseZodSchema.safeParse(quantities);
 
       if (!validation.success) {
         const errors = validation.error.errors.map(err => err.message);
@@ -95,7 +89,7 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
       }
 
       const order = result.data;
-    
+
       // Temporary success simulation
       // await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -115,7 +109,6 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
 
   const handleApplyPromo = async () => {
     const code = promoCodeInput.trim().toUpperCase();
-    // reset all notifications
     setPromoError("");
     setPromoWarning("");
     setAppliedPromo(null);
@@ -158,7 +151,6 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="w-[800px] h-[90vh] flex flex-col p-5 bg-white rounded-lg shadow-lg">
-        <TooltipProvider>
           <div className="p-6 border-b">
             <DialogHeader>
               <DialogTitle>
@@ -171,11 +163,11 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
 
           <div className="flex-1 overflow-y-auto custom-scroll p-6">
             <TicketList
-              key={resetCount}
-              eventId={eventId}
-              onTicketQuantitiesChange={handleQuantitiesChange}
-              onTicketsLoad={(loadedTickets) => setTickets(loadedTickets)}
-              discountPercent={appliedPromo ?? 0}
+                eventId={eventId}
+                onTicketQuantitiesChange={handleQuantitiesChange}
+                onTicketsLoad={handleTicketsLoad}
+                discountPercent={appliedPromo ?? 0}
+                quantities={quantities}
             />
           </div>
 
@@ -184,8 +176,6 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
             {/* Promo Code Input and Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
               <div className="flex flex-wrap items-center justify-start gap-2 pb-2 w-full sm:w-auto">
-              <Tooltip>
-              <TooltipTrigger asChild>
                 <Input
                   placeholder="Promo code"
                   value={promoCodeInput}
@@ -193,11 +183,7 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
                   disabled={isSubmitting}
                   className="h-9 flex-1 sm:flex-none rounded-full w-[250px] min-w-[50px] max-w-[250px] text-[14px]"
                 />
-                </TooltipTrigger>
-                <TooltipContent>Enter promo code to get discount</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
+
                     <Button
                       onClick={handleApplyPromo}
                       disabled={isSubmitting}
@@ -205,11 +191,7 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
                     >
                       Apply
                     </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Apply promo code</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
+
                     <Button
                       variant="outline"
                       onClick={handleResetPromoCode}
@@ -218,9 +200,6 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
                     >
                       Reset
                     </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Reset promo code</TooltipContent>
-                </Tooltip>
               </div>
             </div>
 
@@ -254,8 +233,6 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
             {/* Clear Cart, Total and Buy Button */}
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
               <div className="flex gap-2 w-full sm:w-auto">
-                <Tooltip>
-                  <TooltipTrigger asChild>
                     <Button
                       variant="outline"
                       size="sm"
@@ -266,22 +243,12 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
                       <Trash2 className="h-4 w-4" />
                       Clear Cart
                     </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Clear order data</TooltipContent>
-                </Tooltip>
               </div>
 
               <div className="flex items-center gap-8 w-full sm:w-auto">
-                <Tooltip>
-                <TooltipTrigger asChild>
                 <div className="text-lg font-semibold bg-secondary rounded-full py-1 px-5">
                   Total: ${calculateTotal().toFixed(2)}
                 </div>
-                </TooltipTrigger>
-                <TooltipContent>Total price for all tickets</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
                     <Button
                       onClick={handlePurchase}
                       disabled={isSubmitting || Object.keys(quantities).length === 0}
@@ -294,13 +261,10 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
                       )}
                       {isSubmitting ? "Processing..." : "Buy"}
                     </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Checkout and pay for order</TooltipContent>
-                </Tooltip>
+
               </div>
             </div>
           </div>
-        </TooltipProvider>
       </DialogContent>
     </Dialog>
   );

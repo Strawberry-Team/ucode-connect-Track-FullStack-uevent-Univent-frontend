@@ -1,4 +1,3 @@
-// components/news/CreateNewsModal.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -14,22 +13,16 @@ import { useAuth } from "@/context/auth-context";
 import { z } from "zod";
 import { NewsItem } from "@/types/news";
 import { CompanyNews } from "@/types/company";
+import {newsCreateZodSchema} from "@/zod/shemas";
 
-// Схема валидации для новости
-const newsCreateZodSchema = z.object({
-    title: z.string().min(5, "Title must be at least 5 characters long").max(100, "Title must not exceed 100 characters"),
-    description: z.string().min(20, "Description must be at least 20 characters long").max(5000, "Description must not exceed 5000 characters"),
-});
-
-// Типы
 interface CreateNewsModalProps {
-    companyId?: number; // Опционально для компании
-    eventId?: number;   // Опционально для события
-    newsToEdit?: CompanyNews | NewsItem | null; // Данные новости для редактирования
+    companyId?: number;
+    eventId?: number;
+    newsToEdit?: CompanyNews | NewsItem | null;
     isOpen: boolean;
     onClose: () => void;
     onNewsCreated: (newNews: CompanyNews | NewsItem) => void;
-    onNewsUpdated: (updatedNews: CompanyNews | NewsItem) => void; // Новый коллбэк для обновления
+    onNewsUpdated: (updatedNews: CompanyNews | NewsItem) => void;
 }
 
 export default function CreateNewsModal({
@@ -52,7 +45,6 @@ export default function CreateNewsModal({
     }>({});
     const [isLoading, setIsLoading] = useState(false);
 
-    // Проверяем, что передан либо companyId, либо eventId, но не оба
     if (companyId !== undefined && eventId !== undefined) {
         throw new Error("Cannot provide both companyId and eventId");
     }
@@ -60,7 +52,6 @@ export default function CreateNewsModal({
         throw new Error("Either companyId or eventId must be provided");
     }
 
-    // Заполняем поля данными из newsToEdit при открытии модального окна
     useEffect(() => {
         if (isOpen && newsToEdit) {
             setFormData({
@@ -106,7 +97,6 @@ export default function CreateNewsModal({
         setIsLoading(true);
         try {
             if (newsToEdit) {
-                // Режим редактирования
                 const updateResult = await updateNews(newsToEdit.id, newsData);
                 if (!updateResult?.success || !updateResult.data) {
                     showErrorToasts(updateResult?.errors || ["Failed to update news"]);
@@ -117,7 +107,6 @@ export default function CreateNewsModal({
                 onNewsUpdated(updatedNews);
                 showSuccessToast("News updated successfully");
             } else {
-                // Режим создания
                 let createResult;
                 if (companyId !== undefined) {
                     createResult = await createCompanyNews(companyId, newsData);
@@ -163,7 +152,6 @@ export default function CreateNewsModal({
                     {newsToEdit ? "Edit News" : "Create a New News"}
                 </DialogTitle>
                 <form onSubmit={handleSubmit} className="space-y-4 px-2">
-                    {/* Заголовок */}
                     <div className="space-y-2">
                         <Input
                             id="title"
@@ -174,12 +162,8 @@ export default function CreateNewsModal({
                             className="!text-[15px] w-full mt-3 rounded-md"
                             disabled={isLoading}
                         />
-                        {newsErrors.title && (
-                            <p className="text-sm text-red-500">{newsErrors.title}</p>
-                        )}
                     </div>
 
-                    {/* Описание */}
                     <div className="space-y-2">
                         <Textarea
                             id="description"
@@ -190,9 +174,6 @@ export default function CreateNewsModal({
                             className="!text-[15px] w-full rounded-md min-h-[200px]"
                             disabled={isLoading}
                         />
-                        {newsErrors.description && (
-                            <p className="text-sm text-red-500">{newsErrors.description}</p>
-                        )}
                     </div>
 
                     <Button
