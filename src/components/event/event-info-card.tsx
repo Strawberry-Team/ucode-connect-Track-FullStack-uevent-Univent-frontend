@@ -38,7 +38,7 @@ import {getEventFormats} from "@/lib/formats";
 import {getThemes} from "@/lib/themes";
 import {Event, EventFormat, Theme} from "@/types/event";
 import {showSuccessToast, showErrorToasts} from "@/lib/toast";
-import {format} from "date-fns";
+import {format, startOfDay} from "date-fns";
 import {eventCreateZodSchema, validateEventDates} from "@/zod/shemas";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {getCityAndCountryFromComponents} from "@/components/google-map/google-map-location-picker-modal";
@@ -314,7 +314,9 @@ const DateFields = memo(
                                         setOpenEndCalendar(false);
                                     }}
                                     disabled={(date) =>
-                                        (startDate ? date < startDate : date < new Date(new Date().setHours(0, 0, 0, 0)))
+                                        startDate
+                                            ? date < startOfDay(startDate)
+                                            : date < new Date(new Date().setHours(0, 0, 0, 0))
                                     }
                                 />
                             </PopoverContent>
@@ -383,9 +385,11 @@ const DateFields = memo(
                                         handleDateChange("publishedAt", date);
                                         setOpenPublishedCalendar(false);
                                     }}
-                                    disabled={(date) =>
-                                        startDate ? date > startDate : date > new Date(new Date().setHours(0, 0, 0, 0))
-                                    }
+                                    disabled={(date) => {
+                                        const today = new Date(new Date().setHours(0, 0, 0, 0));
+                                        const maxDate =  startDate;
+                                        return date < today || (maxDate ? date > maxDate : false);
+                                    }}
                                 />
                             </PopoverContent>
                         </Popover>
@@ -442,9 +446,12 @@ const DateFields = memo(
                                         handleDateChange("ticketsAvailableFrom", date);
                                         setOpenTicketsCalendar(false);
                                     }}
-                                    disabled={(date) =>
-                                        startDate ? date > startDate : date > new Date(new Date().setHours(0, 0, 0, 0))
-                                    }
+                                    disabled={(date) => {
+                                        const today = new Date(new Date().setHours(0, 0, 0, 0));
+                                        const minDate = publishedDate ? startOfDay(publishedDate) : today;
+                                        const maxDate = startDate;
+                                        return date < minDate || (maxDate ? date > maxDate : false);
+                                    }}
                                 />
                             </PopoverContent>
                         </Popover>

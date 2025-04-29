@@ -19,7 +19,7 @@ import { getThemes } from "@/lib/themes"
 import { showErrorToasts, showSuccessToast } from "@/lib/toast"
 import { eventCreateZodSchema, validateEventDates } from "@/zod/shemas"
 import { CalendarForm } from "@/components/ui/calendar-form"
-import { format } from "date-fns"
+import {format, addMinutes, isAfter, set, startOfDay} from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { getCityAndCountryFromComponents } from "../google-map/google-map-location-picker-modal";
 
@@ -198,37 +198,36 @@ const DateFields = memo(
          isLoading,
          errors,
      }: {
-        startDate: Date | undefined
-        endDate: Date | undefined
-        ticketsDate: Date | undefined
-        publishedDate: Date | undefined
-        startTime: string
-        endTime: string
-        ticketsTime: string
-        publishedTime: string
-        openStartCalendar: boolean
-        openEndCalendar: boolean
-        openTicketsCalendar: boolean
-        openPublishedCalendar: boolean
-        setOpenStartCalendar: (value: boolean) => void
-        setOpenEndCalendar: (value: boolean) => void
-        setOpenTicketsCalendar: (value: boolean) => void
-        setOpenPublishedCalendar: (value: boolean) => void
-        onStartTimeChange: (value: string) => void
-        onEndTimeChange: (value: string) => void
-        onTicketsTimeChange: (value: string) => void
-        onPublishedTimeChange: (value: string) => void
-        handleDateChange: (name: string, date: Date | undefined) => void
-        timeOptions: string[]
-        isLoading: boolean
+        startDate: Date | undefined;
+        endDate: Date | undefined;
+        ticketsDate: Date | undefined;
+        publishedDate: Date | undefined;
+        startTime: string;
+        endTime: string;
+        ticketsTime: string;
+        publishedTime: string;
+        openStartCalendar: boolean;
+        openEndCalendar: boolean;
+        openTicketsCalendar: boolean;
+        openPublishedCalendar: boolean;
+        setOpenStartCalendar: (value: boolean) => void;
+        setOpenEndCalendar: (value: boolean) => void;
+        setOpenTicketsCalendar: (value: boolean) => void;
+        setOpenPublishedCalendar: (value: boolean) => void;
+        onStartTimeChange: (value: string) => void;
+        onEndTimeChange: (value: string) => void;
+        onTicketsTimeChange: (value: string) => void;
+        onPublishedTimeChange: (value: string) => void;
+        handleDateChange: (name: string, date: Date | undefined) => void;
+        timeOptions: string[];
+        isLoading: boolean;
         errors: {
-            startedAt?: string
-            endedAt?: string
-            ticketsAvailableFrom?: string
-            publishedAt?: string
-        }
+            startedAt?: string;
+            endedAt?: string;
+            ticketsAvailableFrom?: string;
+            publishedAt?: string;
+        };
     }) => {
-
         const getMinutesFromTime = (time: string) => {
             if (!time) return 0;
             const [hours, minutes] = time.split(":").map(Number);
@@ -257,8 +256,8 @@ const DateFields = memo(
                                     mode="single"
                                     selected={startDate}
                                     onSelect={(date) => {
-                                        handleDateChange("startedAt", date)
-                                        setOpenStartCalendar(false)
+                                        handleDateChange("startedAt", date);
+                                        setOpenStartCalendar(false);
                                     }}
                                     disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                                 />
@@ -305,11 +304,13 @@ const DateFields = memo(
                                     mode="single"
                                     selected={endDate}
                                     onSelect={(date) => {
-                                        handleDateChange("endedAt", date)
-                                        setOpenEndCalendar(false)
+                                        handleDateChange("endedAt", date);
+                                        setOpenEndCalendar(false);
                                     }}
                                     disabled={(date) =>
-                                        startDate ? date < startDate : date < new Date(new Date().setHours(0, 0, 0, 0))
+                                        startDate
+                                            ? date < startOfDay(startDate)
+                                            : date < new Date(new Date().setHours(0, 0, 0, 0))
                                     }
                                 />
                             </PopoverContent>
@@ -324,19 +325,13 @@ const DateFields = memo(
                                 <SelectValue placeholder="Time" />
                             </SelectTrigger>
                             <SelectContent>
-
                                 <ScrollArea className="h-48">
                                     {timeOptions.map((time) => {
-                                        const startMinutes = getMinutesFromTime(startTime);
-                                        const endMinutes = getMinutesFromTime(time);
-                                        const isTimeDisabled =  endMinutes < startMinutes + 60;
-
                                         return (
                                             <SelectItem
                                                 className="cursor-pointer"
                                                 key={time}
                                                 value={time}
-                                                disabled={isTimeDisabled}
                                             >
                                                 {time}
                                             </SelectItem>
@@ -367,12 +362,14 @@ const DateFields = memo(
                                     mode="single"
                                     selected={publishedDate}
                                     onSelect={(date) => {
-                                        handleDateChange("publishedAt", date)
-                                        setOpenPublishedCalendar(false)
+                                        handleDateChange("publishedAt", date);
+                                        setOpenPublishedCalendar(false);
                                     }}
-                                    disabled={(date) =>
-                                        startDate ? date > startDate : date > new Date(new Date().setHours(0, 0, 0, 0))
-                                    }
+                                    disabled={(date) => {
+                                        const today = new Date(new Date().setHours(0, 0, 0, 0));
+                                        const maxDate =  startDate;
+                                        return date < today || (maxDate ? date > maxDate : false);
+                                    }}
                                 />
                             </PopoverContent>
                         </Popover>
@@ -387,11 +384,19 @@ const DateFields = memo(
                             </SelectTrigger>
                             <SelectContent>
                                 <ScrollArea className="h-48">
-                                    {timeOptions.map((time) => (
-                                        <SelectItem className="cursor-pointer" key={time} value={time}>
-                                            {time}
-                                        </SelectItem>
-                                    ))}
+                                    {
+                                        timeOptions.map((time) => {
+                                            return (
+                                                <SelectItem
+                                                    className="cursor-pointer"
+                                                    key={time}
+                                                    value={time}
+                                                >
+                                                    {time}
+                                                </SelectItem>
+                                            );
+                                        })}
+
                                 </ScrollArea>
                             </SelectContent>
                         </Select>
@@ -417,12 +422,15 @@ const DateFields = memo(
                                     mode="single"
                                     selected={ticketsDate}
                                     onSelect={(date) => {
-                                        handleDateChange("ticketsAvailableFrom", date)
-                                        setOpenTicketsCalendar(false)
+                                        handleDateChange("ticketsAvailableFrom", date);
+                                        setOpenTicketsCalendar(false);
                                     }}
-                                    disabled={(date) =>
-                                        startDate ? date > startDate : date > new Date(new Date().setHours(0, 0, 0, 0))
-                                    }
+                                    disabled={(date) => {
+                                        const today = new Date(new Date().setHours(0, 0, 0, 0));
+                                        const minDate = publishedDate ? startOfDay(publishedDate) : today;
+                                        const maxDate = startDate;
+                                        return date < minDate || (maxDate ? date > maxDate : false);
+                                    }}
                                 />
                             </PopoverContent>
                         </Popover>
@@ -437,20 +445,27 @@ const DateFields = memo(
                             </SelectTrigger>
                             <SelectContent>
                                 <ScrollArea className="h-48">
-                                    {timeOptions.map((time) => (
-                                        <SelectItem className="cursor-pointer" key={time} value={time}>
-                                            {time}
-                                        </SelectItem>
-                                    ))}
+                                    {timeOptions.map((time) => {
+                                            return (
+                                                <SelectItem
+                                                    className="cursor-pointer"
+                                                    key={time}
+                                                    value={time}
+                                                >
+                                                    {time}
+                                                </SelectItem>
+                                            );
+                                        })}
+
                                 </ScrollArea>
                             </SelectContent>
                         </Select>
                     </div>
                 </div>
             </div>
-        )
+        );
     }
-)
+);
 
 const FormatThemesFields = memo(
     ({
