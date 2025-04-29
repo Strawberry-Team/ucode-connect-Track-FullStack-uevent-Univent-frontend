@@ -63,7 +63,7 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
       setIsSubmitting(true);
 
       const createOrderData: OrderCreateRequest = {
-        promoCode: promoCodeInput,
+        ...(promoCodeInput ? { promoCode: promoCodeInput } : {}),
         paymentMethod: "STRIPE",
         eventId: Number(eventId),
         items: Object.entries(quantities)

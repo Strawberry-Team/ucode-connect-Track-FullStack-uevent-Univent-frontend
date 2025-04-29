@@ -58,7 +58,7 @@ export interface OrderDetailsModalProps {
 }
 
 export interface OrderCreateRequest {
-    promoCode: string;
+    promoCode?: string;
     paymentMethod: string;
     eventId: number;
     items: {
