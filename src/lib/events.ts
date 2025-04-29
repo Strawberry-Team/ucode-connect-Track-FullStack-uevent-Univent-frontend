@@ -66,10 +66,6 @@ export async function getEventPromoCodes(eventId: number): Promise<ApiResponse<P
     return executeApiRequest<PromoCode[]>(() => api.get(`/events/${eventId}/promo-codes`), `Failed to fetch promo codes for event with ID ${eventId}`);
 }
 
-export async function validateEventPromoCode(data: { eventId: number; code: string }): Promise<ApiResponse<ValidPromoCode>> {
-    return executeApiRequest<ValidPromoCode>(() => api.post(`/promo-codes/validate`, data), `Failed to validate promo code ${data.code} for event ID ${data.eventId}`);
-}
-
 export async function createEventPromoCode(eventId: number, promoCodeData: CreatePromoCodeRequest): Promise<ApiResponse<PromoCode>> {
     return executeApiRequest<PromoCode>(() => api.post(`/events/${eventId}/promo-codes`, promoCodeData), `Failed to create promo code for event with ID ${eventId}`);
 }

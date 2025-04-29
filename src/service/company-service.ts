@@ -1,8 +1,8 @@
 // service/companyService.ts
-import { getUserCompany, Company } from "@/lib/users";
+import { getUserCompany } from "@/lib/users";
 import { createCompany, updateCompany, uploadCompanyLogo, deleteCompany } from "@/lib/companies";
+import { Company } from "@/types/company";
 
-// Тип для ошибок
 interface ServiceError {
     errors: string[];
 }

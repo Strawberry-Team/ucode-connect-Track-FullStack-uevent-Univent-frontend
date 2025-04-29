@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter, useParams } from 'next/navigation';
 import type { MouseEvent } from "react";
 import {
   Dialog,
@@ -14,19 +15,23 @@ import TicketList from "./ticket-list";
 import { showErrorToasts, showSuccessToast } from "@/lib/toast";
 import { z } from "zod";
 import { TicketUniqueType, TicketModalProps } from "@/types/ticket";
-import { validateEventPromoCode } from "@/lib/events";
+import { validateEventPromoCode } from "@/lib/promo-codes";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { createOrder, purchaseTickets } from "@/lib/tickets";
+import { OrderCreateRequest } from "@/types/order";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 // Validation schema for ticket purchase
 const ticketPurchaseSchema = z.record(
   z.string(),
   z.number()
     .min(0, "Ticket quantity cannot be negative")
-    .max(10, "Maximum 10 tickets per type allowed")
+    .max(100, "Maximum 100 tickets per type allowed")
 );
 
 const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: TicketModalProps) => {
+  const router = useRouter();
   const [quantities, setQuantities] = useState<{ [typeId: string]: number }>({});
   const [resetCount, setResetCount] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -63,11 +68,41 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
 
       setIsSubmitting(true);
 
-      // TODO: Implement actual purchase API call
-      // const result = await purchaseTickets(eventId, quantities);
+      const createOrderData: OrderCreateRequest = {
+        promoCode: promoCodeInput,
+        paymentMethod: "STRIPE",
+        eventId: Number(eventId),
+        items: Object.entries(quantities)
+          .filter(([, qty]) => qty > 0)
+          .map(([typeId, quantity]) => {
+            const ticket = tickets.find(t => t.id === typeId);
+            return {
+              ticketTitle: ticket?.name ?? 'Test',
+              typeId,
+              quantity,
+            };
+          }),
+      };
 
+      console.log("createOrderData",createOrderData);
+
+      // TODO: Implement actual purchase API call
+      const result = await createOrder(createOrderData);
+
+      if (!result.success) {
+        showErrorToasts(result.errors.join(", ") || "Error creating order");
+        return;
+      }
+
+      const order = result.data;
+    
       // Temporary success simulation
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // await new Promise(resolve => setTimeout(resolve, 1000));
+
+      if (order) {
+        router.push(`/stripe/payment/${order.id}`);
+        return;
+      }
 
       showSuccessToast("Tickets purchased successfully!");
       handleClose();
@@ -123,117 +158,149 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="w-[800px] h-[90vh] flex flex-col p-5 bg-white rounded-lg shadow-lg">
-        <div className="p-6 border-b">
-          <DialogHeader>
-            <DialogTitle>
-              <span className="text-xl font-normal">Tickets for </span>
-              <span className="text-xl font-semibold">"{eventTitle}"</span>
-              <span className="text-xl font-normal"> {eventType.toLowerCase()}</span>
-            </DialogTitle>
-          </DialogHeader>
-        </div>
-
-        <div className="flex-1 overflow-y-auto custom-scroll p-6">
-          <TicketList
-            key={resetCount}
-            eventId={eventId}
-            onTicketQuantitiesChange={handleQuantitiesChange}
-            onTicketsLoad={(loadedTickets) => setTickets(loadedTickets)}
-            discountPercent={appliedPromo ?? 0}
-          />
-        </div>
-
-        <div className="border-t p-6">
-
-          {/* Promo Code Input and Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-            <div className="flex flex-wrap items-center justify-start gap-2 pb-2 w-full sm:w-auto">
-              <Input
-                placeholder="Promo code"
-                value={promoCodeInput}
-                onChange={e => setPromoCodeInput(e.target.value.toUpperCase())}
-                disabled={isSubmitting}
-                className="h-9 flex-1 sm:flex-none rounded-full w-[250px] min-w-[50px] max-w-[250px] text-[14px]"
-              />
-              <Button
-                onClick={handleApplyPromo}
-                disabled={isSubmitting}
-                className="flex items-center gap-2 flex-1 sm:flex-none rounded-full w-[80px]"
-              >
-                Apply
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleResetPromoCode}
-                disabled={isSubmitting}
-                className="flex items-center gap-2 flex-1 sm:flex-none rounded-full w-[80px]"
-              >
-                Reset
-              </Button>
-            </div>
+        <TooltipProvider>
+          <div className="p-6 border-b">
+            <DialogHeader>
+              <DialogTitle>
+                <span className="text-xl font-normal">Tickets for </span>
+                <span className="text-xl font-semibold">"{eventTitle}"</span>
+                <span className="text-xl font-normal"> {eventType.toLowerCase()}</span>
+              </DialogTitle>
+            </DialogHeader>
           </div>
 
-          {/* Promo Error or Success message */}
-          <div className="flex flex-col sm:flex-row gap-1 items-center justify-between">
-            <div className="flex flex-wrap items-center justify-start gap-1 p-0 pb-6 w-full sm:w-auto">
-              {promoError ? (
-                <Alert variant="default" className="w-full sm:w-auto p-0 mb-4 border-none bg-none text-red-700">
-                <AlertCircle strokeWidth={2.5} className="h-5 w-5 text-red-700" />
-                <AlertDescription className="text-red-700 font-normal">{promoError}</AlertDescription>
-                </Alert>
-              ) : promoWarning ? (
-                <Alert variant="default" className="w-full sm:w-auto p-0 mb-4 border-none bg-none text-yellow-700">
-                  <AlertCircle strokeWidth={2.5} className="h-5 w-5 text-yellow-700" />
-                  <AlertDescription className="text-yellow-700 font-normal">{promoWarning}</AlertDescription>
-                </Alert>
-              ) : appliedPromo != null ? (
-                <Alert variant="default" className="w-full sm:w-auto p-0 mb-4 border-none bg-none text-green-700">
-                  <CircleCheck strokeWidth={2.5} className="h-5 w-5 text-green-700" />
-                  <AlertDescription className="text-green-700 font-normal">Promo code applied: {appliedPromo}% off</AlertDescription>
-                </Alert>
-              ) : (
-                <Alert variant="default" className="w-full sm:w-auto p-0 mb-4 border-none bg-none text-gray-500">
-                  <CirclePercent strokeWidth={2.5} className="h-5 w-5 text-gray-500" />
-                  <AlertDescription className="text-gray-500 font-normal">No promo code applied</AlertDescription>
-                </Alert>
-              )}
-            </div>
+          <div className="flex-1 overflow-y-auto custom-scroll p-6">
+            <TicketList
+              key={resetCount}
+              eventId={eventId}
+              onTicketQuantitiesChange={handleQuantitiesChange}
+              onTicketsLoad={(loadedTickets) => setTickets(loadedTickets)}
+              discountPercent={appliedPromo ?? 0}
+            />
           </div>
 
-          {/* Clear Cart, Total and Buy Button */}
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-            <div className="flex gap-2 w-full sm:w-auto">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleClearCart}
-                disabled={isSubmitting || Object.keys(quantities).length === 0}
-                className="flex items-center gap-2 text-[16px] flex-1 sm:flex-none rounded-full w-[150px]"
-              >
-                <Trash2 className="h-4 w-4" />
-                Clear Cart
-              </Button>
-            </div>
+          <div className="border-t p-6">
 
-            <div className="flex items-center gap-8 w-full sm:w-auto">
-              <div className="text-lg font-semibold bg-secondary rounded-full py-1 px-5">
-                Total: ${calculateTotal().toFixed(2)}
+            {/* Promo Code Input and Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+              <div className="flex flex-wrap items-center justify-start gap-2 pb-2 w-full sm:w-auto">
+              <Tooltip>
+              <TooltipTrigger asChild>
+                <Input
+                  placeholder="Promo code"
+                  value={promoCodeInput}
+                  onChange={e => setPromoCodeInput(e.target.value.toUpperCase())}
+                  disabled={isSubmitting}
+                  className="h-9 flex-1 sm:flex-none rounded-full w-[250px] min-w-[50px] max-w-[250px] text-[14px]"
+                />
+                </TooltipTrigger>
+                <TooltipContent>Enter promo code to get discount</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={handleApplyPromo}
+                      disabled={isSubmitting}
+                      className="flex items-center gap-2 flex-1 sm:flex-none rounded-full w-[80px]"
+                    >
+                      Apply
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Apply promo code</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      onClick={handleResetPromoCode}
+                      disabled={isSubmitting}
+                      className="flex items-center gap-2 flex-1 sm:flex-none rounded-full w-[80px]"
+                    >
+                      Reset
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Reset promo code</TooltipContent>
+                </Tooltip>
               </div>
-              <Button
-                onClick={handlePurchase}
-                disabled={isSubmitting || Object.keys(quantities).length === 0}
-                className="flex items-center gap-2 text-[16px] flex-1 sm:flex-none rounded-full w-[150px]"
-              >
-                {isSubmitting ? (
-                  <RefreshCw className="h-4 w-4 animate-spin" />
+            </div>
+
+            {/* Promo Error or Success message */}
+            <div className="flex flex-col sm:flex-row gap-1 items-center justify-between">
+              <div className="flex flex-wrap items-center justify-start gap-1 p-0 pb-6 w-full sm:w-auto">
+                {promoError ? (
+                  <Alert variant="default" className="w-full sm:w-auto p-0 mb-4 border-none bg-none text-red-700">
+                  <AlertCircle strokeWidth={2.5} className="h-5 w-5 text-red-700" />
+                  <AlertDescription className="text-red-700 font-normal">{promoError}</AlertDescription>
+                  </Alert>
+                ) : promoWarning ? (
+                  <Alert variant="default" className="w-full sm:w-auto p-0 mb-4 border-none bg-none text-yellow-700">
+                    <AlertCircle strokeWidth={2.5} className="h-5 w-5 text-yellow-700" />
+                    <AlertDescription className="text-yellow-700 font-normal">{promoWarning}</AlertDescription>
+                  </Alert>
+                ) : appliedPromo != null ? (
+                  <Alert variant="default" className="w-full sm:w-auto p-0 mb-4 border-none bg-none text-green-700">
+                    <CircleCheck strokeWidth={2.5} className="h-5 w-5 text-green-700" />
+                    <AlertDescription className="text-green-700 font-normal">Promo code applied: {appliedPromo}% off</AlertDescription>
+                  </Alert>
                 ) : (
-                  <ShoppingCart className="h-4 w-4" />
+                  <Alert variant="default" className="w-full sm:w-auto p-0 mb-4 border-none bg-none text-gray-500">
+                    <CirclePercent strokeWidth={2.5} className="h-5 w-5 text-gray-500" />
+                    <AlertDescription className="text-gray-500 font-normal">No promo code applied</AlertDescription>
+                  </Alert>
                 )}
-                {isSubmitting ? "Processing..." : "Buy"}
-              </Button>
+              </div>
+            </div>
+
+            {/* Clear Cart, Total and Buy Button */}
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+              <div className="flex gap-2 w-full sm:w-auto">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleClearCart}
+                      disabled={isSubmitting || Object.keys(quantities).length === 0}
+                      className="flex items-center gap-2 text-[16px] flex-1 sm:flex-none rounded-full w-[150px]"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Clear Cart
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Clear order data</TooltipContent>
+                </Tooltip>
+              </div>
+
+              <div className="flex items-center gap-8 w-full sm:w-auto">
+                <Tooltip>
+                <TooltipTrigger asChild>
+                <div className="text-lg font-semibold bg-secondary rounded-full py-1 px-5">
+                  Total: ${calculateTotal().toFixed(2)}
+                </div>
+                </TooltipTrigger>
+                <TooltipContent>Total price for all tickets</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={handlePurchase}
+                      disabled={isSubmitting || Object.keys(quantities).length === 0}
+                      className="flex items-center gap-2 text-[16px] flex-1 sm:flex-none rounded-full w-[150px]"
+                    >
+                      {isSubmitting ? (
+                        <RefreshCw className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <ShoppingCart className="h-4 w-4" />
+                      )}
+                      {isSubmitting ? "Processing..." : "Buy"}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Checkout and pay for order</TooltipContent>
+                </Tooltip>
+              </div>
             </div>
           </div>
-        </div>
+        </TooltipProvider>
       </DialogContent>
     </Dialog>
   );

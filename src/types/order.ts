@@ -1,4 +1,4 @@
-import { PromoCode } from './promo-code';
+import { PromoCode, PromoCodeDiscount } from './promo-code';
 
 export type OrderItem = {
     id: number;
@@ -51,12 +51,38 @@ export type OrderItemInclude = {
     ticket: Ticket;
 };
 
-export type PromoCode = {
-    discountPercent: number;
-} | null;
-
 export interface OrderDetailsModalProps {
     isOpen: boolean;
     onClose: () => void;
     order: Order | null;
+}
+
+export interface OrderCreateRequest {
+    promoCode: string;
+    paymentMethod: string;
+    eventId: number;
+    items: {
+        ticketTitle: string;
+        quantity: number;
+    }[];
+}
+
+export interface OrderItemResponse {
+    id: number;
+    ticketId: number;
+    ticketFileKey: string;
+    initialPrice: number;
+    finalPrice: number;
+}
+
+export interface OrderCreateResponse {
+    id: number;
+    userId: number;
+    promoCodeId: number;
+    paymentStatus: string;
+    paymentMethod: string;
+    totalAmount: number;
+    createdAt: string;
+    orderItems: OrderItemResponse[];
+    promoCode: PromoCodeDiscount;
 }

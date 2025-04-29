@@ -2,6 +2,8 @@ import { ApiResponse } from "@/types/common";
 import { executeApiRequest } from "@/utils/api-request";
 import api from "@/lib/api";
 import { TicketUniqueTypeResponse } from "@/types/ticket";
+import { Order, OrderCreateRequest, OrderCreateResponse } from "@/types/order";
+import { PaymentIntent } from "@/types/payment";
 
 export const getTicketTypes = async (eventId: string)
 : Promise<ApiResponse<TicketUniqueTypeResponse>> => {
@@ -52,3 +54,15 @@ export const purchaseTickets = async (
   );
 };
 
+export async function createOrder(data : OrderCreateRequest): Promise<ApiResponse<OrderCreateResponse>> {
+  return executeApiRequest<OrderCreateResponse>(
+    () => api.post(`/orders`, data),
+    `Failed to create order with promo code ${data.promoCode}`
+  );
+}
+
+export async function createPaymentIntent(orderId: number): Promise<ApiResponse<PaymentIntent>> {
+  return executeApiRequest<PaymentIntent>(
+    () => api.post(`/payments/stripe/payment-intents`, { orderId }),
+    `Failed to create payment intent for order id ${orderId}`);
+}

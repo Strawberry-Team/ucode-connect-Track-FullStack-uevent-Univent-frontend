@@ -39,3 +39,7 @@ export type PromoCodeCreateModalProps = {
     onPromoCodeUpdated: (updatedPromoCode: PromoCode) => void;
     promoCodeToEdit?: PromoCode | null;
 };
+
+export type PromoCodeDiscount = {
+    discountPercent: number;
+} | null;

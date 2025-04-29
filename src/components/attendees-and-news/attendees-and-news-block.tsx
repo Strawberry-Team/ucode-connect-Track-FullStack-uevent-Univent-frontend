@@ -10,7 +10,7 @@ import { CalendarDays, ChevronDown, ChevronUp } from "lucide-react";
 import { updateEventAttendeeVisibility, getEventAttendees } from "@/lib/events";
 import { useAuth } from "@/context/auth-context";
 import { showErrorToasts, showSuccessToast } from "@/lib/toast";
-import { NotificationsBlockProps, NotificationItemProps, Notification, UserNotification } from "@/types/attendees-and-news-block";
+import { NotificationsBlockProps, NotificationItemProps, Notification, UserNotification } from "@/types/attendees-and-news";
 
 function NotificationItem({ notification, isExpanded, isCollapsing, onVisibilityChange, currentUserId }: NotificationItemProps) {
     const descriptionRef = useRef<HTMLDivElement>(null);
