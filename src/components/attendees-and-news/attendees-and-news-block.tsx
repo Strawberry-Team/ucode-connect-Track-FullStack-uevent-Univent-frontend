@@ -147,10 +147,10 @@ export default function AttendeesAndNewsBlock({ notifications, eventId }: Notifi
                     });
                     setNotificationsState(userNotifications);
                 } else {
-                    setError("Failed to load attendees 1");
+                    setError("Failed to load attendees");
                 }
             } catch (err) {
-                setError("Failed to load attendees 2");
+                setError("Failed to load attendees");
             } finally {
                 setIsLoading(false);
             }
@@ -241,12 +241,9 @@ export default function AttendeesAndNewsBlock({ notifications, eventId }: Notifi
     }
 
     if (error) {
-        return <div>{error}</div>;
+        return <div className="text-gray-500 text-lg">{error}</div>;
     }
 
-    if (!notificationsState || notificationsState.length === 0) {
-        return null;
-    }
 
     const notificationsToDisplay = notificationsState.filter((notification) => {
         if (notification.type !== "user") return true;
@@ -254,8 +251,14 @@ export default function AttendeesAndNewsBlock({ notifications, eventId }: Notifi
         return notification.isVisible;
     });
 
-    if (notificationsToDisplay.length === 0) {
-        return null;
+    if (!notificationsState || notificationsState.length === 0 || notificationsToDisplay.length === 0) {
+        return (
+            <div className="mt-6 max-w-[300px]">
+                <p className="text-gray-500 text-lg">
+                    {eventId ? "No attendees available." : "No news available."}
+                </p>
+            </div>
+        );
     }
 
     const firstNotification = notificationsToDisplay[0];
@@ -264,7 +267,7 @@ export default function AttendeesAndNewsBlock({ notifications, eventId }: Notifi
     if (firstNotification.type === "news") {
         containerWidth = "max-w-[850px]";
     } else if (firstNotification.type === "companyNews") {
-        containerWidth = "max-w-[600px]";
+        containerWidth = "max-w-[850px]";
     } else if (firstNotification.type === "user") {
         containerWidth = "max-w-[300px]";
     } else {

@@ -6,13 +6,13 @@ import { useAuth } from "@/context/auth-context";
 import AttendeesAndNewsBlock from "@/components/attendees-and-news/attendees-and-news-block";
 import SubscriptionActions from "@/components/subscription/subscription-actions";
 import { Company, CompanyNewsNotification, EventNotification } from "@/types/company";
+import CompanyEventsCarousel from "@/components/event/company-events-carousel";
 
 interface CompanyPageProps {
     data:
         | {
         company: Company;
         companyNewsNotifications: CompanyNewsNotification[];
-        eventNotifications: EventNotification[];
     }
         | { error: string };
 }
@@ -24,11 +24,7 @@ export default function CompanyPage({ data }: CompanyPageProps) {
         return <div className="px-custom py-4">{data.error}</div>;
     }
 
-    if (!user) {
-        return;
-    }
-
-    const { company, companyNewsNotifications, eventNotifications } = data;
+    const { company, companyNewsNotifications} = data;
 
     const imageUrl = company.logoName
         ? `http://localhost:8080/uploads/company-logos/${company.logoName}`
@@ -61,9 +57,7 @@ export default function CompanyPage({ data }: CompanyPageProps) {
                             isCompanyPage={true}
                         />
                         <div className="-mt-3 flex flex-wrap gap-2">
-                            <div className="flex-1 min-w-[300px] md:flex-[2]">
-                                <AttendeesAndNewsBlock notifications={eventNotifications} />
-                            </div>
+
                             <div className="flex-1 min-w-[300px] md:flex-[4]">
                                 <AttendeesAndNewsBlock notifications={companyNewsNotifications} />
                             </div>
@@ -75,6 +69,8 @@ export default function CompanyPage({ data }: CompanyPageProps) {
             <div className="mt-8 border-t">
                 <p className="mb-2 my-6 text-gray-600 text-lg leading-relaxed">{company.description}</p>
             </div>
+
+            <CompanyEventsCarousel companyId={company.id} />
         </div>
     );
 }

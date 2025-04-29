@@ -176,23 +176,4 @@
   max-width: calc(100% - 180px);
 }
 
-.photos-container {
-  transition: all 0.3s ease;
-}
-
-.photos-container.expanded {
-  @apply -space-x-4;
-}
-
-.photos-container img {
-  position: relative;
-  transition: all 0.3s ease;
-}
-
-.photos-container img:hover {
-  transform: scale(1.15) translateY(-2px);
-  z-index: 50 !important;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
 

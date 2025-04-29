@@ -11,7 +11,7 @@ const EventCard = ({ event, className, hasMoved = false }: ProductCardProps) => 
     const router = useRouter();
 
     const handleClick = () => {
-        if (hasMoved) return; // Блокируем переход, если было перетаскивание
+        if (hasMoved) return;
         router.push(`/events/${event.id}`);
     };
 

@@ -6,19 +6,23 @@ import { CreatePromoCodeRequest, PromoCode, InvalidPromoCode, ValidPromoCode } f
 import { CreateTicketRequest, Ticket, TicketsResponse, TicketTypesResponse } from "@/types/ticket";
 import { NewsItem } from "@/types/news";
 
-export async function getEvents(skip: number = 0, take: number = 12, formats?: string, themes?: string, startedAt?: string, endedAt?: string, title?: string, minPrice?: number, maxPrice?: number, sortBy?: string, sortOrder?: string): Promise<ApiResponse<EventsResponse>> {
-    let url = `/events?skip=${skip}&take=${take}`;
-    if (formats) url += `&formats=${formats}`;
-    if (themes) url += `&themes=${themes}`;
-    if (startedAt) url += `&startedAt=${startedAt}`;
-    if (endedAt) url += `&endedAt=${endedAt}`;
-    if (title) url += `&title=${encodeURIComponent(title)}`;
-    if (minPrice !== undefined) url += `&minPrice=${minPrice}`;
-    if (maxPrice !== undefined) url += `&maxPrice=${maxPrice}`;
-    if (sortBy) url += `&sortBy=${sortBy}`;
-    if (sortOrder) url += `&sortOrder=${sortOrder}`;
+export async function getEvents(skip?: number, take?: number, formats?: string, themes?: string, startedAt?: string, endedAt?: string, title?: string, minPrice?: number, maxPrice?: number, sortBy?: string, sortOrder?: string): Promise<ApiResponse<EventsResponse>> {
+    let url = "/events";
+    const queryParams: string[] = [];
 
-    console.log(url);
+    if (skip !== undefined) queryParams.push(`skip=${skip}`);
+    if (take !== undefined) queryParams.push(`take=${take}`);
+    if (formats) queryParams.push(`formats=${formats}`);
+    if (themes) queryParams.push(`themes=${themes}`);
+    if (startedAt) queryParams.push(`startedAt=${startedAt}`);
+    if (endedAt) queryParams.push(`endedAt=${endedAt}`);
+    if (title) queryParams.push(`title=${encodeURIComponent(title)}`);
+    if (minPrice !== undefined) queryParams.push(`minPrice=${minPrice}`);
+    if (maxPrice !== undefined) queryParams.push(`maxPrice=${maxPrice}`);
+    if (sortBy) queryParams.push(`sortBy=${sortBy}`);
+    if (sortOrder) queryParams.push(`sortOrder=${sortOrder}`);
+    if (queryParams.length > 0) url += `?${queryParams.join("&")}`;
+
     return executeApiRequest<EventsResponse>(() => api.get(url), "Failed to fetch events");
 }
 

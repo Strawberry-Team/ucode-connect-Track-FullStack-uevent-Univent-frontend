@@ -6,7 +6,8 @@ import { CalendarDays, MapPin, Tag, Building } from "lucide-react";
 import SubscriptionActions from "@/components/subscription/subscription-actions";
 import AttendeesAndNewsBlock from "@/components/attendees-and-news/attendees-and-news-block";
 import CommentsDisqus from "@/components/comment/comment";
-import EventsCompanyCarousel from "@/components/event/company-events-carousel";
+import CompanyEventsCarousel from "@/components/event/company-events-carousel";
+import SimilarEventsCarousel from "@/components/event/similar-events-carousel";
 import GoogleMapIframe from "@/components/google-map/google-map-iframe";
 import { useAuth } from "@/context/auth-context";
 import { Event, EventPageProps } from "@/types/event";
@@ -41,6 +42,9 @@ export default function EventPage({ data }: EventPageProps) {
     const imageUrl = event.posterName
         ? `http://localhost:8080/uploads/event-posters/${event.posterName}`
         : "https://via.placeholder.com/384x384";
+
+    // Формируем строку тем для запроса, используя ID тем
+    const themes = event.themes.map((theme) => theme.id).join(",");
 
     return (
         <div className="px-custom py-4 w-full">
@@ -116,7 +120,8 @@ export default function EventPage({ data }: EventPageProps) {
                 </div>
             </div>
 
-            <EventsCompanyCarousel companyId={event.company.id} />
+            <CompanyEventsCarousel companyId={event.company.id} currentEventId={event.id} />
+            <SimilarEventsCarousel currentEventId={event.id} themes={themes} />
 
             <CommentsDisqus
                 id={event.id}
@@ -125,4 +130,4 @@ export default function EventPage({ data }: EventPageProps) {
             />
         </div>
     );
-}
+};

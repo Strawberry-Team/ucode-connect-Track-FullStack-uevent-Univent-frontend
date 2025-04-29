@@ -54,7 +54,7 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
   const handlePurchase = async () => {
     try {
       const validation = ticketPurchaseSchema.safeParse(quantities);
-      
+
       if (!validation.success) {
         const errors = validation.error.errors.map(err => err.message);
         showErrorToasts(errors);
@@ -65,10 +65,10 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
 
       // TODO: Implement actual purchase API call
       // const result = await purchaseTickets(eventId, quantities);
-      
+
       // Temporary success simulation
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       showSuccessToast("Tickets purchased successfully!");
       handleClose();
     } catch (error) {
@@ -151,7 +151,7 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
               <Input
                 placeholder="Promo code"
                 value={promoCodeInput}
-                onChange={e => setPromoCodeInput(e.target.value)}
+                onChange={e => setPromoCodeInput(e.target.value.toUpperCase())}
                 disabled={isSubmitting}
                 className="h-9 flex-1 sm:flex-none rounded-full w-[250px] min-w-[50px] max-w-[250px] text-[14px]"
               />
@@ -175,7 +175,7 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
 
           {/* Promo Error or Success message */}
           <div className="flex flex-col sm:flex-row gap-1 items-center justify-between">
-            <div className="flex flex-wrap items-center justify-start gap-1 p-0 pb-6 w-full sm:w-auto items-center justify-start">
+            <div className="flex flex-wrap items-center justify-start gap-1 p-0 pb-6 w-full sm:w-auto">
               {promoError ? (
                 <Alert variant="default" className="w-full sm:w-auto p-0 mb-4 border-none bg-none text-red-700">
                 <AlertCircle strokeWidth={2.5} className="h-5 w-5 text-red-700" />
@@ -239,4 +239,4 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
   );
 };
 
-export default BuyTicketModal; 
+export default BuyTicketModal;

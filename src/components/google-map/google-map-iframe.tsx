@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useJsApiLoader } from "@react-google-maps/api";
 import { MapEmbedProps } from "@/types/map";
 
 const parseCoordinates = (coords: string): { lat: number; lng: number } | null => {
@@ -12,35 +11,33 @@ const parseCoordinates = (coords: string): { lat: number; lng: number } | null =
 
 export default function GoogleMapIframe({ coordinates }: MapEmbedProps) {
     const [mapEmbedUrl, setMapEmbedUrl] = useState<string>("");
-
-    const { isLoaded } = useJsApiLoader({
-        googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "YOUR_API_KEY_HERE",
-        libraries: ["places"],
-    });
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (isLoaded && coordinates) {
-            const coords = parseCoordinates(coordinates);
-            if (coords) {
-                const { lat, lng } = coords;
-                const geocoder = new google.maps.Geocoder();
-                geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-                    if (status === google.maps.GeocoderStatus.OK && results?.[0]) {
-                        const placeId = results[0].place_id;
-                        const centerLat = lat + 0.0005;
-                        const embedUrl = `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=place_id:${placeId}&center=${centerLat},${lng}&zoom=15&language=en`;
-                        setMapEmbedUrl(embedUrl);
-                    } else {
-                        const centerLat = lat + 0.0005;
-                        const embedUrl = `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${lat},${lng}&center=${centerLat},${lng}&zoom=15&language=en`;
-                        setMapEmbedUrl(embedUrl);
-                    }
-                });
-            } else {
-                setMapEmbedUrl("");
-            }
+        const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+        if (!apiKey) {
+            setError("Google Maps API key is missing");
+            return;
         }
-    }, [isLoaded, coordinates]);
+
+        if (!coordinates) {
+            setError("Coordinates are missing");
+            return;
+        }
+
+        const coords = parseCoordinates(coordinates);
+        if (!coords) {
+            setError("Invalid coordinates format");
+            return;
+        }
+
+        const { lat, lng } = coords;
+        const centerLat = lat + 0.0005;
+        const embedUrl = `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${lat},${lng}&center=${centerLat},${lng}&zoom=15&language=en`;
+        setMapEmbedUrl(embedUrl);
+
+    }, [coordinates]);
+
 
     return (
         <>
@@ -55,7 +52,8 @@ export default function GoogleMapIframe({ coordinates }: MapEmbedProps) {
                     className="md:w-[500px] rounded-lg md:float-right md:ml-6"
                 />
             ) : (
-                <div>
+                <div className="text-gray-600">
+                    Loading map...
                 </div>
             )}
         </>

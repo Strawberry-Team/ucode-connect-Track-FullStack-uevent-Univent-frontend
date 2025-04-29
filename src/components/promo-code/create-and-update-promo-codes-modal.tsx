@@ -1,4 +1,3 @@
-// components/promo-codes/PromoCodeCreateModal.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -26,13 +25,13 @@ const promoCodeZodSchema = z.object({
 });
 
 export default function PromoCodeCreateModal({
-    eventId,
-    isOpen,
-    onClose,
-    onPromoCodeCreated,
-    onPromoCodeUpdated,
-    promoCodeToEdit,
-}: PromoCodeCreateModalProps) {
+                                                 eventId,
+                                                 isOpen,
+                                                 onClose,
+                                                 onPromoCodeCreated,
+                                                 onPromoCodeUpdated,
+                                                 promoCodeToEdit,
+                                             }: PromoCodeCreateModalProps) {
     const [formData, setFormData] = useState({
         title: promoCodeToEdit?.title || "",
         code: promoCodeToEdit?.code || "",
@@ -81,6 +80,8 @@ export default function PromoCodeCreateModal({
         if (name === "discountPercent") {
             const numericValue = value.replace(/[^0-9]/g, "");
             setFormData((prev) => ({ ...prev, [name]: numericValue }));
+        } else if (name === "code") {
+            setFormData((prev) => ({ ...prev, [name]: value.toUpperCase() }));
         } else {
             setFormData((prev) => ({ ...prev, [name]: value }));
         }
@@ -197,9 +198,6 @@ export default function PromoCodeCreateModal({
                                 className="!text-[15px] w-full rounded-md"
                                 disabled={isSubmitting}
                             />
-                            {errors.code && (
-                                <p className="text-sm text-red-500">{errors.code}</p>
-                            )}
                         </div>
                     )}
 
@@ -224,7 +222,7 @@ export default function PromoCodeCreateModal({
                             checked={formData.isActive}
                             onCheckedChange={handleSwitchChange}
                             disabled={isSubmitting}
-                            className={`${
+                            className={`cursor-pointer ${
                                 formData.isActive ? "!bg-green-500" : "!bg-red-500"
                             } transition-colors duration-200`}
                         />

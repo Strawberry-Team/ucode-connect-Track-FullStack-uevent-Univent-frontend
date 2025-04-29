@@ -126,6 +126,12 @@ export interface EventsCardProps {
 
 export interface CompanyEventsCarouselProps {
     companyId: number;
+    currentEventId?: number;
+}
+
+export interface SimilarEventsCarouselProps {
+    currentEventId?: number;
+    themes?: string;
 }
 
 export interface EventsPopularCardCarouselProps {

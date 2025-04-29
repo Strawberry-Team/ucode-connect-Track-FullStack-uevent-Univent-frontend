@@ -33,6 +33,7 @@ export type Event = {
     title: string;
     startedAt: string;
     endedAt: string;
+    venue: string;
     posterName: string;
 };
 
@@ -53,3 +54,9 @@ export type OrderItemInclude = {
 export type PromoCode = {
     discountPercent: number;
 } | null;
+
+export interface OrderDetailsModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    order: Order | null;
+}

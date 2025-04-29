@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DialogTitle } from "@/components/ui/dialog";
 import { Mail } from "lucide-react";
+import {ResetPasswordFormProps} from "@/types/auth";
 
 
 

@@ -38,33 +38,6 @@ export default async function CompanyPageCard({ params }: { params: Promise<{ co
         createdAt: news.createdAt,
     }));
 
-    const rawEventNotifications = [
-        {
-            id: 1,
-            title: "John",
-            createdAt: "2025-04-15T10:07:28.000Z",
-            avatarUrl: `http://localhost:8080/uploads/event-posters/default-poster.png`,
-        },
-        {
-            id: 2,
-            title: "Jane",
-            createdAt: "2025-04-15T10:08:00.000Z",
-            avatarUrl: `http://localhost:8080/uploads/event-posters/default-poster.png`,
-        },
-        {
-            id: 1,
-            title: "John",
-            createdAt: "2025-04-15T10:07:28.000Z",
-            avatarUrl: `http://localhost:8080/uploads/event-posters/default-poster.png`,
-        },
-    ];
-
-    const eventNotifications: EventNotification[] = rawEventNotifications.map((event) => ({
-        type: "event" as const,
-        title: event.title,
-        createdAt: event.createdAt,
-        avatarUrl: event.avatarUrl,
-    }));
 
     const company = companyResponse.data;
 
@@ -73,7 +46,6 @@ export default async function CompanyPageCard({ params }: { params: Promise<{ co
             data={{
                 company,
                 companyNewsNotifications,
-                eventNotifications,
             }}
         />
     );
