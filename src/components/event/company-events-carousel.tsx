@@ -29,7 +29,10 @@ const CompanyEventsCarousel = ({ companyId, currentEventId }: CompanyEventsCarou
                 await new Promise((resolve) => setTimeout(resolve, remaining));
             }
             if (response.success && response.data) {
-                setEvents(response.data);
+                const filteredEvents = response.data.filter(
+                    (event) => event.id !== currentEventId
+                );
+                setEvents(filteredEvents);
             } else {
                 console.error(`Failed to fetch events for company ${companyId}:`, response);
                 setEvents([]);
