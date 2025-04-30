@@ -18,6 +18,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {
     CalendarIcon,
+    CalendarClock,
     ClockIcon,
     Save,
     Camera,
@@ -27,8 +28,9 @@ import {
     FileText,
     Building,
     Users,
-    Clock, 
-    Ticket, 
+    Clock,
+    Eye,
+    Ticket,
     Palette
 } from "lucide-react";
 import {useJsApiLoader} from "@react-google-maps/api";
@@ -42,7 +44,7 @@ import {format, startOfDay} from "date-fns";
 import {eventCreateZodSchema, validateEventDates} from "@/zod/shemas";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {getCityAndCountryFromComponents} from "@/components/google-map/google-map-location-picker-modal";
-import { EventInfoCardProps } from "@/types/event";
+import {EventInfoCardProps} from "@/types/event";
 
 const CalendarComponent = dynamic(() => import("@/components/ui/calendar-form").then(mod => mod.CalendarForm), {ssr: false});
 const LocationPickerModal = dynamic(() => import("../google-map/google-map-location-picker-modal"), {ssr: false});
@@ -243,8 +245,18 @@ const DateFields = memo(
                                     }`}
                                     disabled={isLoading}
                                 >
-                                    <CalendarIcon strokeWidth={2.5} className="ml-0 h-4 w-4"
-                                                  style={{color: "#727272"}}/>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <span className=" pointer-events-auto">
+                                                    <CalendarClock strokeWidth={2.5} className="-ml-1 h-4 w-4" style={{ color: "#727272" }} />
+                                                </span>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Start date</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                     {startDate ? format(startDate, "PPP") : "Start date"}
                                 </Button>
                             </PopoverTrigger>
@@ -300,8 +312,18 @@ const DateFields = memo(
                                     }`}
                                     disabled={isLoading}
                                 >
-                                    <CalendarIcon strokeWidth={2.5} className="ml-0 h-4 w-4"
-                                                  style={{color: "#727272"}}/>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <span className=" pointer-events-auto">
+                                                    <CalendarClock strokeWidth={2.5} className="-ml-1 h-4 w-4" style={{ color: "#727272" }} />
+                                                </span>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>End date</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                     {endDate ? format(endDate, "PPP") : "End date"}
                                 </Button>
                             </PopoverTrigger>
@@ -343,7 +365,7 @@ const DateFields = memo(
                                     {timeOptions.map((time) => {
                                         const startMinutes = getMinutesFromTime(startTime);
                                         const endMinutes = getMinutesFromTime(time);
-                                        const isTimeDisabled =  endMinutes < startMinutes + 60;
+                                        const isTimeDisabled = endMinutes < startMinutes + 60;
 
                                         return (
                                             <SelectItem
@@ -372,8 +394,19 @@ const DateFields = memo(
                                     }`}
                                     disabled={isLoading}
                                 >
-                                    <CalendarIcon strokeWidth={2.5} className="ml-0 h-4 w-4"
-                                                  style={{color: "#727272"}}/>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <span className=" pointer-events-auto">
+                                                    <Eye strokeWidth={2.5} className="-ml-1 h-4 w-4"
+                                                         style={{color: "#727272"}}/>
+                                                </span>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Publish date</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                     {publishedDate ? format(publishedDate, "PPP") : "Publish date"}
                                 </Button>
                             </PopoverTrigger>
@@ -387,7 +420,7 @@ const DateFields = memo(
                                     }}
                                     disabled={(date) => {
                                         const today = new Date(new Date().setHours(0, 0, 0, 0));
-                                        const maxDate =  startDate;
+                                        const maxDate = startDate;
                                         return date < today || (maxDate ? date > maxDate : false);
                                     }}
                                 />
@@ -433,8 +466,19 @@ const DateFields = memo(
                                     }`}
                                     disabled={isLoading}
                                 >
-                                    <CalendarIcon strokeWidth={2.5} className="ml-0 h-4 w-4"
-                                                  style={{color: "#727272"}}/>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <span className=" pointer-events-auto">
+                                                    <Ticket strokeWidth={2.5} className="-ml-1 h-4 w-4"
+                                                            style={{color: "#727272"}}/>
+                                                </span>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Tickets available from</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                     {ticketsDate ? format(ticketsDate, "PPP") : "Tickets available"}
                                 </Button>
                             </PopoverTrigger>
@@ -921,7 +965,7 @@ export default function EventInfoCard({setEditMode, editMode, eventId}: EventInf
                         ? `${placeDetails.geometry.location.lat()},${placeDetails.geometry.location.lng()}`
                         : "";
 
-                    const { city, country } = getCityAndCountryFromComponents(placeDetails);
+                    const {city, country} = getCityAndCountryFromComponents(placeDetails);
                     const formattedVenue = city && country ? `${name}, ${city}, ${country}` : name;
 
                     setVenue(formattedVenue);
@@ -1125,52 +1169,53 @@ export default function EventInfoCard({setEditMode, editMode, eventId}: EventInf
 
     if (isLoading) {
         return (
-            <Card className="shadow-lg transition-all overflow-hidden duration-300 hover:shadow-xl w-[1200px] h-[600px] flex flex-col relative">
+            <Card
+                className="shadow-lg transition-all overflow-hidden duration-300 hover:shadow-xl w-[1200px] h-[600px] flex flex-col relative">
                 <div className="absolute top-0 left-0 w-[33%] min-w-[100px] max-w-[400px] h-[600px] flex-shrink-0">
-                    <Skeleton className="w-full h-full rounded-l-lg" />
+                    <Skeleton className="w-full h-full rounded-l-lg"/>
                 </div>
                 <div className="flex-1 flex flex-col ml-[33%] ml:min-w-[200px] ml:max-w-[400px] h-[550px]">
                     <CardContent className="mt-3 flex-1 p-6 overflow-y-auto custom-scroll">
                         <div className="space-y-6">
-                            <Skeleton className="h-[30px] w-[200px]" />
+                            <Skeleton className="h-[30px] w-[200px]"/>
                             <div className="mt-7 grid grid-cols-2 gap-x-6 gap-y-4">
                                 <div className="space-y-5">
                                     <div className="flex items-center gap-2">
-                                        <Skeleton className="h-[20px] w-[150px]" />
+                                        <Skeleton className="h-[20px] w-[150px]"/>
                                     </div>
                                     <div className="mt-6 flex items-center gap-2">
-                                        <Skeleton className="h-[20px] w-[150px]" />
+                                        <Skeleton className="h-[20px] w-[150px]"/>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <Skeleton className="h-[20px] w-[250px]" />
+                                        <Skeleton className="h-[20px] w-[250px]"/>
                                     </div>
                                     <div className="mt-3 flex items-center gap-2">
-                                        <Skeleton className="h-[20px] w-[150px]" />
+                                        <Skeleton className="h-[20px] w-[150px]"/>
                                     </div>
                                 </div>
                                 <div className="space-y-5">
                                     <div className="flex items-center gap-2">
-                                        <Skeleton className="h-[20px] w-[100px]" />
+                                        <Skeleton className="h-[20px] w-[100px]"/>
                                     </div>
                                     <div className="mt-6 flex items-center gap-2">
-                                        <Skeleton className="h-[20px] w-[150px]" />
+                                        <Skeleton className="h-[20px] w-[150px]"/>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <Skeleton className="h-[20px] w-[100px]" />
+                                        <Skeleton className="h-[20px] w-[100px]"/>
                                     </div>
                                     <div className="mt-3 flex items-center gap-2">
-                                        <Skeleton className="h-[20px] w-[150px]" />
+                                        <Skeleton className="h-[20px] w-[150px]"/>
                                     </div>
                                 </div>
                             </div>
                             <div className="mt-8 flex items-center gap-2">
-                                <Skeleton className="h-[20px] w-[300px]" />
+                                <Skeleton className="h-[20px] w-[300px]"/>
                             </div>
                         </div>
                     </CardContent>
                     <CardFooter className="bg-white">
                         <div className="w-full flex justify-end">
-                            <Skeleton className="h-9 w-[200px]" />
+                            <Skeleton className="h-9 w-[200px]"/>
                         </div>
                     </CardFooter>
                 </div>
@@ -1313,7 +1358,9 @@ export default function EventInfoCard({setEditMode, editMode, eventId}: EventInf
                                         <div className="text-[17px] flex items-center gap-2">
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
-                                                    <Building className="w-5 h-5 text-gray-500 flex-shrink-0 self-center" strokeWidth={2.5} />
+                                                    <Building
+                                                        className="w-5 h-5 text-gray-500 flex-shrink-0 self-center"
+                                                        strokeWidth={2.5}/>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
                                                     <p>Company</p>
@@ -1324,7 +1371,8 @@ export default function EventInfoCard({setEditMode, editMode, eventId}: EventInf
                                         <div className="text-[17px] flex items-center gap-2">
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
-                                                    <MapPin className="w-5 h-5 text-gray-500 flex-shrink-0 self-center" strokeWidth={2.5} />
+                                                    <MapPin className="w-5 h-5 text-gray-500 flex-shrink-0 self-center"
+                                                            strokeWidth={2.5}/>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
                                                     <p>Venue</p>
@@ -1335,7 +1383,8 @@ export default function EventInfoCard({setEditMode, editMode, eventId}: EventInf
                                         <div className="text-[17px] flex items-center gap-2">
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
-                                                    <Clock className="w-5 h-5 text-gray-500 flex-shrink-0 self-center" strokeWidth={2.5} />
+                                                    <Clock className="w-5 h-5 text-gray-500 flex-shrink-0 self-center"
+                                                           strokeWidth={2.5}/>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
                                                     <p>Event Duration</p>
@@ -1349,7 +1398,9 @@ export default function EventInfoCard({setEditMode, editMode, eventId}: EventInf
                                         <div className="text-[17px] flex items-center gap-2">
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
-                                                    <CalendarIcon className="w-5 h-5 text-gray-500 flex-shrink-0 self-center" strokeWidth={2.5} />
+                                                    <CalendarIcon
+                                                        className="w-5 h-5 text-gray-500 flex-shrink-0 self-center"
+                                                        strokeWidth={2.5}/>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
                                                     <p>Published At</p>
@@ -1364,7 +1415,8 @@ export default function EventInfoCard({setEditMode, editMode, eventId}: EventInf
                                         <div className="text-[17px] flex items-center gap-2">
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
-                                                    <Tag className="w-5 h-5 text-gray-500 flex-shrink-0 self-center" strokeWidth={2.5} />
+                                                    <Tag className="w-5 h-5 text-gray-500 flex-shrink-0 self-center"
+                                                         strokeWidth={2.5}/>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
                                                     <p>Format</p>
@@ -1375,7 +1427,8 @@ export default function EventInfoCard({setEditMode, editMode, eventId}: EventInf
                                         <div className="text-[17px] flex items-center gap-2">
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
-                                                    <Palette className="w-5 h-5 text-gray-500 flex-shrink-0 self-center" strokeWidth={2.5} />
+                                                    <Palette className="w-5 h-5 text-gray-500 flex-shrink-0 self-center"
+                                                             strokeWidth={2.5}/>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
                                                     <p>Themes</p>
@@ -1386,7 +1439,8 @@ export default function EventInfoCard({setEditMode, editMode, eventId}: EventInf
                                         <div className="text-[17px] flex items-center gap-2">
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
-                                                    <Users className="w-5 h-5 text-gray-500 flex-shrink-0 self-center" strokeWidth={2.5} />
+                                                    <Users className="w-5 h-5 text-gray-500 flex-shrink-0 self-center"
+                                                           strokeWidth={2.5}/>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
                                                     <p>Attendee Visibility</p>
@@ -1397,7 +1451,8 @@ export default function EventInfoCard({setEditMode, editMode, eventId}: EventInf
                                         <div className="text-[17px] flex items-center gap-2">
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
-                                                    <Ticket className="w-5 h-5 text-gray-500 flex-shrink-0 self-center" strokeWidth={2.5} />
+                                                    <Ticket className="w-5 h-5 text-gray-500 flex-shrink-0 self-center"
+                                                            strokeWidth={2.5}/>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
                                                     <p>Tickets Available From</p>
@@ -1411,7 +1466,8 @@ export default function EventInfoCard({setEditMode, editMode, eventId}: EventInf
                                     <div className="flex items-center gap-2">
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <FileText strokeWidth={2.5} className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                                                <FileText strokeWidth={2.5}
+                                                          className="w-5 h-5 text-gray-500 flex-shrink-0"/>
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 <p>Description</p>

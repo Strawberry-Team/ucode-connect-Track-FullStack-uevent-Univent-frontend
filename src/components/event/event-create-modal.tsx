@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { CalendarIcon, ClockIcon, X, Camera, Tag, Users } from "lucide-react"
+import { CalendarClock, ClockIcon, X, Camera, Tag, Users, Ticket, Eye } from "lucide-react"
 import { useJsApiLoader } from "@react-google-maps/api"
 import { useAuth } from "@/context/auth-context"
 import { createEvent, uploadEventPoster, assignThemesToEvent } from "@/lib/events"
@@ -22,6 +22,7 @@ import { CalendarForm } from "@/components/ui/calendar-form"
 import {format, addMinutes, isAfter, set, startOfDay} from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { getCityAndCountryFromComponents } from "../google-map/google-map-location-picker-modal";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 
 function useDebounce<T>(value: T, delay: number): T {
     const [debouncedValue, setDebouncedValue] = useState<T>(value)
@@ -247,7 +248,18 @@ const DateFields = memo(
                                     }`}
                                     disabled={isLoading}
                                 >
-                                    <CalendarIcon strokeWidth={2.5} className="ml-0 h-4 w-4" style={{ color: "#727272" }} />
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <span className=" pointer-events-auto">
+                                                    <CalendarClock strokeWidth={2.5} className="-ml-1 h-4 w-4" style={{ color: "#727272" }} />
+                                                </span>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Start date</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                     {startDate ? format(startDate, "PPP") : "Start date"}
                                 </Button>
                             </PopoverTrigger>
@@ -295,7 +307,18 @@ const DateFields = memo(
                                     }`}
                                     disabled={isLoading}
                                 >
-                                    <CalendarIcon strokeWidth={2.5} className="ml-0 h-4 w-4" style={{ color: "#727272" }} />
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <span className=" pointer-events-auto">
+                                                    <CalendarClock strokeWidth={2.5} className="-ml-1 h-4 w-4" style={{ color: "#727272" }} />
+                                                </span>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>End date</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                     {endDate ? format(endDate, "PPP") : "End date"}
                                 </Button>
                             </PopoverTrigger>
@@ -353,7 +376,19 @@ const DateFields = memo(
                                     }`}
                                     disabled={isLoading}
                                 >
-                                    <CalendarIcon strokeWidth={2.5} className="ml-0 h-4 w-4" style={{ color: "#727272" }} />
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <span className=" pointer-events-auto">
+                                                    <Eye strokeWidth={2.5} className="-ml-1 h-4 w-4"
+                                                         style={{color: "#727272"}}/>
+                                                </span>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Publish date</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                     {publishedDate ? format(publishedDate, "PPP") : "Publish date"}
                                 </Button>
                             </PopoverTrigger>
@@ -379,7 +414,7 @@ const DateFields = memo(
                             value={publishedTime}
                         >
                             <SelectTrigger className="w-[120px] cursor-pointer disabled:cursor-default">
-                                <ClockIcon strokeWidth={2.5} className="h-4 w-4" style={{ color: "#727272" }} />
+                                <ClockIcon strokeWidth={2.5} className=" h-4 w-4" style={{ color: "#727272" }} />
                                 <SelectValue placeholder="Time" />
                             </SelectTrigger>
                             <SelectContent>
@@ -413,7 +448,19 @@ const DateFields = memo(
                                     }`}
                                     disabled={isLoading}
                                 >
-                                    <CalendarIcon strokeWidth={2.5} className="ml-0 h-4 w-4" style={{ color: "#727272" }} />
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <span className=" pointer-events-auto">
+                                                    <Ticket strokeWidth={2.5} className="-ml-1 h-4 w-4"
+                                                            style={{color: "#727272"}}/>
+                                                </span>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Tickets available from</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                     {ticketsDate ? format(ticketsDate, "PPP") : "Tickets available"}
                                 </Button>
                             </PopoverTrigger>

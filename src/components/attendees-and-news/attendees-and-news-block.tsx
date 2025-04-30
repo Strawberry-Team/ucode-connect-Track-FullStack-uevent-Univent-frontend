@@ -323,7 +323,8 @@ export default function AttendeesAndNewsBlock({ notifications, eventId }: Notifi
                     </div>
                 ) : (
                     !isExpanded &&
-                    !isCollapsing && (
+                    !isCollapsing &&
+                    !(notificationsToDisplay.length === 1 && firstNotification.type === "user") && (
                         <div className={`${buttonWidth} flex justify-end`}>
                             <Button
                                 variant="ghost"
