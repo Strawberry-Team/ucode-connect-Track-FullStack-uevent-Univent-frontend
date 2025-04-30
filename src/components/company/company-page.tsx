@@ -27,7 +27,7 @@ export default function CompanyPage({ data }: CompanyPageProps) {
     const { company, companyNewsNotifications} = data;
 
     const imageUrl = company.logoName
-        ? `http://localhost:8080/uploads/company-logos/${company.logoName}`
+        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/company-logos/${company.logoName}`
         : "https://via.placeholder.com/384x384";
 
     return (

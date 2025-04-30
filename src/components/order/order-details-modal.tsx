@@ -134,7 +134,7 @@ export default function OrderDetailsModal({isOpen, onClose, order}: OrderDetails
                                                 <img
                                                     src={
                                                         order.orderItems[0].ticket.event.posterName
-                                                            ? `http://localhost:8080/uploads/event-posters/${order.orderItems[0].ticket.event.posterName}`
+                                                            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/event-posters/${order.orderItems[0].ticket.event.posterName}`
                                                             : "https://via.placeholder.com/40"
                                                     }
                                                     alt={order.orderItems[0].ticket.event.title}

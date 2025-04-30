@@ -133,7 +133,7 @@ export default function AttendeesAndNewsBlock({ notifications, eventId }: Notifi
                 if (attendeesResponse.success && attendeesResponse.data) {
                     const userNotifications: UserNotification[] = attendeesResponse.data.map((attendee) => {
                         const pictureUrl = attendee.user.profilePictureName
-                            ? `http://localhost:8080/uploads/user-avatars/${attendee.user.profilePictureName}`
+                            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/user-avatars/${attendee.user.profilePictureName}`
                             : "https://via.placeholder.com/150";
                         return {
                             type: "user" as const,

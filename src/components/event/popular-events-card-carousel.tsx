@@ -177,7 +177,7 @@ const EventsPopularCardCarousel = ({ events, isLoading }: EventsPopularCardCarou
                                 <img
                                     src={
                                         popularEvents[popularEvents.length - 1].posterName
-                                            ? `http://localhost:8080/uploads/event-posters/${popularEvents[popularEvents.length - 1].posterName}`
+                                            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/event-posters/${popularEvents[popularEvents.length - 1].posterName}`
                                             : "https://via.placeholder.com/300x192"
                                     }
                                     alt={popularEvents[popularEvents.length - 1].title}
@@ -221,7 +221,7 @@ const EventsPopularCardCarousel = ({ events, isLoading }: EventsPopularCardCarou
                                 <img
                                     src={
                                         event.posterName
-                                            ? `http://localhost:8080/uploads/event-posters/${event.posterName}`
+                                            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/event-posters/${event.posterName}`
                                             : "https://via.placeholder.com/300x192"
                                     }
                                     alt={event.title}
@@ -263,7 +263,7 @@ const EventsPopularCardCarousel = ({ events, isLoading }: EventsPopularCardCarou
                                 <img
                                     src={
                                         popularEvents[0].posterName
-                                            ? `http://localhost:8080/uploads/event-posters/${popularEvents[0].posterName}`
+                                            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/event-posters/${popularEvents[0].posterName}`
                                             : "https://via.placeholder.com/300x192"
                                     }
                                     alt={popularEvents[0].title}

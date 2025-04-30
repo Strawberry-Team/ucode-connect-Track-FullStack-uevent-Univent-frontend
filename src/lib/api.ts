@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 import { fetchCsrfToken } from "./csrf";
 import { refreshAccessToken } from "./auth";
 
-const backendUrl = "http://localhost:8080/api";
+const backendUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`;
 
 const api: AxiosInstance = axios.create({
     baseURL: backendUrl,
@@ -24,7 +24,7 @@ api.interceptors.request.use(
                 csrfToken = await fetchCsrfToken();
             }
             config.headers = config.headers || {};
-            config.headers["X-CSRF-Token"] = csrfToken;
+            config.headers["X-CSRF-TOKEN"] = csrfToken;
         }
 
         const accessToken = Cookies.get("accessToken");
@@ -47,7 +47,7 @@ api.interceptors.response.use(
         if (error.response?.data?.message === "Invalid CSRF token" && error.response?.status === 403) {
             const newCsrfToken = await fetchCsrfToken();
             originalRequest.headers = originalRequest.headers || {};
-            originalRequest.headers["X-CSRF-Token"] = newCsrfToken;
+            originalRequest.headers["X-CSRF-TOKEN"] = newCsrfToken;
             return api.request(originalRequest);
         }
 

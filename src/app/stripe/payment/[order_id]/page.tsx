@@ -8,9 +8,11 @@ import PaymentForm from '@/components/payment/payment-form';
 import Link from 'next/link';
 import { createPaymentIntent } from '@/lib/payments';
 import Head from 'next/head';
-import { 
-  CreditCard, ArrowLeft, CheckCircle, Shield 
-} from 'lucide-react';
+import { CreditCard, ArrowLeft, CheckCircle, Shield, AlertCircle, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Progress } from '@/components/ui/progress';
 
 // Global variable for Stripe Promise
 let stripePromise: ReturnType<typeof loadStripe> | null = null;
@@ -26,7 +28,6 @@ const PaymentPage: React.FC = () => {
   const [orderStatus, setOrderStatus] = useState<string | null>(null);
   const [orderDetails, setOrderDetails] = useState<any>(null);
 
-  console.log("BEFORE useEffect >>>>>>");
   useEffect(() => {
     const initializePayment = async () => {
       if (!order_id || typeof order_id !== 'string') {
@@ -39,13 +40,8 @@ const PaymentPage: React.FC = () => {
       setError(null);
       setClientSecret(null);
 
-      console.log("BEFORE TRY createPaymentIntent >>>>>>");
-
       try {
-        console.log("BEFORE createPaymentIntent >>>>>>");
         const response = await createPaymentIntent(Number(order_id));
-        console.log("AFTER createPaymentIntent >>>>>>",response);
-
         if (!response.success || !response.data) {
           throw new Error('Failed to create payment intent.');
         }
@@ -74,209 +70,144 @@ const PaymentPage: React.FC = () => {
     }
   }, [order_id]);
 
-  // Options for Stripe Elements
+  // Stripe Elements options aligned with shadcn/ui
   const options: StripeElementsOptions = {
     clientSecret: clientSecret ?? undefined,
     appearance: {
       theme: 'flat',
       variables: {
-        colorPrimary: '#10b981',
+        colorPrimary: '#3b82f6', // Blue-500 for primary actions
         colorBackground: '#ffffff',
         colorText: '#1f2937',
         colorDanger: '#ef4444',
-        fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-        borderRadius: '12px',
-        fontSizeBase: '15px',
+        fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+        borderRadius: '8px',
+        fontSizeBase: '16px',
       },
       rules: {
         '.Input': {
-          boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-          border: '1px solid #e5e7eb',
-          padding: '14px',
-          borderRadius: '10px'
+          border: '1px solid #e2e8f0',
+          padding: '12px',
+          boxShadow: 'none',
         },
         '.Input:focus': {
-          boxShadow: '0 0 0 2px rgba(16, 185, 129, 0.4)',
-          borderColor: '#34d399'
+          borderColor: '#3b82f6',
+          boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.2)',
         },
         '.Label': {
-          marginBottom: '8px',
           fontWeight: '500',
-          color: '#4b5563'
+          color: '#4b5563',
+          marginBottom: '8px',
         },
         '.Error': {
           color: '#ef4444',
-          marginTop: '6px'
-        }
-      }
+          marginTop: '8px',
+          fontSize: '14px',
+        },
+      },
     },
   };
 
   return (
-    <>
-      <Head>
-        <title>Complete Payment | uevent</title>
-        <meta name="description" content="Complete your payment for your event tickets" />
-        <style>{`
-          @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-          }
-          .animate-shimmer {
-            animation: shimmer 2s infinite;
-          }
-          .animate-float {
-            animation: float 3s ease-in-out infinite;
-          }
-          @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
-            100% { transform: translateY(0px); }
-          }
-          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        `}</style>
-      </Head>
+      <>
+        <Head>
+          <title>Complete Payment | uevent</title>
+          <meta name="description" content="Complete your payment for your event tickets" />
+        </Head>
 
-      <main className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:from-gray-900 dark:via-gray-800 dark:to-emerald-950">
-        <div className="container max-w-3xl mx-auto px-4 py-10">
-          {/* Navigation */}
-          <nav className="mb-4">
-            <button 
-              onClick={() => router.back()}
-              className="group inline-flex items-center text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors font-medium"
+        <main className="min-h-screen dark:bg-gray-950 py-12">
+          <div className="container mx-auto max-w-2xl px-4">
+            {/* Navigation */}
+            <Button
+                variant="ghost"
+                onClick={() => router.back()}
+                className="mb-8 flex items-center dark:text-gray-300"
             >
-              <ArrowLeft size={16} className="mr-2 group-hover:-translate-x-1 transition-transform" />
-              <span>Return to Event</span>
-            </button>
-          </nav>
+              <ArrowLeft className="h-4 w-4" />
+              Return to Event
+            </Button>
 
-          {/* Header */}
-          <header className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl mb-4 shadow-lg shadow-emerald-500/20 dark:shadow-emerald-900/30 animate-float">
-              <CreditCard className="h-8 w-8 text-white" />
+            <div className="text-center mb-10">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex justify-center items-center">
+                Complete Your Payment
+                <CreditCard className="h-12 w-12 px-2 bg-gray-200 rounded-full ml-2 mt-1" />
+              </h1>
+              <p className="mt-2 text-[18px] text-gray-600 dark:text-gray-400">
+                Order <span className="font-medium">#{order_id}</span>
+              </p>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Complete Your Payment
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300 max-w-md mx-auto">
-              Order <span className="font-medium text-emerald-600 dark:text-emerald-400">#{order_id}</span>
-            </p>
-          </header>
 
-          {/* Steps */}
-          <div className="max-w-lg mx-auto mb-8 hidden md:block">
-            <div className="flex items-center justify-between">
-              <div className="flex flex-col items-center">
-                <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center text-green-600 dark:text-green-400">
-                  <CheckCircle size={16} />
-                </div>
-                <span className="mt-2 text-xs font-medium text-gray-700 dark:text-gray-300">Select</span>
-              </div>
-              
-              <div className="flex-1 h-1 mx-2 bg-green-200 dark:bg-green-900/30"></div>
-              
-              <div className="flex flex-col items-center">
-                <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center ring-2 ring-emerald-50 dark:ring-emerald-900/50 text-emerald-600 dark:text-emerald-400">
-                  <CreditCard size={16} />
-                </div>
-                <span className="mt-2 text-xs font-medium text-emerald-700 dark:text-emerald-300">Payment</span>
-              </div>
-              
-              <div className="flex-1 h-1 mx-2 bg-gray-200 dark:bg-gray-700"></div>
-              
-              <div className="flex flex-col items-center">
-                <div className="w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center text-gray-400 dark:text-gray-500">
-                  <CheckCircle size={16} />
-                </div>
-                <span className="mt-2 text-xs font-medium text-gray-500 dark:text-gray-400">Confirmation</span>
-              </div>
-            </div>
+            {/* Main Content */}
+            {loading ? (
+                <Card className="border-none shadow-lg bg-gray-100 dark:bg-gray-800">
+                  <CardContent className="pt-8 text-center">
+                    <div className="flex justify-center mb-4">
+                      <Loader2 className="h-12 w-12 animate-spin" />
+                    </div>
+                    <p className="mt-3 text-gray-600 dark:text-gray-400">Preparing payment...</p>
+                  </CardContent>
+                </Card>
+            ) : error ? (
+                <Card className="border-none shadow-lg bg-gray-50 dark:bg-gray-800">
+                  <CardContent className="py-8 text-center">
+                    <div className="flex justify-center mb-4">
+                      <AlertCircle className="h-12 w-12 text-red-500" />
+                    </div>
+                    <Alert variant="destructive" className="bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800/50">
+                      <AlertTitle className="text-lg font-semibold text-red-700 dark:text-red-300">
+                        Payment Error
+                      </AlertTitle>
+                      <AlertDescription className="justify-center text-red-600 dark:text-red-400">
+                        {error}
+                      </AlertDescription>
+                    </Alert>
+                    <Button asChild className="mt-6">
+                      <Link href="/profile">View My Orders</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+            ) : !clientSecret || !stripePromise ? (
+                <Card className="border-none shadow-lg bg-gray-50 dark:bg-gray-800">
+                  <CardContent className="pt-8 text-center">
+                    <div className="flex justify-center mb-4">
+                      <AlertCircle className="h-12 w-12 text-red-500" />
+                    </div>
+                    <Alert variant="destructive" className="bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800/50">
+                      <AlertTitle className="text-lg font-semibold text-red-700 dark:text-red-300">
+                        Configuration Error
+                      </AlertTitle>
+                      <AlertDescription className="text-red-600 dark:text-red-400">
+                        We couldn't initialize the payment form. Please try refreshing the page.
+                      </AlertDescription>
+                    </Alert>
+                    <Button onClick={() => window.location.reload()} className="mt-6">
+                      Refresh Page
+                    </Button>
+                  </CardContent>
+                </Card>
+            ) : (
+                <Card className="border-none shadow-lg bg-gray-50 dark:bg-gray-800">
+                  <CardHeader>
+                    <CardTitle className="flex items-center text-xl">
+                      <CreditCard className="mr-2 h-5 w-5" />
+                      Payment Details
+                    </CardTitle>
+                    <CardDescription>Enter your payment information to complete the order.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Elements options={options} stripe={stripePromise}>
+                      <PaymentForm orderId={Number(order_id)} clientSecret={clientSecret} />
+                    </Elements>
+                    <div className="mt-6 flex items-center text-sm text-gray-500 dark:text-gray-400">
+                      <Shield className="mr-2 h-4 w-4" />
+                      Your payment information is encrypted and secure
+                    </div>
+                  </CardContent>
+                </Card>
+            )}
           </div>
-
-          {/* Main content */}
-          {loading ? (
-            <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 text-center">
-              <div className="flex flex-col items-center justify-center min-h-[200px]">
-                <div className="relative w-16 h-16">
-                  <div className="absolute top-0 left-0 w-full h-full border-3 border-emerald-200 dark:border-emerald-900/30 rounded-full"></div>
-                  <div className="absolute top-0 left-0 w-full h-full border-3 border-transparent border-t-emerald-600 dark:border-t-emerald-400 rounded-full animate-spin"></div>
-                </div>
-                <p className="mt-5 text-gray-600 dark:text-gray-300 font-medium">Preparing payment...</p>
-              </div>
-            </div>
-          ) : error ? (
-            <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-              <div className="text-center p-4">
-                <div className="w-16 h-16 mx-auto bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
-                  <svg className="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Payment Error</h2>
-                <p className="text-gray-600 dark:text-gray-300 mb-6">{error}</p>
-                <div className="flex justify-center">
-                  <Link 
-                    href="/profile"
-                    className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-medium rounded-lg transition-all shadow-md"
-                  >
-                    View My Orders
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ) : !clientSecret || !stripePromise ? (
-            <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 text-center">
-              <div className="p-4">
-                <div className="w-16 h-16 mx-auto bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center mb-4">
-                  <svg className="w-8 h-8 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                </div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Configuration Error</h2>
-                <p className="text-gray-600 dark:text-gray-300 mb-6">We couldn't initialize the payment form. Please try refreshing the page.</p>
-                <button 
-                  onClick={() => window.location.reload()}
-                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-medium rounded-lg transition-all shadow-md"
-                >
-                  Refresh Page
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
-              {/* Payment form */}
-              <div className="p-6">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
-                  <CreditCard size={18} className="mr-2 text-emerald-500" />
-                  Payment Details
-                </h2>
-                
-                <Elements options={options} stripe={stripePromise}>
-                  <PaymentForm 
-                    orderId={Number(order_id)} 
-                    clientSecret={clientSecret} 
-                  />
-                </Elements>
-                
-                <div className="mt-6">
-                  {/* <div className="flex items-center justify-center my-4 space-x-4">
-                    <img src="/images/visa.svg" alt="Visa" className="h-6 opacity-80" />
-                    <img src="/images/mastercard.svg" alt="Mastercard" className="h-6 opacity-80" />
-                    <img src="/images/amex.svg" alt="American Express" className="h-6 opacity-80" />
-                    <img src="/images/discover.svg" alt="Discover" className="h-6 opacity-80" />
-                  </div> */}
-                  
-                  <div className="flex items-center mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400">
-                    <Shield size={14} className="text-emerald-500 mr-2" />
-                    <span>Your payment information is encrypted and secure</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </main>
-    </>
+        </main>
+      </>
   );
 };
 

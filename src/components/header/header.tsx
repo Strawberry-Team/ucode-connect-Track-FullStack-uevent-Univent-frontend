@@ -1,23 +1,23 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import {useState, useEffect, useRef} from "react";
+import {usePathname, useRouter, useSearchParams} from "next/navigation";
+import {Avatar, AvatarImage} from "@/components/ui/avatar";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
 import Link from "next/link";
 import AuthModal from "@/components/auth/auth-modal";
-import { useAuth } from "@/context/auth-context";
-import { showErrorToasts } from "@/lib/toast";
-import { NavUser } from "@/components/user/nav-user";
-import { NotificationButton } from "@/components/notification/notification-button";
-import { Notification } from "@/types/notification";
-import { getUserNotifications } from "@/lib/notifications";
-import { Search, X } from "lucide-react";
+import {useAuth} from "@/context/auth-context";
+import {showErrorToasts} from "@/lib/toast";
+import {NavUser} from "@/components/user/nav-user";
+import {NotificationButton} from "@/components/notification/notification-button";
+import {Notification} from "@/types/notification";
+import {getUserNotifications} from "@/lib/notifications";
+import {Search, X} from "lucide-react";
 
 export default function Header() {
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-    const { isAuthenticated, user } = useAuth();
+    const {isAuthenticated, user} = useAuth();
     const pathname = usePathname();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -94,7 +94,7 @@ export default function Header() {
             router.push(`/?${params.toString()}`);
         }
     };
-
+    console.log(user?.role)
     return (
         <header
             className={`z-30 px-custom sticky top-0 flex h-[72px] shrink-0 items-center gap-2 bg-background/95 backdrop-blur-md ${
@@ -102,11 +102,11 @@ export default function Header() {
             }`}
         >
             <div className="flex items-center justify-between gap-4 w-full relative">
-                <Link href="/" className="flex items-center gap-2 cursor-pointer">
+                <Link href="/" className="flex items-center  cursor-pointer">
                     <Avatar className="h-10 w-10 rounded-lg shrink-0">
-                        <AvatarImage src="/logo_favicon.png" alt="Логотип" />
+                        <AvatarImage src="/logo.png" alt="Логотип"/>
                     </Avatar>
-                    <span className="text-[20px] font-medium">Calendula</span>
+                    <span className="text-[20px] font-medium">Univent</span>
                 </Link>
 
                 <div className="flex-1 flex justify-center max-w-2xl relative">
@@ -124,7 +124,7 @@ export default function Header() {
                             className="absolute right-12 top-1/2 transform -translate-y-1/2 p-1"
                             onClick={clearSearch}
                         >
-                            <X className="h-5 w-5 text-gray-500" />
+                            <X className="h-5 w-5 text-gray-500"/>
                         </Button>
                     )}
                     <Button
@@ -132,13 +132,23 @@ export default function Header() {
                         className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1"
                         onClick={handleSearch}
                     >
-                        <Search className="h-5 w-5 text-gray-500" />
+                        <Search className="h-5 w-5 text-gray-500"/>
                     </Button>
                 </div>
 
                 <div className="flex items-center gap-4">
                     {isAuthenticated && user ? (
                         <>
+                            {user.role === "ADMIN" && (
+                                <Button
+                                    variant="outline"
+                                    className="h-10 px-4 text-[14px] font-medium rounded-full"
+                                    onClick={() => router.push("/admin")}
+                                    title="Admin Panel"
+                                >
+                                    Admin JS
+                                </Button>
+                            )}
                             <NotificationButton
                                 unreadCount={unreadNotifications}
                                 notifications={notifications}

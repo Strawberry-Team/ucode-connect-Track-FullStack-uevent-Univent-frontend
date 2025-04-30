@@ -109,7 +109,7 @@ export default function EventsCard({ companyId }: EventsCardProps) {
                                                 <img
                                                     src={
                                                         event.posterName
-                                                            ? `http://localhost:8080/uploads/event-posters/${event.posterName}`
+                                                            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/event-posters/${event.posterName}`
                                                             : "https://via.placeholder.com/200x200"
                                                     }
                                                     alt="Event poster"

@@ -45,7 +45,7 @@ export default function CompanyManageModal({
             });
             setLogoPreview(
                 editingCompany.logoName
-                    ? `http://localhost:8080/uploads/company-logos/${editingCompany.logoName}`
+                    ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/company-logos/${editingCompany.logoName}`
                     : null
             );
         } else {

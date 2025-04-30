@@ -847,7 +847,7 @@ export default function EventInfoCard({setEditMode, editMode, eventId}: EventInf
     const imageUrl = useMemo(() =>
             previewUrl ||
             (event?.posterName
-                ? `http://localhost:8080/uploads/event-posters/${event.posterName}`
+                ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/event-posters/${event.posterName}`
                 : "https://via.placeholder.com/400x600"),
         [previewUrl, event?.posterName]
     );

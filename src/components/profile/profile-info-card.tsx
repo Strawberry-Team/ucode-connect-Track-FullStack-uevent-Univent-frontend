@@ -73,7 +73,7 @@ export default function ProfileInfoCard({setEditMode, editMode}: ProfileCardProp
 
     const imageUrl = previewUrl ||
         (user.profilePictureName
-            ? `http://localhost:8080/uploads/user-avatars/${user.profilePictureName}`
+            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/user-avatars/${user.profilePictureName}`
             : "https://via.placeholder.com/200x200");
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

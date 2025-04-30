@@ -94,7 +94,7 @@ export default function CompanyCard() {
                                             <img
                                                 src={
                                                     company.logoName
-                                                        ? `http://localhost:8080/uploads/company-logos/${company.logoName}`
+                                                        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/company-logos/${company.logoName}`
                                                         : "https://via.placeholder.com/200x200"
                                                 }
                                                 alt="Company logo"

@@ -35,7 +35,7 @@ const EventCard = ({ event, className, hasMoved = false }: ProductCardProps) => 
             <img
                 src={
                     event.posterName
-                        ? `http://localhost:8080/uploads/event-posters/${event.posterName}`
+                        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/event-posters/${event.posterName}`
                         : "https://via.placeholder.com/300x192"
                 }
                 alt={event.title}

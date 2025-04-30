@@ -15,12 +15,14 @@ import { showSuccessToast, showErrorToasts } from "@/lib/toast";
 import { useAuth } from "@/context/auth-context";
 import { NavUserProps, User } from "@/types/user";
 import Link from "next/link";
+import { useRouter } from 'next/navigation';
 
 export function NavUser({ user }: NavUserProps) {
     const { setAuthenticated, setUser } = useAuth();
+    const router = useRouter();
 
     const imageUrl = user.profilePictureName
-        ? `http://localhost:8080/uploads/user-avatars/${user.profilePictureName}`
+        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/user-avatars/${user.profilePictureName}`
         : "https://via.placeholder.com/40x40";
 
     const handleLogout = async () => {
@@ -29,6 +31,7 @@ export function NavUser({ user }: NavUserProps) {
         setUser(null);
         if (result.success) {
             showSuccessToast("Logout successfully");
+            router.push('/');
         } else {
             showErrorToasts(result.errors);
         }
