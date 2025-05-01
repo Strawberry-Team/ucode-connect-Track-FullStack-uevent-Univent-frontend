@@ -13,6 +13,8 @@ import {userZodSchema} from "@/zod/shemas";
 import {format} from "date-fns";
 import {Skeleton} from "@/components/ui/skeleton";
 import {ProfileCardProps} from "@/types/profile";
+import {Badge} from "@/components/ui/badge";
+
 export default function ProfileInfoCard({setEditMode, editMode}: ProfileCardProps) {
     const {user, setUser} = useAuth();
     if (!user) return null
@@ -180,7 +182,7 @@ export default function ProfileInfoCard({setEditMode, editMode}: ProfileCardProp
                             src={imageUrl}
                             alt={user.firstName}
                             className={cn(
-                                "relative h-95 w-95 object-cover rounded-md",
+                                "relative h-95 w-95 object-contain overflow-visible rounded-md",
                                 editMode && "cursor-pointer group-hover:brightness-60 transition-all duration-200"
                             )}
                             onClick={() => editMode && document.getElementById("profilePicture")?.click()}
@@ -212,7 +214,7 @@ export default function ProfileInfoCard({setEditMode, editMode}: ProfileCardProp
                                     name="firstName"
                                     value={formData.firstName}
                                     onChange={handleInputChange}
-                                    className="text-center !text-[17px] font-medium bg-transparent border-0 border-b border-foreground/20 focus:border-primary transition-colors duration-200 rounded-none px-2 py-3 placeholder:text-foreground/40"
+                                    className="text-center !text-lg font-medium bg-transparent border-0 border-b border-foreground/20 focus:border-primary transition-colors duration-200 rounded-none px-2 py-3 placeholder:text-foreground/40"
                                     placeholder="First name"
                                 />
                             </div>
@@ -222,7 +224,7 @@ export default function ProfileInfoCard({setEditMode, editMode}: ProfileCardProp
                                     name="lastName"
                                     value={formData.lastName}
                                     onChange={handleInputChange}
-                                    className="text-center !text-[17px] font-medium bg-transparent border-0 border-b border-foreground/20 focus:border-primary transition-colors duration-200 rounded-none px-2 py-3 placeholder:text-foreground/40"
+                                    className="text-center !text-lg font-medium bg-transparent border-0 border-b border-foreground/20 focus:border-primary transition-colors duration-200 rounded-none px-2 py-3 placeholder:text-foreground/40"
                                     placeholder="Last name"
                                 />
                             </div>
@@ -230,18 +232,20 @@ export default function ProfileInfoCard({setEditMode, editMode}: ProfileCardProp
                     ) : (
                         <div className="space-y-2">
                             <div className="text-center">
-                                <p className="-mt-5 text-[27px] font-medium">
-                                    {user.firstName} {user.lastName}
-                                </p>
-                                <p className="text-base text-foreground/80">{user.email}</p>
-                            </div>
-                            <div className="text-center text-[17px] space-y-1 pt-2">
-                                <div>
-                                    <span className="font-medium">Role:</span> {user.role}
+                                <div className="-mt-5 inline-flex items-center justify-center space-x-2 text-3xl font-medium">
+                                    <span>{user.firstName} {user.lastName}</span>
+                                    <Badge className="px-3 py-1 text-sm font-semibold uppercase text-black rounded-full border border-black bg-white">
+                                        {user.role}
+                                    </Badge>
                                 </div>
+                                <p className="text-base text-black text-md text-xl mt-5">{user.email}</p>
+                            </div>
+                            <div className="text-center text-lg space-y-1 pt-2">
+                                {/* <div>
+                                    <span className="font-medium">Role:</span> {user.role}
+                                </div> */}
                                 <div>
-                                    <span className="font-medium">Joined:</span>{" "}
-                                    {format(new Date(user.createdAt), "MMMM d, yyyy")}
+                                    {`Joined ${format(new Date(user.createdAt), "MMMM d, yyyy")}`}
                                 </div>
                             </div>
                         </div>

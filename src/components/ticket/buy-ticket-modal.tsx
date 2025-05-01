@@ -63,7 +63,8 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
       setIsSubmitting(true);
 
       const createOrderData: OrderCreateRequest = {
-        ...(promoCodeInput ? { promoCode: promoCodeInput } : {}),
+        // Include promoCode only if user applied a valid promo
+        ...(appliedPromo !== null ? { promoCode: promoCodeInput.trim() } : {}),
         paymentMethod: "STRIPE",
         eventId: Number(eventId),
         items: Object.entries(quantities)
@@ -160,7 +161,6 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
               </DialogTitle>
             </DialogHeader>
           </div>
-
           <div className="flex-1 overflow-y-auto custom-scroll p-6">
             <TicketList
                 eventId={eventId}
@@ -170,7 +170,6 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
                 quantities={quantities}
             />
           </div>
-
           <div className="border-t p-6">
 
             {/* Promo Code Input and Buttons */}
@@ -183,7 +182,6 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
                   disabled={isSubmitting}
                   className="h-9 flex-1 sm:flex-none rounded-full w-[250px] min-w-[50px] max-w-[250px] text-[14px]"
                 />
-
                     <Button
                       onClick={handleApplyPromo}
                       disabled={isSubmitting}
@@ -191,7 +189,6 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
                     >
                       Apply
                     </Button>
-
                     <Button
                       variant="outline"
                       onClick={handleResetPromoCode}
@@ -244,7 +241,6 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
                       Clear Cart
                     </Button>
               </div>
-
               <div className="flex items-center gap-8 w-full sm:w-auto">
                 <div className="text-lg font-semibold bg-secondary rounded-full py-1 px-5">
                   Total: ${calculateTotal().toFixed(2)}
@@ -261,7 +257,6 @@ const BuyTicketModal = ({ eventId, eventTitle, eventType, isOpen, onClose }: Tic
                       )}
                       {isSubmitting ? "Processing..." : "Buy"}
                     </Button>
-
               </div>
             </div>
           </div>

@@ -76,7 +76,7 @@ const PaymentPage: React.FC = () => {
     appearance: {
       theme: 'flat',
       variables: {
-        colorPrimary: '#3b82f6', // Blue-500 for primary actions
+        colorPrimary: '#10b981', // New primary actions color (green-500)
         colorBackground: '#ffffff',
         colorText: '#1f2937',
         colorDanger: '#ef4444',
@@ -85,25 +85,14 @@ const PaymentPage: React.FC = () => {
         fontSizeBase: '16px',
       },
       rules: {
-        '.Input': {
-          border: '1px solid #e2e8f0',
-          padding: '12px',
-          boxShadow: 'none',
-        },
-        '.Input:focus': {
-          borderColor: '#3b82f6',
-          boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.2)',
-        },
-        '.Label': {
-          fontWeight: '500',
-          color: '#4b5563',
-          marginBottom: '8px',
-        },
-        '.Error': {
-          color: '#ef4444',
-          marginTop: '8px',
-          fontSize: '14px',
-        },
+        '.Tab svg': { fill: '#374151' },
+        '.Tab--selected': { borderColor: '#000000', color: '#ffffff' },
+        '.Tab--selected svg': { fill: '#ffffff' },
+        '.AccordionHeader-icon svg': { fill: '#374151' },
+        '.Input': { border: '1px solid #000000', padding: '12px', boxShadow: 'none' },
+        '.Input:focus': { borderColor: '#000000', boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.2)' },
+        '.Label': { fontWeight: '500', color: '#6f6f6f', marginBottom: '8px' },
+        '.Error': { color: '#ef4444', marginTop: '8px', fontSize: '14px' },
       },
     },
   };
@@ -157,7 +146,7 @@ const PaymentPage: React.FC = () => {
                       <AlertTitle className="text-lg font-semibold text-red-700 dark:text-red-300">
                         Payment Error
                       </AlertTitle>
-                      <AlertDescription className="justify-center text-red-600 dark:text-red-400">
+                      <AlertDescription className="justify-center text-red-600 dark:text-red-400 items-center">
                         {error}
                       </AlertDescription>
                     </Alert>
@@ -176,7 +165,7 @@ const PaymentPage: React.FC = () => {
                       <AlertTitle className="text-lg font-semibold text-red-700 dark:text-red-300">
                         Configuration Error
                       </AlertTitle>
-                      <AlertDescription className="text-red-600 dark:text-red-400">
+                      <AlertDescription className="text-red-600 dark:text-red-400 items-center">
                         We couldn't initialize the payment form. Please try refreshing the page.
                       </AlertDescription>
                     </Alert>

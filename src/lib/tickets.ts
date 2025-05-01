@@ -55,9 +55,12 @@ export const purchaseTickets = async (
 };
 
 export async function createOrder(data : OrderCreateRequest): Promise<ApiResponse<OrderCreateResponse>> {
+  const errorMessage = data.promoCode
+    ? `Failed to create order with promo code ${data.promoCode}`
+    : 'Failed to create order';
   return executeApiRequest<OrderCreateResponse>(
     () => api.post(`/orders`, data),
-    `Failed to create order with promo code ${data.promoCode}`
+    errorMessage
   );
 }
 

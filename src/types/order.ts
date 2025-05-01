@@ -55,6 +55,7 @@ export interface OrderDetailsModalProps {
     isOpen: boolean;
     onClose: () => void;
     order: Order | null;
+    isLoading?: boolean;
 }
 
 export interface OrderCreateRequest {

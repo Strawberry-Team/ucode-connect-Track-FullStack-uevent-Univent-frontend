@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { CalendarDays, Clock, Building2, Calendar, Eye, EyeOff, Check, CheckCheck, X, Trash2 } from "lucide-react";
 import { format, isValid, parseISO } from "date-fns";
 import { Notification, NotificationListProps } from "@/types/notification";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
     Tooltip,
@@ -118,6 +118,7 @@ export function NotificationList({ notifications: initialNotifications, onUpdate
 
     const hasUnreadNotifications = notifications.some(notification => !notification.readAt);
 
+    console.log(`${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/event-posters/${notifications[0].event?.logoName}`);
     return (
         <div className="flex flex-col gap-2">
             <div className="flex justify-between items-center px-1">
@@ -165,44 +166,50 @@ export function NotificationList({ notifications: initialNotifications, onUpdate
             </div>
             <div className="flex flex-col gap-1 max-h-[440px] border-t px-2 py-2 overflow-y-auto custom-scroll">
                 {notifications.map((notification) => (
-                    <div
+                    <Link
                         key={notification.id}
-                        className={`p-3 rounded-lg transition-all duration-200 transform hover:scale-[1.01] hover:shadow-md ${
-                            Boolean(notification.readAt) ? 'bg-muted/50 hover:bg-muted/80' : 'bg-card hover:bg-card'
+                        href={
+                            notification.event ? `/events/${notification.event.id}` :
+                            notification.company ? `/companies/${notification.company.id}` :
+                            '#'
+                        }
+                        className={`block p-3 rounded-lg transition-all duration-200 transform hover:scale-[1.01] ${
+                            notification.readAt 
+                                ? 'bg-white hover:bg-white' 
+                                : 'bg-card hover:bg-card shadow-lg'
                         }`}
                     >
                         <div className="flex items-start gap-3">
-                            <Avatar className="h-8 w-8 rounded-full">
-                                {notification.event ? (
-                                    <>
-                                        <Calendar strokeWidth={2.5} className="h-5 w-5 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-muted-foreground"/>
-                                        {/* <AvatarImage 
-                                            src={notification.event.logoName ? 
-                                                `/uploads/event-posters/${notification.event.logoName}` : 
-                                                undefined
-                                            } 
-                                            alt={notification.event.title}
-                                        /> */}
-                                    </>
-                                ) : notification.company ? (
-                                    <>
-                                        <Building2 strokeWidth={2.5} className="h-5 w-5 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-muted-foreground" />
-                                        {/* <AvatarImage 
-                                            src={notification.company.logoName ? 
-                                                `/uploads/company-logos/${notification.company.logoName}` : 
-                                                undefined
-                                            } 
-                                            alt={notification.company.title}
-                                        /> */}
-                                    </>
-                                ) : null}
-                            </Avatar>
+                            {/* Event poster or company logo */}
+                            {notification.event?.logoName ? (
+                                <img
+                                    src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/event-posters/${notification.event.logoName}`}
+                                    alt={notification.event.title}
+                                    className="w-20 h-20 rounded-md object-cover"
+                                />
+                            ) : notification.company?.logoName ? (
+                                <img
+                                    src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/company-logos/${notification.company.logoName}`}
+                                    alt={notification.company.title}
+                                    className="w-20 h-20 rounded-md object-cover"
+                                />
+                            ) : (
+                                <Avatar className="h-8 w-8 rounded-full overflow-visible">
+                                    <AvatarFallback>
+                                        {notification.event ? (
+                                            <Calendar strokeWidth={2.5} className={`h-5 w-5 ${notification.readAt ? 'text-muted-foreground' : 'text-black'}`} />
+                                        ) : notification.company ? (
+                                            <Building2 strokeWidth={2.5} className={`h-5 w-5 ${notification.readAt ? 'text-muted-foreground' : 'text-black'}`} />
+                                        ) : null}
+                                    </AvatarFallback>
+                                </Avatar>
+                            )}
                             <div className="flex-1">
                                 <div className="flex justify-between items-start">
-                                    {Boolean(notification.readAt) ? (
-                                        <h4 className="text-sm font-normal">{notification.title}</h4>
+                                    {notification.readAt ? (
+                                        <h4 className="text-sm font-normal text-muted-foreground">{notification.title}</h4>
                                     ) : (
-                                        <h4 className="text-sm font-medium">{notification.title}</h4>
+                                        <h4 className="text-sm font-medium text-gray-800">{notification.title}</h4>
                                     )}
                                     <div className="flex gap-1">
                                         <TooltipProvider>
@@ -211,7 +218,7 @@ export function NotificationList({ notifications: initialNotifications, onUpdate
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
-                                                        className={`h-6 w-6 hover:bg-accent/80 ${Boolean(notification.readAt) ? 'text-muted-foreground' : ''}`}
+                                                        className={`h-6 w-6 hover:bg-accent/80 ${Boolean(notification.readAt) ? 'text-muted-foreground' : 'text-black'}`}
                                                         onClick={() => handleMarkAsRead(notification.id)}
                                                         disabled={Boolean(notification.readAt)}
                                                     >
@@ -233,7 +240,7 @@ export function NotificationList({ notifications: initialNotifications, onUpdate
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
-                                                        className="h-6 w-6 hover:bg-accent/80"
+                                                        className={`h-6 w-6 hover:bg-accent/80 ${Boolean(notification.readAt) ? 'text-muted-foreground' : 'text-black'}`}
                                                         onClick={() => handleHideNotification(notification.id)}
                                                     >
                                                         <X strokeWidth={2.5} className="h-4 w-4" />
@@ -256,7 +263,7 @@ export function NotificationList({ notifications: initialNotifications, onUpdate
                                                         {part}
                                                         <Link 
                                                             href={`/events/${notification.event?.id}`}
-                                                            className="font-medium hover:underline text-foreground"
+                                                            className={`font-medium hover:underline ${notification.readAt ? 'text-muted-foreground' : 'text-foreground'}`}
                                                         >
                                                             {notification.event?.title}
                                                         </Link>
@@ -286,8 +293,7 @@ export function NotificationList({ notifications: initialNotifications, onUpdate
                                     )}
                                 </p>
                                 <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
-                                    {/* <CalendarDays strokeWidth={2.5} className="h-3 w-3"/> */}
-                                    <Clock strokeWidth={2.5} className="h-3 w-3" />
+                                    <Clock strokeWidth={2.5} className={`h-3 w-3 ${notification.readAt ? 'opacity-50' : ''}`} />
                                     <span>
                                         {formatDate(notification.createdAt)}
                                     </span>
@@ -297,7 +303,7 @@ export function NotificationList({ notifications: initialNotifications, onUpdate
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </Link>
                 ))}
             </div>
         </div>
