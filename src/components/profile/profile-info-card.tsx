@@ -51,17 +51,18 @@ export default function ProfileInfoCard({setEditMode, editMode}: ProfileCardProp
             <Card className="shadow-lg transition-all duration-300 hover:shadow-xl h-[640px] flex flex-col w-full md:w-1/2">
                 <CardContent className="space-y-6 flex-1">
                     <div className="flex flex-col items-center gap-4">
-                        <Skeleton className="h-95 w-95 rounded-md" />
+                        <Skeleton className="h-[380px] w-[380px] rounded-full" />
                     </div>
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <div className="text-center">
-                                <Skeleton className="h-[30px] w-[200px] mx-auto" />
-                                <Skeleton className="h-[20px] w-[150px] mx-auto mt-2" />
+                            <div className="mt-2 text-center">
+                                <div className="inline-flex items-center justify-center space-x-2">
+                                    <Skeleton className="h-9 w-[200px]" />
+                                </div>
+                                <Skeleton className="h-6 w-[250px] mx-auto mt-5" />
                             </div>
-                            <div className="text-center space-y-2">
-                                <Skeleton className="h-[20px] w-[100px] mx-auto" />
-                                <Skeleton className="h-[20px] w-[100px] mx-auto" />
+                            <div className="text-center space-y-2 pt-2">
+                                <Skeleton className="h-5 w-[150px] mx-auto" />
                             </div>
                         </div>
                     </div>

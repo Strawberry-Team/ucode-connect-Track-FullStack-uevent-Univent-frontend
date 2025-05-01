@@ -110,22 +110,21 @@ export default function OrdersCard() {
                             {Array.from({ length: 1 }).map((_, index) => (
                                 <div key={index} className="flex flex-col">
                                     <div className="flex items-center justify-between rounded-lg px-2 py-1">
-                                        <div className="flex items-center gap-2">
-                                            <Skeleton className="h-10 w-10 rounded-full" />
+                                        <div className="mt-2 ml-1 flex items-center gap-2">
+                                            <Skeleton className="h-12 w-12 rounded-lg" />
                                             <div className="flex flex-col gap-1">
                                                 <div className="flex items-center gap-1">
-                                                    <Skeleton className="h-[24px] w-[100px]" />
+                                                    <Skeleton className="h-6 w-[120px]" />
                                                 </div>
                                                 <div className="flex items-center gap-1">
-                                                    <Skeleton className="h-[16px] w-[80px]" />
+                                                    <Skeleton className="h-5 w-[80px] rounded-full" />
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="flex flex-col items-end gap-1">
                                             <div className="flex items-center gap-1">
-                                                <Skeleton className="h-[20px] w-[70px]" />
+                                                <Skeleton className="-mt-3 h-5 w-[90px]" />
                                             </div>
-                                            <Skeleton className="h-[20px] w-[50px]" />
                                         </div>
                                     </div>
                                     <div className="my-2">
@@ -138,7 +137,7 @@ export default function OrdersCard() {
                         <div className="-mt-2 max-h-[300px] overflow-y-auto overflow-x-hidden px-3 pt-3 custom-scroll">
                             {orders.map((order, index) => (
                                 <div key={order.id} className="flex flex-col">
-                                    <div className="grid mt-2 grid-rows-2 [grid-template-columns:auto_1fr] gap-1 p-3 rounded-md transition-all duration-500 hover:shadow-[0_0_15px_rgba(0,0,0,0.15)] cursor-pointer"
+                                    <div className="grid mt-2 mb-3 grid-rows-2 [grid-template-columns:auto_1fr] gap-1 p-3 rounded-md transition-all duration-500 hover:shadow-[0_0_15px_rgba(0,0,0,0.15)] cursor-pointer"
                                          onClick={() => handleOrderClick(order.id)}
                                     >
                                         {/* Poster spans two rows */}
@@ -197,7 +196,7 @@ export default function OrdersCard() {
                                             )}
                                         </div>
                                     </div>
-                                    {index < orders.length - 1 && <hr className="border-gray-200 mt-2" />}
+                                    {index < orders.length - 1 && <hr className="border-gray-200 " />}
                                 </div>
                             ))}
                         </div>
