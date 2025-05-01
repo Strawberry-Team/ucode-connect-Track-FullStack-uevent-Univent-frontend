@@ -182,7 +182,7 @@ export default function ProfileInfoCard({setEditMode, editMode}: ProfileCardProp
                             src={imageUrl}
                             alt={user.firstName}
                             className={cn(
-                                "relative h-95 w-95 object-contain overflow-visible rounded-md",
+                                "relative h-95 w-95 object-cover rounded-full",
                                 editMode && "cursor-pointer group-hover:brightness-60 transition-all duration-200"
                             )}
                             onClick={() => editMode && document.getElementById("profilePicture")?.click()}

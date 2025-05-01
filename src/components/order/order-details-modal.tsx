@@ -1,6 +1,6 @@
 "use client";
 
-import {Dialog, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
     CalendarDays,
     Clock,
@@ -17,26 +17,28 @@ import {
     Download,
     FileScan
 } from "lucide-react";
-import {format} from "date-fns";
-import {OrderDetailsModalProps} from "@/types/order";
+import { format } from "date-fns";
+import { OrderDetailsModalProps } from "@/types/order";
 import Link from "next/link";
 import { Badge } from "../ui/badge";
 import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
+import { getOrderItemTicket } from '@/lib/orders'; // Импортируем функцию для получения PDF
+import { showErrorToasts } from '@/lib/toast';
 
-export default function OrderDetailsModal({isOpen, onClose, order, isLoading}: OrderDetailsModalProps) {
+export default function OrderDetailsModal({ isOpen, onClose, order, isLoading }: OrderDetailsModalProps) {
     const router = useRouter();
 
     const getStatusIcon = (status: string) => {
         switch (status) {
             case "PENDING":
-                return <Clock strokeWidth={2.5} className="h-5 w-5 text-white"/>;
+                return <Clock strokeWidth={2.5} className="h-5 w-5 text-white" />;
             case "PAID":
-                return <CheckCircle strokeWidth={2.5} className="h-5 w-5 text-white"/>;
+                return <CheckCircle strokeWidth={2.5} className="h-5 w-5 text-white" />;
             case "FAILED":
-                return <XCircle strokeWidth={2.5} className="h-5 w-5 text-white"/>;
+                return <XCircle strokeWidth={2.5} className="h-5 w-5 text-white" />;
             case "REFUNDED":
-                return <RefreshCcw strokeWidth={2.5} className="h-5 w-5 text-white"/>;
+                return <RefreshCcw strokeWidth={2.5} className="h-5 w-5 text-white" />;
             default:
                 return null;
         }
@@ -50,10 +52,22 @@ export default function OrderDetailsModal({isOpen, onClose, order, isLoading}: O
         return order.totalAmount / (1 - discountPercent);
     };
 
-    // Handler to redirect to the ticket route
-    const handleDownload = (orderId: number, itemId: number) => {
-        const url = `/orders/${orderId}/item/${itemId}/ticket`;
-        window.open(url, '_blank');
+    // Handler to fetch and open the PDF directly
+    const handleDownload = async (orderId: number, itemId: number) => {
+        try {
+            const response = await getOrderItemTicket(orderId, itemId);
+            if (response.success && response.data) {
+                // Создаём Blob из ответа и открываем PDF в новой вкладке
+                const blob = new Blob([response.data], { type: 'application/pdf' });
+                const url = window.URL.createObjectURL(blob);
+                window.open(url, '_blank');
+                window.URL.revokeObjectURL(url); // Очищаем URL после использования
+            } else {
+                showErrorToasts(['Failed to load ticket PDF']);
+            }
+        } catch (error) {
+            showErrorToasts(['Error fetching ticket PDF']);
+        }
     };
 
     return (
@@ -68,9 +82,8 @@ export default function OrderDetailsModal({isOpen, onClose, order, isLoading}: O
                                     <Badge
                                         className={`inline-flex items-center gap-1 text-sm font-semibold uppercase text-white rounded-full ml-3 ${
                                             order.paymentStatus === 'PENDING' ? 'bg-yellow-500' :
-                                            order.paymentStatus === 'PAID'    ? 'bg-green-500'  :
-                                            order.paymentStatus === 'FAILED'  ? 'bg-red-500'    : 'bg-blue-500'
-                                            
+                                                order.paymentStatus === 'PAID'    ? 'bg-green-500'  :
+                                                    order.paymentStatus === 'FAILED'  ? 'bg-red-500'    : 'bg-blue-500'
                                         }`}
                                     >
                                         {getStatusIcon(order.paymentStatus)}
@@ -231,8 +244,12 @@ export default function OrderDetailsModal({isOpen, onClose, order, isLoading}: O
                                                     </div>
 
                                                     {order.paymentStatus === "PAID" && (
-                                                        <Button variant="outline" size="sm" onClick={() => handleDownload(order.id, item.id)}
-                                                            className="flex items-center gap-3">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => handleDownload(order.id, item.id)} // Вызываем обновленный handleDownload
+                                                            className="flex items-center gap-3"
+                                                        >
                                                             <FileScan strokeWidth={2.5} className="h-4 w-4"/>
                                                         </Button>
                                                     )}

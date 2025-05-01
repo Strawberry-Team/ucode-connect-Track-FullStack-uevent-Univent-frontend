@@ -13,16 +13,13 @@ export default function ProfileForm({ companyId }: ProfileFormProps) {
     return (
         <div className="flex justify-center items-center mt-7 bg-background ">
             <div className="flex flex-col md:flex-row gap-6 max-w-4xl w-full">
-                {/* Карточка профиля */}
                 <CompanyInfoCard
                     editMode={editMode}
                     setEditMode={setEditMode}
                     companyId={companyId}
                 />
 
-                {/* Правая колонка с карточками */}
                 <div className="flex flex-col gap-6 w-full md:w-1/2">
-                    {/* Карточка компании */}
                     <EventsCard companyId={companyId}/>
 
                     <NewsCard companyId={companyId} />

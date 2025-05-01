@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="./public/logo.png" width="200" />
+    <img src="public/logo_white.png" width="200" />
     <h1 align="center">Univent</h1>
 </div>
 

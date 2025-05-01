@@ -104,7 +104,7 @@ export default function Header() {
             <div className="flex items-center justify-between gap-4 w-full relative">
                 <Link href="/" className="flex items-center  cursor-pointer">
                     <Avatar className="h-10 w-10 rounded-lg shrink-0">
-                        <AvatarImage src="/logo.png" alt="Логотип"/>
+                        <AvatarImage src="/logo_black.png" alt="Логотип"/>
                     </Avatar>
                     <span className="text-[20px] font-medium">Univent</span>
                 </Link>
