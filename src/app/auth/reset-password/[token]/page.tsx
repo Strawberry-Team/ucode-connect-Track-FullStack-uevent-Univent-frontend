@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { changePassword } from "@/lib/auth";
@@ -103,19 +104,18 @@ export default function ResetPasswordPage() {
             >
                 <div className="grid md:grid-cols-2 h-full">
                     <div className="relative hidden md:block h-full w-full">
-                        <img
-                            src="/assets/solo.png"
+                        <Image
+                            src="/logo.png"
                             alt="Logo"
+                            fill
                             className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
                             style={{ maxWidth: "100%", maxHeight: "100%" }}
                         />
                     </div>
                     <div className="w-full h-full flex flex-col">
-                        {/* Заголовок */}
                         <div className="flex flex-col items-center text-center pt-15 px-6">
                             <DialogTitle className="text-2xl font-bold">Change Password</DialogTitle>
                         </div>
-                        {/* Центрирование контента */}
                         <div className="flex-1 flex items-center justify-center px-6 pb-35">
                             <form onSubmit={handleChangePassword} className="w-full p-6 space-y-4">
                                 <div className="relative flex items-center gap-2">

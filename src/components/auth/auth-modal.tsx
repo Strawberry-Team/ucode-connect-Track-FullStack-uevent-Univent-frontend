@@ -6,7 +6,6 @@ import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useAuth } from "@/context/auth-context";
 import { showErrorToasts, showSuccessToast } from "@/lib/toast";
-import LogoImage from "@/assets/solo.png";
 import Image from "next/image";
 import LoginForm from "./login-form";
 import ResetPasswordForm from "./reset-password-form";
@@ -189,11 +188,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             >
                 <div className="grid md:grid-cols-2 h-full">
                     <div className="relative hidden md:block h-full w-full">
-                        <img
-                            src="/assets/solo.png"
+                        <Image
+                            src="/logo.png"
                             alt="Logo"
-                            className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-                            style={{ maxWidth: "100%", maxHeight: "100%" }}
+                            fill
+                            className="absolute inset-0 h-full w-full object-contain dark:brightness-[0.2] dark:grayscale"
+                            style={{ background: "#C4C4C4", maxWidth: "100%", maxHeight: "100%" }}
                         />
                     </div>
                     <div className="w-full h-full flex flex-col">

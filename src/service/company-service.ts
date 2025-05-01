@@ -10,7 +10,6 @@ interface ServiceError {
 export const companyService = {
     fetchCompanies: async (userId: number): Promise<Company[]> => {
         const result = await getUserCompany(userId);
-        console.log("dsads")
         if (result.data !== undefined && result.data !== null) {
             return result.data;
         }

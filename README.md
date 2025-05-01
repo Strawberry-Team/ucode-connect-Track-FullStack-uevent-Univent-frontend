@@ -44,7 +44,7 @@ Service empowers users to create companies, organize events, and sell tickets ac
 ## 🚀 Get started
 ### ⚙️ Installation
 
-1. Run the [calendula-backend](https://github.com/Strawberry-Team/calendula-backend) project.
+1. Run the [univent-backend](https://github.com/Strawberry-Team/calendula-backend) project.
 
 2. Go to the project folder.
 
@@ -60,5 +60,8 @@ Service empowers users to create companies, organize events, and sell tickets ac
 
 5. Running:
 ```sh
-  npm run dev
+  npm run build
+```
+```sh
+  npm run start
 ```

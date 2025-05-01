@@ -99,7 +99,6 @@ export default function Header() {
         window.open("http://localhost:3001/admin", "_blank");
     };
 
-    console.log(user?.role);
 
     return (
         <header
