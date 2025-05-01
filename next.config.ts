@@ -1,16 +1,10 @@
-import type {NextConfig} from "next";
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
     images: {
-        remotePatterns: [
-            {
-                protocol: "http",
-                hostname: "localhost",
-                port: "",
-                pathname: "/**",
-            },
-        ]
+        domains: ["localhost"],
     },
+    devIndicators: false,
 };
 
 export default nextConfig;

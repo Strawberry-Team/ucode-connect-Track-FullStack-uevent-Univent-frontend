@@ -185,7 +185,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order, isLoading }:
                                                     </span>
                                                     </div>
                                                     <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                        <Calendar strokeWidth={2.5} className="h-4 w-4"/>
+                                                        <Calendar strokeWidth={2.5} className="h-4 w-4 flex-shrink-0"/>
                                                         <span>
                                                         {format(
                                                             new Date(order.orderItems[0].ticket.event.startedAt),
@@ -197,7 +197,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order, isLoading }:
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                        <MapPin strokeWidth={2.5} className="h-4 w-4"/>
+                                                        <MapPin strokeWidth={2.5} className="h-4 w-4 flex-shrink-0"/>
                                                         <span>{order.orderItems[0].ticket.event.venue}</span>
                                                     </div>
                                                 </div>
