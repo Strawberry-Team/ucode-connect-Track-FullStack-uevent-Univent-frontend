@@ -9,3 +9,10 @@ export async function getOrderById(orderId: number): Promise<ApiResponse<Order>>
         `Failed to fetch order with ID ${orderId}`
     );
 }
+
+export async function getOrderItemTicket(orderId: number, itemId: number): Promise<ApiResponse<Blob>> {
+    return executeApiRequest<Blob>(
+        () => api.get(`/orders/${orderId}/items/${itemId}/ticket`, { responseType: 'blob' }),
+        `Failed to fetch ticket PDF for order ${orderId}, item ${itemId}`
+    );
+}

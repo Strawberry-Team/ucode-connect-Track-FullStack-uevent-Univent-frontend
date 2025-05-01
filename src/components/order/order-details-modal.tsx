@@ -50,10 +50,9 @@ export default function OrderDetailsModal({isOpen, onClose, order, isLoading}: O
         return order.totalAmount / (1 - discountPercent);
     };
 
-    // Handler to download ticket file
-    const handleDownload = (fileKey?: string) => {
-        if (!fileKey) return;
-        const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/tickets/${fileKey}`;
+    // Handler to redirect to the ticket route
+    const handleDownload = (orderId: number, itemId: number) => {
+        const url = `/orders/${orderId}/item/${itemId}/ticket`;
         window.open(url, '_blank');
     };
 
@@ -230,9 +229,9 @@ export default function OrderDetailsModal({isOpen, onClose, order, isLoading}: O
                                                             </div>
                                                         )}
                                                     </div>
-                                                    {/* Download button */}
-                                                    {order.paymentStatus === "PAID" && (item as any).ticketFileKey && (
-                                                        <Button variant="outline" size="sm" onClick={() => handleDownload((item as any).ticketFileKey)}
+
+                                                    {order.paymentStatus === "PAID" && (
+                                                        <Button variant="outline" size="sm" onClick={() => handleDownload(order.id, item.id)}
                                                             className="flex items-center gap-3">
                                                             <FileScan strokeWidth={2.5} className="h-4 w-4"/>
                                                         </Button>

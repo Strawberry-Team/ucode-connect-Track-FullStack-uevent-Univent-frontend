@@ -135,10 +135,10 @@ export default function OrdersCard() {
                             ))}
                         </div>
                     ) : orders.length > 0 ? (
-                        <div className="max-h-[300px] overflow-y-auto overflow-x-hidden px-3 pt-3 custom-scroll">
+                        <div className="-mt-2 max-h-[300px] overflow-y-auto overflow-x-hidden px-3 pt-3 custom-scroll">
                             {orders.map((order, index) => (
                                 <div key={order.id} className="flex flex-col">
-                                    <div className="grid grid-rows-2 [grid-template-columns:auto_1fr] gap-1 p-3 rounded-md transition-all duration-500 hover:shadow-xl cursor-pointer"
+                                    <div className="grid mt-2 grid-rows-2 [grid-template-columns:auto_1fr] gap-1 p-3 rounded-md transition-all duration-500 hover:shadow-[0_0_15px_rgba(0,0,0,0.15)] cursor-pointer"
                                          onClick={() => handleOrderClick(order.id)}
                                     >
                                         {/* Poster spans two rows */}
