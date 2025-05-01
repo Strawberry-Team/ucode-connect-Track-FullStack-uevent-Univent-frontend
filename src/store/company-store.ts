@@ -1,6 +1,5 @@
-// store/companyStore.ts
 import { create } from "zustand";
-import { Company } from "@/lib/users";
+import { Company } from "@/types/company";
 
 type CompanyStore = {
     companies: Company[];

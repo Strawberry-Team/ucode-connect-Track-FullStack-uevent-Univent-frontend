@@ -189,8 +189,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             >
                 <div className="grid md:grid-cols-2 h-full">
                     <div className="relative hidden md:block h-full w-full">
-                        <Image
-                            src={LogoImage}
+                        <img
+                            src="/assets/solo.png"
                             alt="Logo"
                             className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
                             style={{ maxWidth: "100%", maxHeight: "100%" }}

@@ -5,8 +5,6 @@ import { useRouter, useParams } from "next/navigation";
 import { changePassword } from "@/lib/auth";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { showErrorToasts, showSuccessToast } from "@/lib/toast";
-import LogoImage from "@/assets/solo.png";
-import Image from "next/image";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -105,8 +103,8 @@ export default function ResetPasswordPage() {
             >
                 <div className="grid md:grid-cols-2 h-full">
                     <div className="relative hidden md:block h-full w-full">
-                        <Image
-                            src={LogoImage}
+                        <img
+                            src="/assets/solo.png"
                             alt="Logo"
                             className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
                             style={{ maxWidth: "100%", maxHeight: "100%" }}

@@ -30,6 +30,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
     return (
         <html lang="en" suppressHydrationWarning>
+            <head>
+                <link rel="icon" href="/favicon.ico?v=1" type="image/x-icon" />
+                <link rel="shortcut icon" href="/favicon.ico?v=1" type="image/x-icon" />
+            </head>
             <body suppressHydrationWarning>
                 <AuthProvider initialAuthState={isAuthenticated} initialUser={initialUser}>
                     <Header />

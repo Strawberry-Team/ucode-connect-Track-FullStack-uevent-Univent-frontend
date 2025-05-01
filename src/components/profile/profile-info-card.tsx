@@ -234,16 +234,13 @@ export default function ProfileInfoCard({setEditMode, editMode}: ProfileCardProp
                             <div className="text-center">
                                 <div className="-mt-5 inline-flex items-center justify-center space-x-2 text-3xl font-medium">
                                     <span>{user.firstName} {user.lastName}</span>
-                                    <Badge className="px-3 py-1 text-sm font-semibold uppercase text-black rounded-full border border-black bg-white">
+                                    <Badge className="px-3 mt-2 py-1 text-sm font-semibold uppercase text-black rounded-full border border-black bg-white">
                                         {user.role}
                                     </Badge>
                                 </div>
                                 <p className="text-base text-black text-md text-xl mt-5">{user.email}</p>
                             </div>
                             <div className="text-center text-lg space-y-1 pt-2">
-                                {/* <div>
-                                    <span className="font-medium">Role:</span> {user.role}
-                                </div> */}
                                 <div>
                                     {`Joined ${format(new Date(user.createdAt), "MMMM d, yyyy")}`}
                                 </div>
