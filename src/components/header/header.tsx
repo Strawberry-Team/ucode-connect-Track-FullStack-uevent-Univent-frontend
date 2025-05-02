@@ -151,7 +151,7 @@ export default function Header() {
                                     onClick={handleAdminClick}
                                     title="Admin Panel"
                                 >
-                                    Admin JS
+                                    Admin Panel
                                 </Button>
                             )}
                             <NotificationButton

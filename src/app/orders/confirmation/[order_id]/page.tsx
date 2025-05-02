@@ -5,7 +5,6 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import Head from 'next/head';
 import {
-  ArrowLeft,
   CheckCircle,
   XCircle,
   AlertCircle,
@@ -13,12 +12,21 @@ import {
   RotateCcw,
   Loader2,
   ShoppingBag,
-  ArrowRight
+  Undo2,
+  Wallet,
+  CircleX,
+  CircleCheck,
+  Clock2,
+  Shield,
+  CreditCard
 } from 'lucide-react';
 import {getOrderById} from '@/lib/orders';
 import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardHeader, CardTitle, CardDescription} from '@/components/ui/card';
-import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import { Elements } from '@stripe/react-stripe-js';
+import PaymentForm from '@/components/payment/payment-form';
+import { format } from "date-fns";
+import { Order } from '@/types/order';
 
 const POLLING_INTERVAL = 3000; // 3 seconds
 const POLLING_TIMEOUT = 120000; // 2 minutes
@@ -34,6 +42,7 @@ const [loading, setLoading] = useState(true);
 const [orderStatus, setOrderStatus] = useState<string | null>(null);
 const [error, setError] = useState<string | null>(null);
 const [orderDetails, setOrderDetails] = useState<any>(null);
+const [orderData, setOrderData] = useState<Order | null>(null);
 const intervalRef = useRef<NodeJS.Timeout | null>(null);
 const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 const pollingAttemptsRef = useRef<number>(0);
@@ -106,6 +115,11 @@ useEffect(() => {
         console.log(`Received order status: ${currentStatus}`);
         setOrderStatus(currentStatus ?? null);
         setOrderDetails(response);
+        
+        // Встановити дані замовлення для відображення
+        if (response.success && response.data) {
+          setOrderData(response.data);
+        }
 
         // Check if status is final
         const isFinalStatus = ['PAID', 'FAILED', 'CANCELLED', 'REFUNDED'].includes(currentStatus ?? '');
@@ -121,7 +135,7 @@ useEffect(() => {
         // Якщо досягнуто максимальної кількості спроб, але статус ще не фінальний
         if (pollingAttemptsRef.current >= MAX_POLLING_ATTEMPTS && !isFinalStatus) {
           console.warn(`Maximum polling attempts (${MAX_POLLING_ATTEMPTS}) reached without final status.`);
-          setError('Verification timeout. Please check your order status in "My Orders".');
+          setError('Verification timeout. Please try again later.');
           setLoading(false);
           clearTimers();
           return true;
@@ -210,16 +224,16 @@ useEffect(() => {
   const getStatusIcon = () => {
     switch (orderStatus) {
       case 'PAID':
-        return <CheckCircle className="h-12 w-12 text-green-500"/>;
+        return <CircleCheck className="h-5 w-5 text-black"/>;
       case 'FAILED':
       case 'CANCELLED':
-        return <XCircle className="h-12 w-12 text-red-500"/>;
+        return <CircleX className="h-5 w-5 text-black"/>;
       case 'PENDING':
-        return <Clock className="h-12 w-12 text-amber-500"/>;
+        return <Clock2 className="h-5 w-5 text-black"/>;
       case 'REFUNDED':
-        return <RotateCcw className="h-12 w-12 text-blue-500"/>;
+        return <RotateCcw className="h-5 w-5 text-black"/>;
       default:
-        return <AlertCircle className="h-12 w-12 text-gray-500"/>;
+        return <AlertCircle className="h-5 w-5 text-black"/>;
     }
   };
 
@@ -232,11 +246,11 @@ useEffect(() => {
       case 'CANCELLED':
         return 'text-red-600';
       case 'PENDING':
-        return 'text-amber-600';
+        return 'text-yellow-600';
       case 'REFUNDED':
         return 'text-blue-600';
       default:
-        return 'text-gray-600';
+        return 'text-black';
     }
   };
 
@@ -249,11 +263,11 @@ useEffect(() => {
       case 'CANCELLED':
         return 'bg-red-100';
       case 'PENDING':
-        return 'bg-amber-100';
+        return 'bg-yellow-100';
       case 'REFUNDED':
         return 'bg-black-100';
       default:
-        return 'bg-gray-100';
+        return 'bg-black';
     }
   };
 
@@ -261,17 +275,17 @@ useEffect(() => {
   const getStatusHeading = () => {
     switch (orderStatus) {
       case 'PAID':
-        return 'Payment Successful!';
+        return 'Success';
       case 'FAILED':
-        return 'Payment Failed';
+        return 'Failed';
       case 'CANCELLED':
-        return 'Order Cancelled';
+        return 'Cancelled';
       case 'PENDING':
-        return 'Payment Processing';
+        return 'Processing';
       case 'REFUNDED':
-        return 'Payment Refunded';
+        return 'Refunded';
       default:
-        return 'Verifying Status';
+        return 'Verifying';
     }
   };
 
@@ -279,124 +293,134 @@ useEffect(() => {
   const getStatusMessage = () => {
     switch (orderStatus) {
       case 'PAID':
-        return `Thank you! Your tickets for order #${orderId} are confirmed.`;
+        return `Your payment is confirmed. The tickets have been sent to your email. You can also view them in the order details in your profile.`;
       case 'FAILED':
-        return `Payment for order #${orderId} could not be processed. Your ticket reservation has been cancelled. Please try creating a new order.`;
+        return `Your payment wasn't processed. Please try again.`;
       case 'CANCELLED':
-        return `Order #${orderId} was cancelled.`;
+        return `This order has been cancelled`;
       case 'PENDING':
-        return `Your payment for order #${orderId} is still processing. This page will update automatically. If not, please check "My Orders" shortly.`;
+        return `Your payment is still processing. This page will update automatically.`;
       case 'REFUNDED':
-        return `Your payment for order #${orderId} has been refunded.`;
+        return `Your payment has been refunded`;
       default:
-        return `Checking the final status for order #${orderId}.`;
+        return `Checking payment status...`;
     }
   };
 
   return (
     <>
       <Head>
-        <title>Order Confirmation | uevent</title>
-        <meta name="description" content="Order confirmation details"/>
-      </Head>
+          <title className="text-black">
+            <span className="text-black">order payment | </span>
+            <span>{process.env.NEXT_PUBLIC_APP_NAME}</span>
+          </title>
+          <meta name="description" content={`Payment status for Order #${order_id}`} />
+        </Head>
 
-      <main className="min-h-screen dark:bg-gray-950 py-12">
+      <main className="min-h-screen bg-white py-12">
         <div className="container mx-auto max-w-2xl px-4">
           {/* Navigation */}
-          <Button
-            variant="ghost"
-            onClick={() => router.back()}
-            className="mb-8 flex items-center dark:text-gray-300"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2"/>
-            Return to Event
-          </Button>
-
-          <div className="text-center mb-10">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex justify-center items-center">
-              Order Confirmation
-              <CheckCircle className="h-12 w-12 px-2 bg-gray-200 rounded-full ml-2 mt-1"/>
-            </h1>
-            {orderId && (
-              <p className="mt-2 text-[18px] text-gray-600 dark:text-gray-400">
-                Order <span className="font-medium">#{orderId}</span>
-              </p>
-            )}
+          <div className="flex justify-between">
+            <div className="flex items-center">
+              <Button
+                variant="outline"
+                onClick={() => router.back()}
+                className="mb-8 flex items-center text-black hover:bg-black hover:text-white transition-colors duration-300"
+              >
+                <Undo2 strokeWidth={2.5} className="h-4 w-4 mr-2"/>
+                Go back
+              </Button>
+            </div>
+            <div className="flex items-center">
+              <Button
+                variant="outline"
+                onClick={() => router.push('/profile')}
+                className="mb-8 flex items-center text-black hover:bg-black hover:text-white transition-colors duration-300"
+              >
+                <Wallet strokeWidth={2.5} className="h-4 w-4 mr-2"/>
+                My Orders
+              </Button>
+            </div>
           </div>
+
+          {/* Order Details */}
+          <div className="text-center mb-12 space-y-5 border-b border-gray-200 pb-6">
+              <h1 className="text-4xl font-bold text-black flex justify-center items-center">
+                {`Order #${order_id}`}
+              </h1>
+              <h1 className="text-xl font-semibold text-black flex justify-center items-center">
+                {orderData ? `of ${format(new Date(orderData.createdAt), 'MMM d, yyyy HH:mm')} for $${orderData.totalAmount.toFixed(2)}` : ''}
+              </h1>
+              <p className="text-lg text-gray-600 flex justify-center items-center">
+                Payment status
+              </p>
+            </div>
 
           {/* Main Content */}
           {loading ? (
-            <Card className="border-none shadow-lg bg-gray-100 dark:bg-gray-800">
-              <CardContent className="pt-8 text-center">
-                <div className="flex justify-center mb-4">
-                  <Loader2 className="h-12 w-12 animate-spin"/>
-                </div>
-                <p className="mt-3 text-gray-600 dark:text-gray-400">Verifying payment status...</p>
-                {pollingAttemptsRef.current > 0 && (
-                  <p className="mt-1 text-xs text-gray-400">Attempt {pollingAttemptsRef.current}/{MAX_POLLING_ATTEMPTS}</p>
-                )}
-              </CardContent>
+            <Card className="border-none shadow-xl rounded-xl bg-gray-50">
+            <CardContent className="p-12 text-center flex flex-col items-center justify-center space-y-6">
+              <div className="flex justify-center items-center">
+                <Loader2 strokeWidth={2.5} className="h-5 w-5 text-black animate-spin" />
+                <h3 className="ml-2 text-xl font-semibold">
+                  Loading payment status...
+                </h3>
+              </div>
+              {pollingAttemptsRef.current > 0 && (
+                <p className="text-base">Attempt {pollingAttemptsRef.current}/{MAX_POLLING_ATTEMPTS}</p>
+              )}
+              <Button
+                variant="outline"
+                onClick={() => router.push('/')}
+                className="mt-4 flex items-center text-black hover:bg-black hover:text-white transition-colors duration-300"
+              >
+                <Wallet strokeWidth={2.5} className="h-4 w-4 mr-2" />
+                Go Home
+              </Button>
+            </CardContent>
             </Card>
           ) : error ? (
-            <Card className="border-none shadow-lg bg-gray-50 dark:bg-gray-800">
-              <CardContent className="py-8 text-center">
-                <div className="flex justify-center mb-4">
-                  <AlertCircle className="h-12 w-12 text-red-500"/>
+            <Card className="border-none shadow-xl rounded-xl bg-gray-50">
+              <CardContent className="p-12 text-center flex flex-col items-center justify-center space-y-6">
+                <div className="flex justify-center items-center">
+                  <CircleX strokeWidth={2.5} className="h-5 w-5 text-black" />
+                  <h3 className="ml-2 text-xl font-semibold">
+                    Failed to verify payment status
+                  </h3>
                 </div>
-                <Alert
-                  variant="destructive"
-                  className="bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800/50"
+                <p className="text-base">
+                  {error}
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={() => router.push('/')}
+                  className="mt-4 flex items-center text-black hover:bg-black hover:text-white transition-colors duration-300"
                 >
-                  <AlertTitle className="text-lg font-semibold text-red-700 dark:text-red-300">
-                    Verification Error
-                  </AlertTitle>
-                  <AlertDescription className="justify-center text-red-600 dark:text-red-400">
-                    {error}
-                  </AlertDescription>
-                </Alert>
-                <Button asChild className="mt-6">
-                  <Link href="/profile">View My Orders</Link>
+                  <Wallet strokeWidth={2.5} className="h-4 w-4 mr-2" />
+                  Go Home
                 </Button>
               </CardContent>
             </Card>
           ) : (
-            <Card className="border-none shadow-lg bg-gray-50 dark:bg-gray-800">
-              <CardHeader>
-                <CardTitle className="flex items-center text-xl">
+            <Card className="border-none shadow-xl rounded-xl bg-gray-50">
+              <CardContent className="p-12 text-center flex flex-col items-center justify-center space-y-6">
+                <div className="flex justify-center items-center">
                   {getStatusIcon()}
-                  <span className="ml-2">{getStatusHeading()}</span>
-                </CardTitle>
-                <CardDescription>{getStatusMessage()}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {orderStatus === 'PAID' && orderDetails && (
-                  <div className="border-t border-b border-gray-200 dark:border-gray-700 py-4 mb-6">
-                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                      Order Date: {formatDate(orderDetails.createdAt)}
-                    </div>
-                    {orderDetails.event && (
-                      <div className="text-sm text-gray-800 dark:text-gray-200 font-medium mb-1">
-                        Event: {orderDetails.event.title}
-                      </div>
-                    )}
-                    {orderDetails.totalAmount && (
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        Total: ${orderDetails.totalAmount.toFixed(2)}
-                      </div>
-                    )}
-                  </div>
-                )}
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button asChild>
-                    <Link href="/profile" className="flex items-center">
-                      <ShoppingBag className="h-4 w-4 mr-2"/>
-                      View My Orders
-                    </Link>
-                  </Button>
-                  <Button asChild variant="outline">
-                    <Link href="/">Browse Events</Link>
-                  </Button>
+                  <h3 className="ml-2 text-xl font-semibold">
+                    {getStatusHeading()}
+                  </h3>
                 </div>
+                <p className="text-base">
+                  {getStatusMessage()}
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={() => router.push('/')}
+                  className="mt-4 flex items-center text-black hover:bg-black hover:text-white transition-colors duration-300"
+                >
+                  <Wallet strokeWidth={2.5} className="h-4 w-4 mr-2" />
+                  Go Home
+                </Button>
               </CardContent>
             </Card>
           )}

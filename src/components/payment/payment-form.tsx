@@ -67,7 +67,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ orderId, clientSecret }) => {
       <form onSubmit={handleSubmit} className="space-y-6">
         <PaymentElement id="payment-element" options={paymentElementOptions} />
         {errorMessage && (
-            <Alert variant="destructive">
+            <Alert variant="default">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{errorMessage}</AlertDescription>
             </Alert>
@@ -75,7 +75,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ orderId, clientSecret }) => {
         <Button
             type="submit"
             disabled={isLoading || !stripe || !elements}
-            className="w-full"
+            className="w-full bg-black text-white hover:bg-black/90"
         >
           {isLoading ? (
               <div className="flex items-center">
