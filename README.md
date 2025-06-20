@@ -19,9 +19,6 @@
    </h3>
 </div>
 
-
-
-## 🛠 Technologies
 <p align="center">
 	<img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
 	<img src="https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black" alt="React" />
@@ -39,7 +36,7 @@
 
 
 
-## 🗓️ Overview
+# 🗓️ Overview
 <b>Univent</b> is a platform for creating, attending and managing events! 
 
 Organise events with interactive maps, buy tickets, use promo codes and receive notifications. 
@@ -62,7 +59,7 @@ Here is a [link](https://docs.google.com/presentation/d/1sdtH8O495crk_I2gUyWO1z9
 
 
 
-## 🧑‍💻 Team
+# 🧑‍💻 Team
 <div>
     <ul>
         <li>
