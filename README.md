@@ -8,19 +8,19 @@
    <img src="public/logo_black.png" width="200" />
    <h1 align="center">Univent</h1>
 
-	<p align="center">
-		<img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
-		<img src="https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black" alt="React" />
-	 	<img src="https://img.shields.io/badge/Next.js-000000?logo=next.js&logoColor=white" alt="Next.js" />
-		<img src="https://img.shields.io/badge/Shadcn-000000" alt="Shadcn" />
-		<img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
-		<img src="https://img.shields.io/badge/Stripe-008CDD?logo=stripe&logoColor=white" alt="Stripe" />
-		<img src="https://img.shields.io/badge/Google_Maps-4285F4?logo=google-maps&logoColor=white" alt="Google Maps" />
-		<img src="https://img.shields.io/badge/Axios-5A29E4?logo=axios&logoColor=white" alt="Axios" />
-	  	<img src="https://img.shields.io/badge/JWT-000000?logo=json-web-token&logoColor=white" alt="JSON Web Token" />
-		<img src="https://img.shields.io/badge/PostCSS-DD3A0A?logo=postcss&logoColor=white" alt="PostCSS" />
-		<img src="https://img.shields.io/badge/Zod-3E4B9E?logo=zod&logoColor=white" alt="Zod" />
-	</p>
+<p align="center">
+	<img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
+	<img src="https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black" alt="React" />
+	<img src="https://img.shields.io/badge/Next.js-000000?logo=next.js&logoColor=white" alt="Next.js" />
+	<img src="https://img.shields.io/badge/Shadcn-000000" alt="Shadcn" />
+	<img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
+	<img src="https://img.shields.io/badge/Stripe-008CDD?logo=stripe&logoColor=white" alt="Stripe" />
+	<img src="https://img.shields.io/badge/Google_Maps-4285F4?logo=google-maps&logoColor=white" alt="Google Maps" />
+	<img src="https://img.shields.io/badge/Axios-5A29E4?logo=axios&logoColor=white" alt="Axios" />
+	<img src="https://img.shields.io/badge/JWT-000000?logo=json-web-token&logoColor=white" alt="JSON Web Token" />
+	<img src="https://img.shields.io/badge/PostCSS-DD3A0A?logo=postcss&logoColor=white" alt="PostCSS" />
+	<img src="https://img.shields.io/badge/Zod-3E4B9E?logo=zod&logoColor=white" alt="Zod" />
+</p>
 
    <h3>
       <p align="center">
