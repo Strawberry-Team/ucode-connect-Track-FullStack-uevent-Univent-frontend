@@ -96,7 +96,7 @@ export default function Header() {
     };
 
     const handleAdminClick = () => {
-        window.open("http://localhost:3001/admin", "_blank");
+        window.open(process.env.NEXT_PUBLIC_ADMIN_PANEL_URL, "_blank");
     };
 
 

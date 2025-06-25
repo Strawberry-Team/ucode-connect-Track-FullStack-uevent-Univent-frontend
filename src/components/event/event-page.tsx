@@ -128,7 +128,7 @@ export default function EventPage({data}: EventPageProps) {
             <CommentsDisqus
                 id={event.id}
                 title={event.title}
-                url={`${process.env.NEXT_PUBLIC_SITE_URL}/products/${event.id}`}
+                url={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/products/${event.id}`}
             />
         </div>
     );

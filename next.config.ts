@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
     images: {
-        domains: ["localhost"],
+        domains: ["localhost", "univent-platform.koyeb.app"],
     },
     devIndicators: false,
 };
