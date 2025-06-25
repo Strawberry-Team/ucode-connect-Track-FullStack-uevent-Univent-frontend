@@ -3,14 +3,13 @@ import Cookies from "js-cookie";
 import { fetchCsrfToken } from "./csrf";
 import { refreshAccessToken } from "./auth";
 
-// // Define the environment
-// const isProduction = process.env.NODE_ENV === 'production';
+// Define the environment
+const isProduction = process.env.NODE_ENV === 'production';
 
-// // Configure the API URL based on the environment
-// const backendUrl = isProduction 
-//   ? '/api' // For production, use relative path
-//   : `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`; // For development
-const backendUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`;
+// Configure the API URL based on the environment
+const backendUrl = isProduction 
+  ? '/api' // For production, use relative path
+  : `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`; // For development
 
 const api: AxiosInstance = axios.create({
     baseURL: backendUrl,
