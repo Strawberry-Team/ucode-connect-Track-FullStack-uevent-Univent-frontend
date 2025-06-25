@@ -8,7 +8,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 // Configure the API URL based on the environment
 const backendUrl = isProduction 
-  ? '/api' // For production, use relative path
+  ? 'https://univent-platform.koyeb.app/api' // For production, use direct backend URL for server components
   : `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`; // For development
 
 const api: AxiosInstance = axios.create({
