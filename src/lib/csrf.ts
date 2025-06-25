@@ -2,6 +2,11 @@ import api from "./api";
 import { AxiosRequestConfig } from "axios";
 
 export async function fetchCsrfToken(): Promise<string> {
+    // Only fetch CSRF tokens in browser environment
+    if (typeof window === 'undefined') {
+        throw new Error("CSRF tokens are only required in browser environment");
+    }
+
     try {
         const response = await api.get("/auth/csrf-token", { withCredentials: true });
         let csrfToken = response.data.csrfToken || response.headers["x-csrf-token"];

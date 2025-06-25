@@ -5,6 +5,7 @@ import { refreshAccessToken } from "./auth";
 
 // Define the environment
 const isProduction = process.env.NODE_ENV === 'production';
+const isBrowser = typeof window !== 'undefined';
 
 // Configure the API URL based on the environment
 const backendUrl = isProduction 
@@ -13,7 +14,7 @@ const backendUrl = isProduction
 
 const api: AxiosInstance = axios.create({
     baseURL: backendUrl,
-    withCredentials: true,
+    withCredentials: isBrowser, // Only set withCredentials in browser
     headers: {
         "Content-Type": "application/json",
     },
@@ -21,22 +22,25 @@ const api: AxiosInstance = axios.create({
 
 api.interceptors.request.use(
     async (config) => {
-        const requiresCsrf = ["POST", "PATCH", "DELETE", "PUT"].includes(
-            config.method?.toUpperCase() || ""
-        );
-        if (requiresCsrf) {
-            let csrfToken = Cookies.get("X-CSRF-TOKEN");
-            if (!csrfToken) {
-                csrfToken = await fetchCsrfToken();
+        // Only handle CSRF tokens in browser environment
+        if (isBrowser) {
+            const requiresCsrf = ["POST", "PATCH", "DELETE", "PUT"].includes(
+                config.method?.toUpperCase() || ""
+            );
+            if (requiresCsrf) {
+                let csrfToken = Cookies.get("X-CSRF-TOKEN");
+                if (!csrfToken) {
+                    csrfToken = await fetchCsrfToken();
+                }
+                config.headers = config.headers || {};
+                config.headers["X-CSRF-TOKEN"] = csrfToken;
             }
-            config.headers = config.headers || {};
-            config.headers["X-CSRF-TOKEN"] = csrfToken;
-        }
 
-        const accessToken = Cookies.get("accessToken");
-        if (accessToken) {
-            config.headers = config.headers || {};
-            config.headers["Authorization"] = `Bearer ${accessToken}`;
+            const accessToken = Cookies.get("accessToken");
+            if (accessToken) {
+                config.headers = config.headers || {};
+                config.headers["Authorization"] = `Bearer ${accessToken}`;
+            }
         }
 
         return config;
@@ -47,6 +51,11 @@ api.interceptors.request.use(
 api.interceptors.response.use(
     (response) => response,
     async (error: AxiosError<{ message?: string | string[] }>) => {
+        // Only handle auth errors in browser environment
+        if (!isBrowser) {
+            return Promise.reject(error);
+        }
+
         const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
 
         // Обработка ошибки "Invalid CSRF token" (403)
