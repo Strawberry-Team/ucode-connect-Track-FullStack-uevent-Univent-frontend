@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { CalendarDays, MapPinned, Tag } from "lucide-react";
 import { Event, ProductCardProps } from "@/types/event";
 import { format } from "date-fns";
+import { BASE_EVENT_POSTER_URL } from "@/lib/constants";
 
 const EventCard = ({ event, className, hasMoved = false }: ProductCardProps) => {
     const router = useRouter();
@@ -35,7 +36,7 @@ const EventCard = ({ event, className, hasMoved = false }: ProductCardProps) => 
             <img
                 src={
                     event.posterName
-                        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/event-posters/${event.posterName}`
+                        ? `${BASE_EVENT_POSTER_URL}${event.posterName}`
                         : "https://via.placeholder.com/300x192"
                 }
                 alt={event.title}

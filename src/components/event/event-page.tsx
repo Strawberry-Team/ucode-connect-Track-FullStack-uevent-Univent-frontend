@@ -12,6 +12,7 @@ import GoogleMapIframe from "@/components/google-map/google-map-iframe";
 import {useAuth} from "@/context/auth-context";
 import {Event, EventPageProps} from "@/types/event";
 import TicketActions from "@/components/ticket/ticket-actions";
+import { BASE_EVENT_POSTER_URL } from "@/lib/constants";
 
 export default function EventPage({data}: EventPageProps) {
     const {isAuthenticated, user} = useAuth();
@@ -40,7 +41,7 @@ export default function EventPage({data}: EventPageProps) {
     const price = getPriceRange();
 
     const imageUrl = event.posterName
-        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/event-posters/${event.posterName}`
+        ? `${BASE_EVENT_POSTER_URL}${event.posterName}`
         : "https://via.placeholder.com/384x384";
 
     // Формируем строку тем для запроса, используя ID тем

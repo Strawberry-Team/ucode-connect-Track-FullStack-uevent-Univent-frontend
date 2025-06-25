@@ -13,6 +13,7 @@ import {useCompanyStore} from "@/store/company-store";
 import {companyService} from "@/service/company-service";
 import {showErrorToasts} from "@/lib/toast";
 import {Company} from "@/types/company";
+import { BASE_COMPANY_LOGO_URL } from "@/lib/constants";
 
 export default function CompanyCard() {
     const {user} = useAuth();
@@ -94,7 +95,7 @@ export default function CompanyCard() {
                                             <img
                                                 src={
                                                     company.logoName
-                                                        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/company-logos/${company.logoName}`
+                                                        ? `${BASE_COMPANY_LOGO_URL}${company.logoName}`
                                                         : "https://via.placeholder.com/200x200"
                                                 }
                                                 alt="Company logo"

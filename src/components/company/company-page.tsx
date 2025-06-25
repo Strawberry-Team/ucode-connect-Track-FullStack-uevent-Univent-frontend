@@ -7,6 +7,7 @@ import AttendeesAndNewsBlock from "@/components/attendees-and-news/attendees-and
 import SubscriptionActions from "@/components/subscription/subscription-actions";
 import { Company, CompanyNewsNotification, EventNotification } from "@/types/company";
 import CompanyEventsCarousel from "@/components/event/company-events-carousel";
+import { BASE_COMPANY_LOGO_URL } from "@/lib/constants";
 
 interface CompanyPageProps {
     data:
@@ -27,7 +28,7 @@ export default function CompanyPage({ data }: CompanyPageProps) {
     const { company, companyNewsNotifications} = data;
 
     const imageUrl = company.logoName
-        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/company-logos/${company.logoName}`
+        ? `${BASE_COMPANY_LOGO_URL}${company.logoName}`
         : "https://via.placeholder.com/384x384";
 
     return (

@@ -111,7 +111,7 @@ export default function Header() {
                     <Avatar className="h-10 w-10 rounded-lg shrink-0">
                         <AvatarImage src="/logo_black.png" alt="Логотип" />
                     </Avatar>
-                    <span className="text-[20px] font-medium">Univent</span>
+                    <span className="text-[20px] text-black font-medium">Univent</span>
                 </Link>
 
                 <div className="flex-1 flex justify-center max-w-2xl relative">
@@ -165,7 +165,7 @@ export default function Header() {
                     ) : (
                         <Button
                             variant="outline"
-                            className="h-10 px-6 text-[14px] rounded-full font-medium border-gray-300 hover:bg-accent hover:text-accent-foreground"
+                            className="h-10 px-6 text-[14px] text-black rounded-full font-medium border-gray-300 hover:bg-accent hover:text-accent-foreground"
                             onClick={() => setIsLoginModalOpen(true)}
                         >
                             Login

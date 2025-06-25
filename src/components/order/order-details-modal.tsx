@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
 import { getOrderItemTicket } from '@/lib/orders'; // Импортируем функцию для получения PDF
 import { showErrorToasts } from '@/lib/toast';
+import { BASE_EVENT_POSTER_URL } from "@/lib/constants";
 
 export default function OrderDetailsModal({ isOpen, onClose, order, isLoading }: OrderDetailsModalProps) {
     const router = useRouter();
@@ -172,7 +173,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order, isLoading }:
                                                 <img
                                                     src={
                                                         order.orderItems[0].ticket.event.posterName
-                                                            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/event-posters/${order.orderItems[0].ticket.event.posterName}`
+                                                            ? `${BASE_EVENT_POSTER_URL}${order.orderItems[0].ticket.event.posterName}`
                                                             : "https://via.placeholder.com/40"
                                                     }
                                                     alt={order.orderItems[0].ticket.event.title}

@@ -9,6 +9,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Event, EventsPopularCardCarouselProps } from "@/types/event";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
+import { BASE_EVENT_POSTER_URL } from "@/lib/constants";
 
 const EventsPopularCardCarousel = ({ events, isLoading }: EventsPopularCardCarouselProps) => {
     const [currentIndex, setCurrentIndex] = useState<number>(1);
@@ -177,7 +178,7 @@ const EventsPopularCardCarousel = ({ events, isLoading }: EventsPopularCardCarou
                                 <img
                                     src={
                                         popularEvents[popularEvents.length - 1].posterName
-                                            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/event-posters/${popularEvents[popularEvents.length - 1].posterName}`
+                                            ? `${BASE_EVENT_POSTER_URL}${popularEvents[popularEvents.length - 1].posterName}`
                                             : "https://via.placeholder.com/300x192"
                                     }
                                     alt={popularEvents[popularEvents.length - 1].title}
@@ -221,7 +222,7 @@ const EventsPopularCardCarousel = ({ events, isLoading }: EventsPopularCardCarou
                                 <img
                                     src={
                                         event.posterName
-                                            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/event-posters/${event.posterName}`
+                                            ? `${BASE_EVENT_POSTER_URL}${event.posterName}`
                                             : "https://via.placeholder.com/300x192"
                                     }
                                     alt={event.title}
@@ -263,7 +264,7 @@ const EventsPopularCardCarousel = ({ events, isLoading }: EventsPopularCardCarou
                                 <img
                                     src={
                                         popularEvents[0].posterName
-                                            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/event-posters/${popularEvents[0].posterName}`
+                                            ? `${BASE_EVENT_POSTER_URL}${popularEvents[0].posterName}`
                                             : "https://via.placeholder.com/300x192"
                                     }
                                     alt={popularEvents[0].title}

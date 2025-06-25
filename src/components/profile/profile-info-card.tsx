@@ -14,6 +14,7 @@ import {format} from "date-fns";
 import {Skeleton} from "@/components/ui/skeleton";
 import {ProfileCardProps} from "@/types/profile";
 import {Badge} from "@/components/ui/badge";
+import { BASE_USER_AVATAR_URL } from "@/lib/constants";
 
 export default function ProfileInfoCard({setEditMode, editMode}: ProfileCardProps) {
     const {user, setUser} = useAuth();
@@ -76,7 +77,7 @@ export default function ProfileInfoCard({setEditMode, editMode}: ProfileCardProp
 
     const imageUrl = previewUrl ||
         (user.profilePictureName
-            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/user-avatars/${user.profilePictureName}`
+            ? `${BASE_USER_AVATAR_URL}${user.profilePictureName}`
             : "https://via.placeholder.com/200x200");
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

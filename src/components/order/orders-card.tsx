@@ -14,6 +14,7 @@ import { showErrorToasts } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { Badge } from "../ui/badge";
+import { BASE_EVENT_POSTER_URL } from "@/lib/constants";
 
 export default function OrdersCard() {
     const { user } = useAuth();
@@ -145,7 +146,7 @@ export default function OrdersCard() {
                                             <div className="row-span-2 w-12 h-12 rounded-lg object-cover flex-shrink-0 mr-2">
                                             <img
                                                 src={order.orderItems[0].ticket.event.posterName
-                                                    ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/event-posters/${order.orderItems[0].ticket.event.posterName}`
+                                                    ? `${BASE_EVENT_POSTER_URL}${order.orderItems[0].ticket.event.posterName}`
                                                     : "https://via.placeholder.com/40"}
                                                 alt={order.orderItems[0].ticket.event.title}
                                                 className="row-span-2 w-12 h-12 rounded-lg object-cover flex-shrink-0"

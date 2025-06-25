@@ -13,8 +13,7 @@ import { showSuccessToast, showErrorToasts } from "@/lib/toast";
 import { format } from "date-fns";
 import { companyUpdateZodSchema } from "@/zod/shemas";
 import { Skeleton } from "@/components/ui/skeleton";
-
-
+import { BASE_COMPANY_LOGO_URL } from "@/lib/constants";
 
 export default function CompanyInfoCard({
                                             setEditMode,
@@ -62,7 +61,7 @@ export default function CompanyInfoCard({
     const imageUrl =
         previewUrl ||
         (company?.logoName
-            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/company-logos/${company.logoName}`
+            ? `${BASE_COMPANY_LOGO_URL}${company.logoName}`
             : "https://via.placeholder.com/200x200");
 
     const handleInputChange = (

@@ -16,6 +16,8 @@ import { markNotificationAsRead, markNotificationAsHidden } from "@/lib/notifica
 import { useAuth } from "@/context/auth-context";
 import { showSuccessToast, showErrorToasts } from "@/lib/toast";
 import Link from "next/link";
+import { BASE_COMPANY_LOGO_URL } from "@/lib/constants";
+import { BASE_EVENT_POSTER_URL } from "@/lib/constants";
 
 const formatDate = (dateString: string): string => {
     const date = parseISO(dateString);
@@ -118,7 +120,6 @@ export function NotificationList({ notifications: initialNotifications, onUpdate
 
     const hasUnreadNotifications = notifications.some(notification => !notification.readAt);
 
-    console.log(`${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/event-posters/${notifications[0].event?.logoName}`);
     return (
         <div className="flex flex-col gap-2">
             <div className="flex justify-between items-center px-1">
@@ -183,13 +184,13 @@ export function NotificationList({ notifications: initialNotifications, onUpdate
                             {/* Event poster or company logo */}
                             {notification.event?.logoName ? (
                                 <img
-                                    src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/event-posters/${notification.event.logoName}`}
+                                    src={`${BASE_EVENT_POSTER_URL}${notification.event.logoName}`}
                                     alt={notification.event.title}
                                     className="w-20 h-20 rounded-md object-cover"
                                 />
                             ) : notification.company?.logoName ? (
                                 <img
-                                    src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/company-logos/${notification.company.logoName}`}
+                                    src={`${BASE_COMPANY_LOGO_URL}${notification.company.logoName}`}
                                     alt={notification.company.title}
                                     className="w-20 h-20 rounded-md object-cover"
                                 />
