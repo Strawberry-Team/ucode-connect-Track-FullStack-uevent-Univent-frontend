@@ -31,22 +31,31 @@ api.interceptors.request.use(
     async (config) => {
         // Only handle CSRF tokens in browser environment
         if (isBrowser) {
+            console.log(`[API] Making ${config.method?.toUpperCase()} request to:`, (config.baseURL || '') + (config.url || ''));
+            
             const requiresCsrf = ["POST", "PATCH", "DELETE", "PUT"].includes(
                 config.method?.toUpperCase() || ""
             );
             if (requiresCsrf) {
+                console.log('[API] CSRF token required for this request');
                 let csrfToken = Cookies.get("X-CSRF-TOKEN");
+                console.log('[API] Existing CSRF token from cookies:', csrfToken ? 'found' : 'not found');
+                
                 if (!csrfToken) {
+                    console.log('[API] Fetching new CSRF token...');
                     csrfToken = await fetchCsrfToken();
+                    console.log('[API] New CSRF token fetched:', csrfToken ? 'success' : 'failed');
                 }
                 config.headers = config.headers || {};
                 config.headers["X-CSRF-TOKEN"] = csrfToken;
+                console.log('[API] CSRF token set in headers');
             }
 
             const accessToken = Cookies.get("accessToken");
             if (accessToken) {
                 config.headers = config.headers || {};
                 config.headers["Authorization"] = `Bearer ${accessToken}`;
+                console.log('[API] Authorization token set');
             }
         }
 
