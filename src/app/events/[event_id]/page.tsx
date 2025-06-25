@@ -1,6 +1,9 @@
 import { getEventById, getEventByIdNews, getEventTicketTypes } from "@/lib/events";
 import EventPage from "@/components/event/event-page";
 
+// Disable caching for this page
+export const revalidate = 0;
+
 interface NewsNotification {
     type: "news";
     title: string;
@@ -22,7 +25,7 @@ export default async function PageCard({ params }: PageCardProps) {
 
     const eventResponse = await getEventById(id);
     if (!eventResponse.success || !eventResponse.data) {
-        return <EventPage data={{ error: `Event not found: ${eventResponse.errors}` }} />;
+        return <EventPage data={{ error: `Event not found (ID: ${id}): ${Array.isArray(eventResponse.errors) ? eventResponse.errors.join(', ') : eventResponse.errors || 'Unknown error'}` }} />;
     }
 
     const ticketTypesResponse = await getEventTicketTypes(id);

@@ -45,7 +45,7 @@ A user-friendly profile for everyone - from organisers to guests.
 
 
 
-# 🗓 About "Univent" ticketing service
+# 🎫 About "Univent" ticketing service
 Univent is a dynamic ticketing platform crafted to streamline event management and ticket purchasing. Built with Next.js, React, and Tailwind CSS, Univent delivers a responsive, intuitive, and user-friendly interface for both event organizers and attendees.
 
 Service empowers users to create companies, organize events, and sell tickets across diverse venues, offering tools like interactive seating maps for precise ticket selection. Attendees can effortlessly explore events, purchase tickets, and track their bookings through a personalized profile page, where they can view their purchase history. With its sleek, minimalist design and robust functionality, Univent ensures a seamless experience for planning and attending events, making it an ideal solution for modern event management.

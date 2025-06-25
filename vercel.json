@@ -1,12 +1,3 @@
 {
-    "rewrites": [
-      {
-        "source": "/api/(.*)",
-        "destination": "https://univent-platform.koyeb.app/api/$1"
-      },
-      {
-        "source": "/uploads/(.*)",
-        "destination": "https://univent-platform.koyeb.app/uploads/$1"
-      }
-    ]
-  }
+    "__comment": "Rewrites moved to next.config.ts to avoid conflicts"
+}
