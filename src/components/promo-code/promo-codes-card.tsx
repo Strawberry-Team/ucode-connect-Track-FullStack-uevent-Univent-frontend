@@ -116,7 +116,7 @@ export default function PromoCodesCard({ eventId }: PromoCodesCardProps) {
                             ))}
                         </div>
                     ) : promoCodes.length > 0 ? (
-                        <div className="max-h-[160px] overflow-y-auto px-3 pt-3 custom-scroll">
+                        <div className="max-h-[160px] overflow-y-auto px-3 pt-3 pb-3 custom-scroll">
                             {promoCodes.map((promoCode, index) => (
                                 <div key={promoCode.id} className="flex flex-col">
                                     <div className="flex items-center justify-between rounded-lg px-2 transition-all duration-500 hover:shadow-[0_0_15px_rgba(0,0,0,0.15)]">

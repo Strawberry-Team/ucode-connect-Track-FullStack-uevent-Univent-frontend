@@ -26,6 +26,7 @@ import { useRouter } from 'next/navigation';
 import { getOrderItemTicket } from '@/lib/orders'; // Импортируем функцию для получения PDF
 import { showErrorToasts } from '@/lib/toast';
 import { BASE_EVENT_POSTER_URL } from "@/lib/constants";
+import { openBlobInNewTab } from '@/utils/ticket-pdf';
 
 export default function OrderDetailsModal({ isOpen, onClose, order, isLoading }: OrderDetailsModalProps) {
     const router = useRouter();
@@ -58,11 +59,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order, isLoading }:
         try {
             const response = await getOrderItemTicket(orderId, itemId);
             if (response.success && response.data) {
-                // Создаём Blob из ответа и открываем PDF в новой вкладке
-                const blob = new Blob([response.data], { type: 'application/pdf' });
-                const url = window.URL.createObjectURL(blob);
-                window.open(url, '_blank');
-                window.URL.revokeObjectURL(url); // Очищаем URL после использования
+                openBlobInNewTab(response.data);
             } else {
                 showErrorToasts(['Failed to load ticket PDF']);
             }

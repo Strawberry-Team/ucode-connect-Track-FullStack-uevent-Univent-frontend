@@ -1,5 +1,6 @@
 // Define the environment
 export const isProduction = process.env.NODE_ENV === 'production';
+export const isClientSideRendering = typeof window !== 'undefined';
 
 export const BASE_USER_AVATAR_URL = isProduction
     ? '/uploads/user-avatars/' // For production, use relative path

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { getOrderItemTicket } from '@/lib/orders';
 import { showErrorToasts } from '@/lib/toast';
+import { openBlobInNewTab } from '@/utils/ticket-pdf';
 
 export default function TicketPage() {
     const { id, itemId } = useParams();
@@ -13,10 +14,7 @@ export default function TicketPage() {
             try {
                 const response = await getOrderItemTicket(Number(id), Number(itemId));
                 if (response.success && response.data) {
-                    const blob = new Blob([response.data], { type: 'application/pdf' });
-                    const url = window.URL.createObjectURL(blob);
-                    window.open(url, '_blank');
-                    window.URL.revokeObjectURL(url);
+                    openBlobInNewTab(response.data);
                 } else {
                     showErrorToasts(['Failed to load ticket PDF']);
                 }

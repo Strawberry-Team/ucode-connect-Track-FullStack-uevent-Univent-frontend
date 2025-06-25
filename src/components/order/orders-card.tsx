@@ -54,8 +54,15 @@ export default function OrdersCard() {
     }, [user]);
 
     const handleOrderClick = async (orderId: number) => {
+        // Prevent multiple clicks on the same order
+        if (modalLoading || (selectedOrder && selectedOrder.id === orderId)) {
+            return;
+        }
+        
         setModalLoading(true);
         setIsModalOpen(true);
+        setSelectedOrder(null); // Clear previous order
+        
         try {
             const response = await getOrderById(orderId);
             if (response.success && response.data) {

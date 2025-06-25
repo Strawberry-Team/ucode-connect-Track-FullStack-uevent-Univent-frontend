@@ -228,7 +228,7 @@ export default function CompanyInfoCard({
                     </div>
                 </div>
 
-                <div className="py-2 space-y-4 overflow-y-auto h-[130px] custom-scroll">
+                <div className="py-0 space-y-4 overflow-y-auto h-[130px] custom-scroll">
                     {editMode ? (
                         <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-300">
                             <div>

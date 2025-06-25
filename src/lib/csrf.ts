@@ -1,9 +1,10 @@
 import axios from "axios";
 import { AxiosRequestConfig } from "axios";
+import { isClientSideRendering } from "./constants";
 
 export async function fetchCsrfToken(): Promise<string> {
     // Only fetch CSRF tokens in browser environment
-    if (typeof window === 'undefined') {
+    if (!isClientSideRendering) {
         throw new Error("CSRF tokens are only required in browser environment");
     }
 
