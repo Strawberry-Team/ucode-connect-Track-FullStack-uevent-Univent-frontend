@@ -1,4 +1,4 @@
-import api from "./api";
+import axios from "axios";
 import { AxiosRequestConfig } from "axios";
 
 export async function fetchCsrfToken(): Promise<string> {
@@ -8,7 +8,8 @@ export async function fetchCsrfToken(): Promise<string> {
     }
 
     try {
-        const response = await api.get("/auth/csrf-token", { withCredentials: true });
+        // Use relative URL for client-side requests (goes through rewrites)
+        const response = await axios.get("/api/auth/csrf-token", { withCredentials: true });
         let csrfToken = response.data.csrfToken || response.headers["x-csrf-token"];
 
         const setCookieHeader = response.headers["set-cookie"];

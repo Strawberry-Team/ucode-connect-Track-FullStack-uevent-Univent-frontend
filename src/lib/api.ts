@@ -7,13 +7,20 @@ import { refreshAccessToken } from "./auth";
 const isProduction = process.env.NODE_ENV === 'production';
 const isBrowser = typeof window !== 'undefined';
 
-// Configure the API URL based on the environment
-const backendUrl = isProduction 
-  ? 'https://univent-platform.koyeb.app/api' // For production, use direct backend URL for server components
-  : `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`; // For development
+// Configure different URLs for server and client
+const getApiUrl = () => {
+    if (isProduction) {
+        // In production, server components use direct backend URL
+        // Client components use relative URLs (which go through rewrites)
+        return isBrowser ? '/api' : 'https://univent-platform.koyeb.app/api';
+    } else {
+        // In development, both use the backend URL
+        return `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`;
+    }
+};
 
 const api: AxiosInstance = axios.create({
-    baseURL: backendUrl,
+    baseURL: getApiUrl(),
     withCredentials: isBrowser, // Only set withCredentials in browser
     headers: {
         "Content-Type": "application/json",
