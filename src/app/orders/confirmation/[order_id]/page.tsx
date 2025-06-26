@@ -18,7 +18,8 @@ import {
   CircleCheck,
   Clock2,
   Shield,
-  CreditCard
+  CreditCard,
+  HomeIcon
 } from 'lucide-react';
 import {getOrderById} from '@/lib/orders';
 import {Button} from '@/components/ui/button';
@@ -334,11 +335,11 @@ useEffect(() => {
             <div className="flex items-center">
               <Button
                 variant="outline"
-                onClick={() => router.push('/profile')}
+                onClick={() => router.push('/')}
                 className="mb-8 flex items-center text-black hover:bg-black hover:text-white transition-colors duration-300"
               >
-                <Wallet strokeWidth={2.5} className="h-4 w-4 mr-2"/>
-                My Orders
+                <HomeIcon strokeWidth={2.5} className="h-4 w-4 mr-2"/>
+                Go Home
               </Button>
             </div>
           </div>
@@ -370,13 +371,13 @@ useEffect(() => {
                 <p className="text-base">Attempt {pollingAttemptsRef.current}/{MAX_POLLING_ATTEMPTS}</p>
               )}
               <Button
-                variant="outline"
-                onClick={() => router.push('/')}
-                className="mt-4 flex items-center text-black hover:bg-black hover:text-white transition-colors duration-300"
-              >
-                <Wallet strokeWidth={2.5} className="h-4 w-4 mr-2" />
-                Go Home
-              </Button>
+                  variant="outline"
+                  onClick={() => router.push('/profile')}
+                  className="mt-4 flex items-center text-black hover:bg-black hover:text-white transition-colors duration-300"
+                >
+                  <Wallet strokeWidth={2.5} className="h-4 w-4 mr-2" />
+                  My Orders
+                </Button>
             </CardContent>
             </Card>
           ) : error ? (
@@ -393,11 +394,11 @@ useEffect(() => {
                 </p>
                 <Button
                   variant="outline"
-                  onClick={() => router.push('/')}
-                  className="mt-4 flex items-center text-black hover:bg-black hover:text-white transition-colors duration-300"
+                  onClick={() => router.push('/profile')}
+                  className="mb-8 flex items-center text-black hover:bg-black hover:text-white transition-colors duration-300"
                 >
                   <Wallet strokeWidth={2.5} className="h-4 w-4 mr-2" />
-                  Go Home
+                  My Orders
                 </Button>
               </CardContent>
             </Card>
@@ -415,11 +416,11 @@ useEffect(() => {
                 </p>
                 <Button
                   variant="outline"
-                  onClick={() => router.push('/')}
+                  onClick={() => router.push('/profile')}
                   className="mt-4 flex items-center text-black hover:bg-black hover:text-white transition-colors duration-300"
                 >
                   <Wallet strokeWidth={2.5} className="h-4 w-4 mr-2" />
-                  Go Home
+                  My Orders
                 </Button>
               </CardContent>
             </Card>
