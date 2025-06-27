@@ -38,6 +38,14 @@ yarn-error.log*
 next-env.d.ts
 
 .idea
-.env
-
 .cursor
+
+# dotenv environment variable files
+.env
+.env.development
+.env.test
+.env.production
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
