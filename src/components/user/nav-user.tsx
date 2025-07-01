@@ -16,13 +16,14 @@ import { useAuth } from "@/context/auth-context";
 import { NavUserProps, User } from "@/types/user";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
+import { BASE_USER_AVATAR_URL } from "@/lib/constants";
 
 export function NavUser({ user }: NavUserProps) {
     const { setAuthenticated, setUser } = useAuth();
     const router = useRouter();
 
     const imageUrl = user.profilePictureName
-        ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/user-avatars/${user.profilePictureName}`
+        ? `${BASE_USER_AVATAR_URL}${user.profilePictureName}`
         : "https://via.placeholder.com/40x40";
 
     const handleLogout = async () => {

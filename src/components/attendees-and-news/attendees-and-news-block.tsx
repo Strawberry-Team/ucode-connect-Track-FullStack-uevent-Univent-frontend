@@ -11,6 +11,7 @@ import { updateEventAttendeeVisibility, getEventAttendees } from "@/lib/events";
 import { useAuth } from "@/context/auth-context";
 import { showErrorToasts, showSuccessToast } from "@/lib/toast";
 import { NotificationsBlockProps, NotificationItemProps, Notification, UserNotification } from "@/types/attendees-and-news";
+import { BASE_USER_AVATAR_URL } from "@/lib/constants";
 
 function NotificationItem({ notification, isExpanded, isCollapsing, onVisibilityChange, currentUserId }: NotificationItemProps) {
     const descriptionRef = useRef<HTMLDivElement>(null);
@@ -133,7 +134,7 @@ export default function AttendeesAndNewsBlock({ notifications, eventId }: Notifi
                 if (attendeesResponse.success && attendeesResponse.data) {
                     const userNotifications: UserNotification[] = attendeesResponse.data.map((attendee) => {
                         const pictureUrl = attendee.user.profilePictureName
-                            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/user-avatars/${attendee.user.profilePictureName}`
+                            ? `${BASE_USER_AVATAR_URL}${attendee.user.profilePictureName}`
                             : "https://via.placeholder.com/150";
                         return {
                             type: "user" as const,

@@ -13,8 +13,7 @@ import { showSuccessToast, showErrorToasts } from "@/lib/toast";
 import { format } from "date-fns";
 import { companyUpdateZodSchema } from "@/zod/shemas";
 import { Skeleton } from "@/components/ui/skeleton";
-
-
+import { BASE_COMPANY_LOGO_URL } from "@/lib/constants";
 
 export default function CompanyInfoCard({
                                             setEditMode,
@@ -62,7 +61,7 @@ export default function CompanyInfoCard({
     const imageUrl =
         previewUrl ||
         (company?.logoName
-            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/company-logos/${company.logoName}`
+            ? `${BASE_COMPANY_LOGO_URL}${company.logoName}`
             : "https://via.placeholder.com/200x200");
 
     const handleInputChange = (
@@ -229,7 +228,7 @@ export default function CompanyInfoCard({
                     </div>
                 </div>
 
-                <div className="py-2 space-y-4 overflow-y-auto h-[130px] custom-scroll">
+                <div className="py-0 space-y-4 overflow-y-auto h-[130px] custom-scroll">
                     {editMode ? (
                         <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-300">
                             <div>

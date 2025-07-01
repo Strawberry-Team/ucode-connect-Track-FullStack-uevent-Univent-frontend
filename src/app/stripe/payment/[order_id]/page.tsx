@@ -7,7 +7,7 @@ import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js';
 import PaymentForm from '@/components/payment/payment-form';
 import { createPaymentIntent } from '@/lib/payments';
 import Head from 'next/head';
-import { CreditCard, Shield, AlertCircle, Loader2, Undo2, Wallet, CircleX } from 'lucide-react';
+import { CreditCard, Shield, AlertCircle, Loader2, Undo2, Wallet, CircleX, HomeIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {format} from "date-fns";
@@ -131,14 +131,14 @@ const PaymentPage: React.FC = () => {
                 </Button>
               </div>
               <div className="flex items-center">
-                <Button
-                  variant="outline"
-                  onClick={() => router.push('/profile')}
-                  className="mb-8 flex items-center text-black hover:bg-black hover:text-white transition-colors duration-300"
-                >
-                  <Wallet strokeWidth={2.5} className="h-4 w-4 mr-2" />
-                  My Orders
-                </Button>
+              <Button
+                variant="outline"
+                onClick={() => router.push('/')}
+                className="mb-8 flex items-center text-black hover:bg-black hover:text-white transition-colors duration-300"
+              >
+                <HomeIcon strokeWidth={2.5} className="h-4 w-4 mr-2"/>
+                Go Home
+              </Button>
               </div>
             </div>
 

@@ -12,6 +12,7 @@ import { showErrorToasts, showSuccessToast } from "@/lib/toast";
 import { Camera } from "lucide-react";
 import { companyCreateZodSchema, companyUpdateZodSchema } from "@/zod/shemas";
 import { Company, ManageCompanyModalProps } from "@/types/company";
+import { BASE_COMPANY_LOGO_URL } from "@/lib/constants";
 
 export default function CompanyManageModal({
                                                isOpen,
@@ -45,7 +46,7 @@ export default function CompanyManageModal({
             });
             setLogoPreview(
                 editingCompany.logoName
-                    ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/company-logos/${editingCompany.logoName}`
+                    ? `${BASE_COMPANY_LOGO_URL}${editingCompany.logoName}`
                     : null
             );
         } else {

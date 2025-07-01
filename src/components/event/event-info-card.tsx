@@ -45,6 +45,7 @@ import {eventCreateZodSchema, validateEventDates} from "@/zod/shemas";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {getCityAndCountryFromComponents} from "@/components/google-map/google-map-location-picker-modal";
 import {EventInfoCardProps} from "@/types/event";
+import { BASE_EVENT_POSTER_URL } from "@/lib/constants";
 
 const CalendarComponent = dynamic(() => import("@/components/ui/calendar-form").then(mod => mod.CalendarForm), {ssr: false});
 const LocationPickerModal = dynamic(() => import("../google-map/google-map-location-picker-modal"), {ssr: false});
@@ -847,7 +848,7 @@ export default function EventInfoCard({setEditMode, editMode, eventId}: EventInf
     const imageUrl = useMemo(() =>
             previewUrl ||
             (event?.posterName
-                ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/event-posters/${event.posterName}`
+                ? `${BASE_EVENT_POSTER_URL}${event.posterName}`
                 : "https://via.placeholder.com/400x600"),
         [previewUrl, event?.posterName]
     );

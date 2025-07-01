@@ -14,6 +14,7 @@ import { getCompanyEvents } from "@/lib/companies";
 import { showErrorToasts } from "@/lib/toast";
 import { Event, EventsCardProps } from "@/types/event";
 import EventCreateModal from "@/components/event/event-create-modal";
+import { BASE_EVENT_POSTER_URL } from "@/lib/constants";
 
 export default function EventsCard({ companyId }: EventsCardProps) {
     const [events, setEvents] = useState<Event[]>([]);
@@ -109,7 +110,7 @@ export default function EventsCard({ companyId }: EventsCardProps) {
                                                 <img
                                                     src={
                                                         event.posterName
-                                                            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/uploads/event-posters/${event.posterName}`
+                                                            ? `${BASE_EVENT_POSTER_URL}${event.posterName}`
                                                             : "https://via.placeholder.com/200x200"
                                                     }
                                                     alt="Event poster"
