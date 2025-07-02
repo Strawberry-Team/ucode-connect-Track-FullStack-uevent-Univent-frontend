@@ -35,6 +35,32 @@
 
 
 
+# Table of Contents
+- [Overview](#️-overview)
+- [Team](#-team)
+- [About "Univent" ticketing service](#-about-univent-ticketing-service)
+- [Features and Functionality](#-features-and-functionality)
+  - [Authentication & Authorization](#-authentication--authorization)
+  - [User Management & Profile](#-user-management--profile)
+  - [Company Management](#-company-management)
+  - [Event Management](#-event-management)
+  - [Advanced Ticketing System](#-advanced-ticketing-system)
+  - [Payment Processing & Orders](#-payment-processing--orders)
+  - [Promo Codes & Discounts](#-promo-codes--discounts)
+  - [Notification System](#-notification-system)
+  - [News & Content Management](#-news--content-management)
+  - [Subscription Management](#-subscription-management)
+  - [Advanced Search & Filtering](#-advanced-search--filtering)
+  - [Google Maps Integration](#-google-maps-integration)
+  - [Responsive Design & UI](#-responsive-design--ui)
+  - [Analytics & Attendee Management](#-analytics--attendee-management)
+  - [Security & Data Protection](#-security--data-protection)
+- [Use case diagram](#-use-case-diagram)
+- [Activity diagram](#-activity-diagram)
+- [Deployment Diagram](#-deployment-diagram)
+- [Get started](#-get-started)
+
+
 
 # 🗓️ Overview
 <b>Univent</b> is a platform for creating, attending and managing events! 
@@ -75,6 +101,7 @@ Here is a [link](https://docs.google.com/presentation/d/1sdtH8O495crk_I2gUyWO1z9
 ![Desktop View](https://github.com/user-attachments/assets/8a7ca803-97f9-4dc4-a509-0609296614ac)
 ![Tablet View](https://github.com/user-attachments/assets/cd5f8352-8896-4a96-8488-c747902ff0c7)
 ![Mobile and Tablet View](https://github.com/user-attachments/assets/cbd9ebe4-e325-4fed-9b36-4b0ec51e1ff6)
+
 
 
 # 🎯 Features and Functionality

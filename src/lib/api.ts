@@ -9,7 +9,7 @@ const getApiUrl = () => {
     if (isProduction) {
         // In production, server components use direct backend URL
         // Client components use relative URLs (which go through rewrites)
-        return isClientSideRendering ? '/api' : 'https://univent-platform.koyeb.app/api';
+        return isClientSideRendering ? '/api' : 'https://univent-platform.onrender.com/api';
     } else {
         // In development, both use the backend URL
         return `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`;
