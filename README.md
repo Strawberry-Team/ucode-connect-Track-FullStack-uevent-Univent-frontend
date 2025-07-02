@@ -52,10 +52,10 @@ Service empowers users to create companies, organize events, and sell tickets ac
 
 Here is a [link](https://docs.google.com/presentation/d/1sdtH8O495crk_I2gUyWO1z9XUWx4i6cH/edit?usp=sharing&ouid=109902939512595211399&rtpof=true&sd=true) to the presentation file.</p>
 
-![CleanShot 2025-06-20 at 19 42 38](https://github.com/user-attachments/assets/bbef933a-aff0-4612-a0fa-c3734263a027)
-![CleanShot 2025-06-20 at 19 36 33](https://github.com/user-attachments/assets/8a7ca803-97f9-4dc4-a509-0609296614ac)
-![CleanShot 2025-06-20 at 19 36 37](https://github.com/user-attachments/assets/cd5f8352-8896-4a96-8488-c747902ff0c7)
-![CleanShot 2025-06-20 at 19 36 42](https://github.com/user-attachments/assets/cbd9ebe4-e325-4fed-9b36-4b0ec51e1ff6)
+![Slide 1](https://github.com/user-attachments/assets/bbef933a-aff0-4612-a0fa-c3734263a027)
+![Slide 2](https://github.com/user-attachments/assets/8a7ca803-97f9-4dc4-a509-0609296614ac)
+![Slide 3](https://github.com/user-attachments/assets/cd5f8352-8896-4a96-8488-c747902ff0c7)
+![Slide 4](https://github.com/user-attachments/assets/cbd9ebe4-e325-4fed-9b36-4b0ec51e1ff6)
 
 
 
@@ -74,6 +74,7 @@ Here is a [link](https://docs.google.com/presentation/d/1sdtH8O495crk_I2gUyWO1z9
     </ul>
 </div>
 
+![team](https://github.com/user-attachments/assets/158d4db4-d304-43f0-a5dd-5b88461f26bb)
 
 
 # 🎯 Features and Functionality
