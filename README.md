@@ -50,7 +50,7 @@ Univent is a dynamic ticketing platform crafted to streamline event management a
 
 Service empowers users to create companies, organize events, and sell tickets across diverse venues, offering tools like interactive seating maps for precise ticket selection. Attendees can effortlessly explore events, purchase tickets, and track their bookings through a personalized profile page, where they can view their purchase history. With its sleek, minimalist design and robust functionality, Univent ensures a seamless experience for planning and attending events, making it an ideal solution for modern event management.
 
-Here is a [Slides](https://docs.google.com/presentation/d/1sdtH8O495crk_I2gUyWO1z9XUWx4i6cH/edit?usp=sharing&ouid=109902939512595211399&rtpof=true&sd=true) to the presentation file.</p>
+Here is a [link](https://docs.google.com/presentation/d/1sdtH8O495crk_I2gUyWO1z9XUWx4i6cH/edit?usp=sharing&ouid=109902939512595211399&rtpof=true&sd=true) to the presentation file.</p>
 
 ![Description](https://github.com/user-attachments/assets/bbef933a-aff0-4612-a0fa-c3734263a027)
 ![Desktop View](https://github.com/user-attachments/assets/8a7ca803-97f9-4dc4-a509-0609296614ac)
