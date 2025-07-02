@@ -45,20 +45,6 @@ A user-friendly profile for everyone - from organisers to guests.
 
 
 
-# 🎫 About "Univent" ticketing service
-Univent is a dynamic ticketing platform crafted to streamline event management and ticket purchasing. Built with Next.js, React, and Tailwind CSS, Univent delivers a responsive, intuitive, and user-friendly interface for both event organizers and attendees.
-
-Service empowers users to create companies, organize events, and sell tickets across diverse venues, offering tools like interactive seating maps for precise ticket selection. Attendees can effortlessly explore events, purchase tickets, and track their bookings through a personalized profile page, where they can view their purchase history. With its sleek, minimalist design and robust functionality, Univent ensures a seamless experience for planning and attending events, making it an ideal solution for modern event management.
-
-Here is a [link](https://docs.google.com/presentation/d/1sdtH8O495crk_I2gUyWO1z9XUWx4i6cH/edit?usp=sharing&ouid=109902939512595211399&rtpof=true&sd=true) to the presentation file.</p>
-
-![Description](https://github.com/user-attachments/assets/bbef933a-aff0-4612-a0fa-c3734263a027)
-![Desktop View](https://github.com/user-attachments/assets/8a7ca803-97f9-4dc4-a509-0609296614ac)
-![Tablet View](https://github.com/user-attachments/assets/cd5f8352-8896-4a96-8488-c747902ff0c7)
-![Mobile and Tablet View](https://github.com/user-attachments/assets/cbd9ebe4-e325-4fed-9b36-4b0ec51e1ff6)
-
-
-
 # 🧑‍💻 Team
 <div>
     <ul>
@@ -75,6 +61,20 @@ Here is a [link](https://docs.google.com/presentation/d/1sdtH8O495crk_I2gUyWO1z9
 </div>
 
 ![team](https://github.com/user-attachments/assets/158d4db4-d304-43f0-a5dd-5b88461f26bb)
+
+
+
+# 🎫 About "Univent" ticketing service
+Univent is a dynamic ticketing platform crafted to streamline event management and ticket purchasing. Built with Next.js, React, and Tailwind CSS, Univent delivers a responsive, intuitive, and user-friendly interface for both event organizers and attendees.
+
+Service empowers users to create companies, organize events, and sell tickets across diverse venues, offering tools like interactive seating maps for precise ticket selection. Attendees can effortlessly explore events, purchase tickets, and track their bookings through a personalized profile page, where they can view their purchase history. With its sleek, minimalist design and robust functionality, Univent ensures a seamless experience for planning and attending events, making it an ideal solution for modern event management.
+
+Here is a [link](https://docs.google.com/presentation/d/1sdtH8O495crk_I2gUyWO1z9XUWx4i6cH/edit?usp=sharing&ouid=109902939512595211399&rtpof=true&sd=true) to the presentation file.</p>
+
+![Description](https://github.com/user-attachments/assets/bbef933a-aff0-4612-a0fa-c3734263a027)
+![Desktop View](https://github.com/user-attachments/assets/8a7ca803-97f9-4dc4-a509-0609296614ac)
+![Tablet View](https://github.com/user-attachments/assets/cd5f8352-8896-4a96-8488-c747902ff0c7)
+![Mobile and Tablet View](https://github.com/user-attachments/assets/cbd9ebe4-e325-4fed-9b36-4b0ec51e1ff6)
 
 
 # 🎯 Features and Functionality
