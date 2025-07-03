@@ -1,11 +1,11 @@
 <div align="center">
    <p align="center">
       <a href="https://ucode.world/en/" target="_blank">
-         <img src="https://github.com/Strawberry-Team/ucode-connect-Track-FullStack-uevent-Univent-frontend/blob/main/public/ucode_it_academy_logo.svg" height="100px" alt="ucode_logo">
+         <img src="./public/ucode_it_academy_logo.svg" height="100px" alt="ucode_logo">
       </a>
    </p>
 
-   <img src="public/logo_black.png" width="200" />
+   <img src="./public/logo_black.png" width="200" />
    <h1 align="center">Univent</h1>
 
 <p align="center">
@@ -35,27 +35,46 @@
 
 
 
+# 📑 Table of Contents
+- [🗓️ About "Univent" Platform](#-about-univent-platform)
+- [🧑‍💻 Team](#-team)
+- [🎫 About "Univent" ticketing service](#-about-univent-ticketing-service)
+- [🎯 Features and Functionality](#-features-and-functionality)
+  - [🔐 Authentication & Authorization](#-authentication--authorization)
+  - [👥 User Management & Profile](#-user-management--profile)
+  - [🏢 Company Management](#-company-management)
+  - [🎪 Event Management](#-event-management)
+  - [🎫 Advanced Ticketing System](#-advanced-ticketing-system)
+  - [💳 Payment Processing & Orders](#-payment-processing--orders)
+  - [🎟️ Promo Codes & Discounts](#-promo-codes--discounts)
+  - [🔔 Notification System](#-notification-system)
+  - [📰 News & Content Management](#-news--content-management)
+  - [📬 Subscription Management](#-subscription-management)
+  - [🔍 Advanced Search & Filtering](#-advanced-search--filtering)
+  - [🗺️ Google Maps Integration](#-google-maps-integration)
+  - [📱 Responsive Design & UI](#-responsive-design--ui)
+  - [📊 Analytics & Attendee Management](#-analytics--attendee-management)
+  - [🔒 Security & Data Protection](#-security--data-protection)
+- [👤 Use case diagram](#-use-case-diagram)
+- [🧲 Activity diagram](#-activity-diagram)
+- [🚚 Deployment Diagram](#-deployment-diagram)
+- [🚀 Get started](#-get-started)
 
-# 🗓️ Overview
+
+
+# 🗓️ About "Univent" Platform
 <b>Univent</b> is a platform for creating, attending and managing events! 
 
 Organise events with interactive maps, buy tickets, use promo codes and receive notifications. 
 
 A user-friendly profile for everyone - from organisers to guests.
 
-
-
-# 🎫 About "Univent" ticketing service
-Univent is a dynamic ticketing platform crafted to streamline event management and ticket purchasing. Built with Next.js, React, and Tailwind CSS, Univent delivers a responsive, intuitive, and user-friendly interface for both event organizers and attendees.
-
-Service empowers users to create companies, organize events, and sell tickets across diverse venues, offering tools like interactive seating maps for precise ticket selection. Attendees can effortlessly explore events, purchase tickets, and track their bookings through a personalized profile page, where they can view their purchase history. With its sleek, minimalist design and robust functionality, Univent ensures a seamless experience for planning and attending events, making it an ideal solution for modern event management.
-
 Here is a [link](https://docs.google.com/presentation/d/1sdtH8O495crk_I2gUyWO1z9XUWx4i6cH/edit?usp=sharing&ouid=109902939512595211399&rtpof=true&sd=true) to the presentation file.</p>
 
-![CleanShot 2025-06-20 at 19 42 38](https://github.com/user-attachments/assets/bbef933a-aff0-4612-a0fa-c3734263a027)
-![CleanShot 2025-06-20 at 19 36 33](https://github.com/user-attachments/assets/8a7ca803-97f9-4dc4-a509-0609296614ac)
-![CleanShot 2025-06-20 at 19 36 37](https://github.com/user-attachments/assets/cd5f8352-8896-4a96-8488-c747902ff0c7)
-![CleanShot 2025-06-20 at 19 36 42](https://github.com/user-attachments/assets/cbd9ebe4-e325-4fed-9b36-4b0ec51e1ff6)
+![Description](https://github.com/user-attachments/assets/bbef933a-aff0-4612-a0fa-c3734263a027)
+![Desktop View](https://github.com/user-attachments/assets/8a7ca803-97f9-4dc4-a509-0609296614ac)
+![Tablet View](https://github.com/user-attachments/assets/cd5f8352-8896-4a96-8488-c747902ff0c7)
+![Mobile and Tablet View](https://github.com/user-attachments/assets/cbd9ebe4-e325-4fed-9b36-4b0ec51e1ff6)
 
 
 
@@ -73,6 +92,15 @@ Here is a [link](https://docs.google.com/presentation/d/1sdtH8O495crk_I2gUyWO1z9
         </li>
     </ul>
 </div>
+
+![team](https://github.com/user-attachments/assets/158d4db4-d304-43f0-a5dd-5b88461f26bb)
+
+
+
+# 🎫 About "Univent" Frontend
+Univent is a dynamic ticketing platform crafted to streamline event management and ticket purchasing. Built with Next.js, React, and Tailwind CSS, Univent delivers a responsive, intuitive, and user-friendly interface for both event organizers and attendees.
+
+Service empowers users to create companies, organize events, and sell tickets across diverse venues, offering tools like interactive seating maps for precise ticket selection. Attendees can effortlessly explore events, purchase tickets, and track their bookings through a personalized profile page, where they can view their purchase history. With its sleek, minimalist design and robust functionality, Univent ensures a seamless experience for planning and attending events, making it an ideal solution for modern event management.
 
 
 
@@ -211,24 +239,29 @@ Here is a [link](https://docs.google.com/presentation/d/1sdtH8O495crk_I2gUyWO1z9
 
 
 # 🚀 Get started
-1. Run the [univent-backend](https://github.com/Strawberry-Team/calendula-backend) project.
-2. Go to the project folder.
+1. Run the ["Univent" Backend](https://github.com/Strawberry-Team/ucode-connect-Track-FullStack-uevent-Univent-backend) project.
+2. Clone this repository and move to the project directory:
+   ```bash
+   git clone <repository-url> univent-frontend
+   cd univent-frontend
+   ```
+3. Install the dependencies:
+   ```sh
+   npm install
+   ```
 3. Configure the environment file:
-   - Locate the .env.example file in the root of the project. 
-   - Rename .env.example to .env. 
-   - Open .env and add your Google API key in the appropriate field.
-4. Install the dependencies:
-```sh
-  npm install
-```
+   - Locate the `.env.development.example` file in the root of the project. 
+   - Rename `.env.development.example` to `.env.development`. 
+   - Open `.env.development` and add your Google API key in the appropriate field.
 5. Run commands:
-```sh
-  npm run build
-```
-```sh
-  npm run start
-```
+   ```sh
+   npm run build
+   ```
+   ```sh
+   npm run start:dev
+   ```
+6. Application will be launched on [http://localhost:3000/](http://localhost:3000/).
 
-
+---
 
 © Inessa Repeshko. 2025
